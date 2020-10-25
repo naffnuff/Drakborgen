@@ -13,6 +13,48 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\dorrkort">
+      <UniqueIdentifier>{7fd22130-2968-48c2-8928-bda085fc3484}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\draken">
+      <UniqueIdentifier>{83a20b95-e35d-4763-ae4c-bf504f34d3c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\hjaltekort">
+      <UniqueIdentifier>{c612afec-d6c3-4669-9c4a-a93f14bd4d11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\kistkort">
+      <UniqueIdentifier>{c69918b5-7bcc-4adf-93f6-64352cdee3bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\magiskating">
+      <UniqueIdentifier>{4740479e-3fe9-4521-80ce-fd4b24b21389}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\monster">
+      <UniqueIdentifier>{2f982b40-a011-4ea2-93e4-f2e665d17ce1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\regelkort">
+      <UniqueIdentifier>{5f3747c1-3973-461e-bd6e-7ccebd23899f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\rumsbrickor">
+      <UniqueIdentifier>{f305380d-8569-4f2b-9e0a-a3afc3900b58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\rumsfallor">
+      <UniqueIdentifier>{42ff1200-30c8-4ad6-89a7-134e338c4e9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\rumskort">
+      <UniqueIdentifier>{e561acf5-7c7e-4b0c-aac4-9313174a7ea2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\rumsletning">
+      <UniqueIdentifier>{3830b65f-267b-4c36-b2b2-c09d3dc5cea2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\skattkammaren">
+      <UniqueIdentifier>{8078cd8d-2076-420e-8549-ae30105cd85f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\sokningskort">
+      <UniqueIdentifier>{00c2d1a9-a6b6-4c4a-80ad-7af90807d981}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\stridskort">
+      <UniqueIdentifier>{53d5baa7-1b45-4d93-863a-1c9d277382f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -50,5 +92,1225 @@
     <ClInclude Include="Tile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Media\hjaltar.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Media\hjaltar2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Media\spelplan.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0000.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0001.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0002.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0003.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0004.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0005.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0006.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0007.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0008.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0009.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0010.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0011.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0012.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0013.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkort0014.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\dorrkort\dorrkortback.png">
+      <Filter>Resource Files\dorrkort</Filter>
+    </Image>
+    <Image Include="Media\draken\draken0000.png">
+      <Filter>Resource Files\draken</Filter>
+    </Image>
+    <Image Include="Media\draken\draken0001.png">
+      <Filter>Resource Files\draken</Filter>
+    </Image>
+    <Image Include="Media\draken\draken0002.png">
+      <Filter>Resource Files\draken</Filter>
+    </Image>
+    <Image Include="Media\draken\draken0003.png">
+      <Filter>Resource Files\draken</Filter>
+    </Image>
+    <Image Include="Media\draken\draken0004.png">
+      <Filter>Resource Files\draken</Filter>
+    </Image>
+    <Image Include="Media\draken\draken0005.png">
+      <Filter>Resource Files\draken</Filter>
+    </Image>
+    <Image Include="Media\draken\draken0006.png">
+      <Filter>Resource Files\draken</Filter>
+    </Image>
+    <Image Include="Media\draken\draken0007.png">
+      <Filter>Resource Files\draken</Filter>
+    </Image>
+    <Image Include="Media\draken\drakenback.png">
+      <Filter>Resource Files\draken</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\aelfric.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\aelfricdeath.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\aelfricstridskort0000.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\aelfricstridskort0001.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\aelfricstridskort0002.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\aelfricstridskortback.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\bardhor.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\bardhorbow.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\bardhorbowback.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\bardhordeath.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\bardhorstridskort0000.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\bardhorstridskort0001.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\bardhorstridskort0002.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\bardhorstridskortback.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\rohan.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\rohandeath.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\rohanstridskort0000.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\rohanstridskort0001.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\rohanstridskort0002.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\rohanstridskortback.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\sigeir.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\sigeirdeath.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\sigeirstridskort0000.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\sigeirstridskort0001.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\sigeirstridskort0002.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\hjaltekort\sigeirstridskortback.png">
+      <Filter>Resource Files\hjaltekort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0000.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0001.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0002.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0003.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0004.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0005.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0006.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0007.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0008.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0009.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0010.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0011.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0012.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0013.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkort0014.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\kistkort\kistkortback.png">
+      <Filter>Resource Files\kistkort</Filter>
+    </Image>
+    <Image Include="Media\magiskating\magiskdryck.png">
+      <Filter>Resource Files\magiskating</Filter>
+    </Image>
+    <Image Include="Media\magiskating\magiskdryckback.png">
+      <Filter>Resource Files\magiskating</Filter>
+    </Image>
+    <Image Include="Media\magiskating\magiskring0000.png">
+      <Filter>Resource Files\magiskating</Filter>
+    </Image>
+    <Image Include="Media\magiskating\magiskring0001.png">
+      <Filter>Resource Files\magiskating</Filter>
+    </Image>
+    <Image Include="Media\magiskating\magiskring0002.png">
+      <Filter>Resource Files\magiskating</Filter>
+    </Image>
+    <Image Include="Media\magiskating\magiskring0003.png">
+      <Filter>Resource Files\magiskating</Filter>
+    </Image>
+    <Image Include="Media\magiskating\magiskringback.png">
+      <Filter>Resource Files\magiskating</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0000.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0001.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0002.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0003.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0004.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0005.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0006.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0007.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0008.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0009.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0010.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0011.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0012.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0013.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monster0014.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\monster\monsterback.png">
+      <Filter>Resource Files\monster</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0000.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0001.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0002.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0003.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0004.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0005.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0006.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0007.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0008.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0009.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0010.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0011.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0012.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0013.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0014.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\regelkort\regelkort0015.png">
+      <Filter>Resource Files\regelkort</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0000.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0001.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0002.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0003.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0004.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0005.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0006.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0007.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0008.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0009.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0010.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0011.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0012.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0013.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0014.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0015.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0016.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0017.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0018.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0019.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0020.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0021.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0022.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0023.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0024.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0025.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0026.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0027.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0028.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0029.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0030.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0031.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0032.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0033.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0034.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0035.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0036.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0037.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0038.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0039.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0040.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0041.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0042.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0043.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0044.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0045.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0046.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0047.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0048.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0049.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0050.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0051.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0052.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0053.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0054.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0055.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0056.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0057.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0058.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0059.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0060.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0061.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0062.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0063.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0064.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0065.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0066.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0067.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0068.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0069.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0070.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0071.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0072.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0073.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0074.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0075.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0076.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0077.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0078.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0079.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0080.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0081.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0082.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0083.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0084.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0085.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0086.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0087.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0088.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0089.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0090.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0091.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0092.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0093.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0094.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0095.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0096.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0097.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0098.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0099.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0100.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0101.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0102.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0103.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0104.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0105.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0106.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0107.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0108.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0109.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0110.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0111.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0112.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0113.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsbrickor\rumsbricka0114.png">
+      <Filter>Resource Files\rumsbrickor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0000.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0001.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0002.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0003.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0004.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0005.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0006.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0007.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0008.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0009.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0010.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0011.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0012.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0013.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallor0014.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumsfallor\rumsfallorback.png">
+      <Filter>Resource Files\rumsfallor</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0000.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0001.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0002.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0003.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0004.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0005.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0006.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0007.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0008.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0009.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0010.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0011.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0012.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0013.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0014.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0015.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0016.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0017.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0018.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0019.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0020.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0021.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0022.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0023.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0024.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0025.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0026.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0027.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0028.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0029.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0030.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0031.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0032.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0033.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0034.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0035.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0036.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0037.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0038.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0039.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0040.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0041.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0042.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0043.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0044.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0045.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0046.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0047.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0048.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0049.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0050.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0051.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0052.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0053.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0054.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0055.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0056.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0057.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0058.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0059.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0060.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0061.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0062.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0063.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0064.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0065.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0066.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0067.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0068.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0069.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0070.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0071.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0072.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0073.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0074.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0075.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0076.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0077.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0078.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0079.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0080.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0081.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0082.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskort0083.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumskort\rumskortback.png">
+      <Filter>Resource Files\rumskort</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0000.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0001.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0002.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0003.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0004.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0005.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0006.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0007.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0008.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0009.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0010.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0011.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0012.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0013.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletning0014.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\rumsletning\rumsletningback.png">
+      <Filter>Resource Files\rumsletning</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0000.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0001.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0002.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0003.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0004.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0005.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0006.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0007.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0008.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0009.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0010.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0011.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0012.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0013.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0014.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0015.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0016.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0017.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0018.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0019.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0020.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0021.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0022.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0023.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0024.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0025.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0026.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0027.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0028.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0029.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0030.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammaren0031.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren\skattkammarenback.png">
+      <Filter>Resource Files\skattkammaren</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0000.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0001.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0002.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0003.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0004.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0005.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0006.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0007.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0008.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0009.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0010.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0011.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0012.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0013.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskort0014.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\sokningskort\sokningskortback.png">
+      <Filter>Resource Files\sokningskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortbergstroll0000.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortbergstroll0001.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortbergstroll0002.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortbergstrollback.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortorch0000.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortorch0001.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortorch0002.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortorchback.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortskelett0000.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortskelett0001.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortskelett0002.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortskelettback.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortsvartalv0000.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortsvartalv0001.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortsvartalv0002.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\stridskort\stridskortsvartalvback.png">
+      <Filter>Resource Files\stridskort</Filter>
+    </Image>
   </ItemGroup>
 </Project>
