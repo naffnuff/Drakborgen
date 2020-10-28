@@ -5,10 +5,14 @@
 class Setup
 {
 public:
+	Setup() = delete;
+	Setup(Setup&) = delete;
+	void operator=(Setup&) = delete;
+
 	static void setUpGame(Game& game);
 
 private:
-	static void createTiles(Deck<Tile>& tiles);
-	static void createTile(Deck<Tile>& tiles, const std::string& number);
+	static void createTiles(TileDeck& tiles);
+	static void createTile(TileDeck& tiles, const std::string& number);
 };
 

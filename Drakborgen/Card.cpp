@@ -1,27 +1,38 @@
 #include "Card.h"
 
 Card::Card(const std::string& imagePath)
+	: sprite(imagePath)
 {
-	if (!texture.loadFromFile(imagePath))
-	{
-		throw std::runtime_error("No card image found: " + imagePath);
-	}
-	sprite.setTexture(texture);
+}
+
+Card::Card(Card&& other) noexcept
+{
+	*this = std::move(other);
+}
+
+void Card::operator=(Card&& other) noexcept
+{
+	sprite = std::move(other.sprite);
 }
 
 void Card::centerAround(sf::Vector2f position)
 {
-	sf::Vector2u dimensions = texture.getSize();
-	sprite.setPosition(position.x - float(dimensions.x) / 2.0f, position.y - float(dimensions.y) / 2.0f);
+	sf::FloatRect bounds = getBounds();
+	sprite.get().setPosition(position.x - float(bounds.width) / 2.0f, position.y - float(bounds.height) / 2.0f);
 }
 
 sf::FloatRect Card::getBounds()
 {
-	return sprite.getGlobalBounds();
+	return sprite.get().getGlobalBounds();
+}
+
+void Card::setScale( float factorX, float factorY )
+{
+	sprite.get().setScale(factorX, factorY);
 }
 
 void Card::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	states.transform *= getTransform();
-	target.draw(sprite, states);
+	target.draw(sprite.get(), states);
 }

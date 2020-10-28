@@ -33,9 +33,9 @@ std::unique_ptr<Card> CardDisplay::pullCard(int index)
 
 void CardDisplay::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+	states.transform *= getTransform();
 	for (const std::unique_ptr<Card>& card : cards)
 	{
-		states.transform *= getTransform();
 		target.draw(*card, states);
 	}
 }
@@ -46,5 +46,13 @@ void CardDisplay::placeCards()
 	if (cards.size() == 1)
 	{
 		cards.front().get()->centerAround({ windowSize.x / 2.0f, windowSize.y / 2.0f });
+	}
+	if (cards.size() == 4)
+	{
+		std::vector<std::pair<float, float>> quarters = { { 1.0f, 1.0f }, { 3.0f, 1.0f }, { 1.0f, 3.0f }, { 3.0f, 3.0f } };
+		for(int i = 0; i < quarters.size(); ++i)
+		{
+			cards[i].get()->centerAround({ windowSize.x * quarters[i].first / 4.0f, windowSize.y * quarters[i].second / 4.0f });
+		}
 	}
 }

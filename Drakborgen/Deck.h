@@ -5,10 +5,18 @@
 
 #include "Random.h"
 
-template<typename T>
+template<typename T, int Capacity>
 class Deck
 {
 public:
+	Deck()
+	{
+		items.reserve(Capacity);
+	}
+	
+	Deck(Card&) = delete;
+	void operator=(Deck&) = delete;
+
 	void shuffle()
 	{
 		random.shuffle(items);
@@ -18,11 +26,20 @@ public:
 	void createItem(Args... args)
 	{
 		items.push_back(std::make_unique<T>(args...));
+		if (items.size() > Capacity)
+		{
+			throw std::runtime_error("Deck size exceeds capacity");
+		}
 	}
 
 	bool isEmpty() const
 	{
 		return items.size() == 0;
+	}
+
+	bool isFull() const
+	{
+		return items.size() == Capacity;
 	}
 
 	std::unique_ptr<T> pullNextItem()

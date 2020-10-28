@@ -16,6 +16,8 @@ Board::Board()
 	boardSprite.setTexture(boardTexture);
 	vaultSprite.setTexture(vaultTexture);
 	vaultSprite.setPosition(getSitePosition({ 4, 6 }));
+	vaultSprite.move(0.0f, 5.0f);
+	//players.reserve(4);
 
 	tileGrid[0][0] = std::make_unique<Tile>();
 	tileGrid[0][columnCount - 1] = std::make_unique<Tile>();
@@ -95,14 +97,13 @@ void Board::clearClickSites()
 
 void Board::addPlayer(const std::string& imagePath, int index)
 {
-	if (players.size() <= index)
+	if (players.size() != index)
 	{
-		players.resize(size_t(index + 1));
+		throw std::runtime_error("Board: player index mismatch");
 	}
-	Player& player = players[index];
-	player.texture.loadFromFile(imagePath);
-	player.sprite.setTexture(players[index].texture);
-	player.sprite.setScale(1.0f / 3.0f, 1.0f / 3.0f);
+	players.push_back({ Card(imagePath), invalidSite });
+	Player& player = players.back();
+	player.avatar.setScale(1.0f / 3.0f, 1.0f / 3.0f);
 }
 
 void Board::setPlayerSite(int index, Site site)
@@ -140,7 +141,7 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 	for (const Player& player : players)
 	{
-		target.draw(player.sprite, states);
+		target.draw(player.avatar, states);
 	}
 }
 
@@ -158,8 +159,5 @@ void Board::placePlayer(int index)
 {
 	Player& player = players[index];
 	sf::Vector2f sitePosition = getSitePosition(player.site);
-	sf::FloatRect bounds = player.sprite.getGlobalBounds();
-	float playerPositionX = sitePosition.x + tileSize / 2.0f - bounds.width / 2.0f;
-	float playerPositionY = sitePosition.y + tileSize / 2.0f - bounds.height / 2.0f;
-	player.sprite.setPosition(playerPositionX, playerPositionY);
+	player.avatar.centerAround({ sitePosition.x + tileSize / 2.0f, sitePosition.y + tileSize / 2.0f });
 }

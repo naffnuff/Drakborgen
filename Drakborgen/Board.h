@@ -3,9 +3,10 @@
 #include <memory>
 #include <array>
 
-#include <SFML/Graphics.hpp>
+#include "UniqueSprite.h"
 
 #include "Tile.h"
+#include "Card.h"
 
 class Board : public sf::Drawable, public sf::Transformable
 {
@@ -20,11 +21,12 @@ public:
 		int column = 0;
 	};
 
+	static constexpr Site invalidSite = { -1, -1 };
+
 private:
 	struct Player
 	{
-		sf::Texture texture;
-		sf::Sprite sprite;
+		Card avatar;
 		Site site;
 	};
 
@@ -33,6 +35,9 @@ public:
 	static constexpr int columnCount = 13;
 
 	Board();
+
+	Board(Board&) = delete;
+	void operator=(Board&) = delete;
 
 	void update(float elapsedTime, float timeDelta);
 	bool hasTile(Site site) const;

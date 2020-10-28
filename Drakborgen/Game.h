@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include "UniqueSprite.h"
 
 #include "Hero.h"
 #include "Card.h"
@@ -8,6 +8,8 @@
 #include "Board.h"
 #include "Deck.h"
 #include "Tile.h"
+
+using TileDeck = Deck<Tile, 115>;
 
 class Game
 {
@@ -27,14 +29,18 @@ private:
 
 public:
 	Game();
+	
+	Game(Game&) = delete;
+	void operator=(Game&) = delete;
+
 	void run();
-	Deck<Tile>& getTiles() { return tiles; }
+	TileDeck& getTiles() { return tiles; }
 
 private:
 	sf::RenderWindow window;
 	Board board;
 	CardDisplay cardDisplay;
-	Deck<Tile> tiles;
+	TileDeck tiles;
 	State state = State::PickHero;
 
 	int playerCount = 4;

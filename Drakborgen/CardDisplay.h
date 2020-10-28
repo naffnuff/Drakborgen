@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include <SFML/Graphics.hpp>
+#include "UniqueSprite.h"
 
 #include "Card.h"
 
@@ -10,6 +10,9 @@ class CardDisplay : public sf::Drawable, public sf::Transformable
 {
 public:
 	CardDisplay(sf::Window& window);
+	
+	CardDisplay(CardDisplay&) = delete;
+	void operator=(CardDisplay&) = delete;
 	
 	bool empty() const { return cards.empty(); }
 

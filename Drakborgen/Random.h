@@ -6,6 +6,9 @@ class Random
 {
 public:
 	Random();
+	
+	Random(Random&) = delete;
+	void operator=(Random&) = delete;
 
 	template<typename Container>
 	void shuffle(Container& container);

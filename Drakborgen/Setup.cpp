@@ -2,11 +2,11 @@
 
 void Setup::setUpGame(Game& game)
 {
-	Deck<Tile>& tiles = game.getTiles();
+	TileDeck& tiles = game.getTiles();
 	createTiles(tiles);
 }
 
-void Setup::createTiles( Deck<Tile>& tiles )
+void Setup::createTiles(TileDeck& tiles)
 {
 	createTile(tiles, "000");
 	createTile(tiles, "001");
@@ -123,9 +123,13 @@ void Setup::createTiles( Deck<Tile>& tiles )
 	createTile(tiles, "112");
 	createTile(tiles, "113");
 	createTile(tiles, "114");
+	if (!tiles.isFull())
+	{
+		throw std::runtime_error("Tile dock is not full");
+	}
 }
 
-void Setup::createTile(Deck<Tile>& tiles, const std::string& number)
+void Setup::createTile(TileDeck& tiles, const std::string& number)
 {
 	tiles.createItem("Media/rumsbrickor/rumsbricka0" + number + ".png");
 }

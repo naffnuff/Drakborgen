@@ -30,7 +30,13 @@ void Game::run()
 			}
 		}
 	}
-	heroes.push_back(Hero("rohan", "Riddar Rohan", "Media/hjaltekort/rohan.png"));
+
+	//heroes.reserve(4);
+	heroes.push_back(Hero("rohan", "Riddar Rohan"));
+	heroes.push_back(Hero("sigeir", "Sigeir Skarpyxe"));
+	heroes.push_back(Hero("aelfric", "Aelfric Brunkåpa"));
+	heroes.push_back(Hero("bardhor", "Bardhor Bågman"));
+
 	for (Hero& hero : heroes)
 	{
 		cardDisplay.pushCard(hero.pullStatsCard());
@@ -70,7 +76,7 @@ void Game::run()
 								players.emplace_back();
 								players.back().heroIndex = heroIndex;
 								heroes[heroIndex].placeStatsCard(cardDisplay.pullCard(heroIndex));
-								board.setClickSites({ { 0, 1 }, { 1, 0 }, { board.rowCount - 1, 0 }, { board.rowCount - 1, board.columnCount - 1 } });
+								board.setClickSites({ { 0, 0 }, { 0, board.columnCount - 1 }, { board.rowCount - 1, 0 }, { board.rowCount - 1, board.columnCount - 1 } });
 								state = State::PickStartTower;
 							}
 						}
