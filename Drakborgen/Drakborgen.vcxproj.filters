@@ -66,13 +66,22 @@
     <ClCompile Include="Board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Deck.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Tile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CardDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Card.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hero.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Random.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -90,6 +99,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Tile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CardDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Card.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hero.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1311,6 +1332,9 @@
     </Image>
     <Image Include="Media\stridskort\stridskortsvartalvback.png">
       <Filter>Resource Files\stridskort</Filter>
+    </Image>
+    <Image Include="Media\skattkammaren.png">
+      <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
 </Project>

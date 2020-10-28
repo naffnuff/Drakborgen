@@ -2,11 +2,13 @@
 
 #include <SFML/Graphics.hpp>
 
-class Tile : public sf::Drawable, public sf::Transformable
+class Card : public sf::Drawable, public sf::Transformable
 {
 public:
-	Tile();
-	Tile(const std::string& imagePath);
+	Card(const std::string& imagePath);
+
+	void centerAround(sf::Vector2f position);
+	sf::FloatRect getBounds();
 
 private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;

@@ -154,16 +154,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
-    <ClCompile Include="Deck.cpp" />
+    <ClCompile Include="Card.cpp" />
+    <ClCompile Include="CardDisplay.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Hero.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Random.cpp" />
     <ClCompile Include="Setup.cpp" />
     <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
+    <ClInclude Include="Card.h" />
+    <ClInclude Include="CardDisplay.h" />
     <ClInclude Include="Deck.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Hero.h" />
+    <ClInclude Include="Random.h" />
     <ClInclude Include="Setup.h" />
     <ClInclude Include="Tile.h" />
   </ItemGroup>
@@ -508,6 +515,7 @@
     <Image Include="Media\rumsletning\rumsletning0013.png" />
     <Image Include="Media\rumsletning\rumsletning0014.png" />
     <Image Include="Media\rumsletning\rumsletningback.png" />
+    <Image Include="Media\skattkammaren.png" />
     <Image Include="Media\skattkammaren\skattkammaren0000.png" />
     <Image Include="Media\skattkammaren\skattkammaren0001.png" />
     <Image Include="Media\skattkammaren\skattkammaren0002.png" />

@@ -1,8 +1,15 @@
 #include "Tile.h"
 
+Tile::Tile()
+{
+}
+
 Tile::Tile(const std::string& imagePath)
 {
-	texture.loadFromFile(imagePath);
+	if (!texture.loadFromFile(imagePath))
+	{
+		throw std::runtime_error("Could not find tile image " + imagePath);
+	}
 	sprite.setTexture(texture);
 	sprite.setScale(0.96f, 0.96f);
 }

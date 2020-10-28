@@ -11,27 +11,30 @@ Game::Game()
 #else
 	: window(sf::VideoMode::getDesktopMode(), "Drakborgen", sf::Style::Fullscreen)
 #endif // DEBUG
+	, cardDisplay(window)
 {
-	{
-		std::unique_ptr<Tile> tile = std::make_unique<Tile>("Media/rumsbrickor/rumsbricka0000.png");
-		board.placeTile(tile, 0, 1);
-	}
-	{
-		std::unique_ptr<Tile> tile = std::make_unique<Tile>("Media/rumsbrickor/rumsbricka0001.png");
-		board.placeTile(tile, 0, 2);
-	}
-	{
-		std::unique_ptr<Tile> tile = std::make_unique<Tile>("Media/rumsbrickor/rumsbricka0002.png");
-		board.placeTile(tile, 1, 0);
-	}
-	{
-		std::unique_ptr<Tile> tile = std::make_unique<Tile>("Media/rumsbrickor/rumsbricka0003.png");
-		board.placeTile(tile, 2, 0);
-	}
 }
 
 void Game::run()
 {
+	sf::Clock clock;
+	float lastTimestamp = 0.0f;
+	tiles.shuffle();
+	for (int row = 0; row < board.rowCount; ++row)
+	{
+		for (int column = 0; column < board.columnCount; ++column)
+		{
+			if (!tiles.isEmpty() && !board.hasTile({ row, column }))
+			{
+				board.placeTile(tiles.pullNextItem(), { row, column });
+			}
+		}
+	}
+	heroes.push_back(Hero("rohan", "Riddar Rohan", "Media/hjaltekort/rohan.png"));
+	for (Hero& hero : heroes)
+	{
+		cardDisplay.pushCard(hero.pullStatsCard());
+	}
 	while (window.isOpen())
 	{
 		sf::Event event;
@@ -56,6 +59,52 @@ void Game::run()
 				if (event.mouseButton.button == sf::Mouse::Button::Left)
 				{
 					leftMouseButtonDown = false;
+					const bool isClick = buttonPressedMousePosition.x == event.mouseButton.x && buttonPressedMousePosition.y == event.mouseButton.y;
+					if (state == State::PickHero)
+					{
+						if (isClick)
+						{
+							int heroIndex = cardDisplay.hitTest(buttonPressedMousePosition);
+							if (heroIndex >= 0)
+							{
+								players.emplace_back();
+								players.back().heroIndex = heroIndex;
+								heroes[heroIndex].placeStatsCard(cardDisplay.pullCard(heroIndex));
+								board.setClickSites({ { 0, 1 }, { 1, 0 }, { board.rowCount - 1, 0 }, { board.rowCount - 1, board.columnCount - 1 } });
+								state = State::PickStartTower;
+							}
+						}
+					}
+					else if (state == State::PickStartTower)
+					{
+						if (isClick)
+						{
+							sf::Vector2f boardPosition = board.getPosition();
+							sf::Vector2f mouseBoardPosition = sf::Vector2f( event.mouseButton.x - boardPosition.x, event.mouseButton.y - boardPosition.y );
+							if (board.testClickSites(mouseBoardPosition))
+							{
+								Board::Site site = board.getSite(mouseBoardPosition);
+								int index = players.size() - 1;
+								Player& player = players[index];
+								player.boardSite = site;
+								board.addPlayer("Media/hjaltekort/" + heroes[player.heroIndex].getId() + "gubbe.png", index);
+								board.setPlayerSite(index, site);
+								if(cardDisplay.empty())
+								{
+									board.clearClickSites();
+									state = State::PlayerMove;
+								}
+								else
+								{
+									board.removeClickSite(site);
+									state = State::PickHero;
+								}
+							}
+						}
+					}
+					else if (state == State::PickStartTower)
+					{
+					}
 				}
 			}
 			if (event.type == sf::Event::EventType::MouseMoved)
@@ -69,9 +118,17 @@ void Game::run()
 			}
 		}
 
+		sf::Time time = clock.getElapsedTime();
+		float timestamp = time.asSeconds();
+		float timeDelta = timestamp - lastTimestamp;
+		lastTimestamp = timestamp;
+
+		board.update(timestamp, timeDelta);
+
 		window.clear();
 
 		window.draw(board);
+		window.draw(cardDisplay);
 
 		window.display();
 	}

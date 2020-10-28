@@ -1,33 +1,126 @@
 #include "Board.h"
 
+#include <iostream>
+
 Board::Board()
+	: clickOverlay(sf::Vector2f(tileSize, tileSize))
 {
-	if (!texture.loadFromFile("Media/spelplan.jpg"))
+	if (!boardTexture.loadFromFile("Media/spelplan.jpg"))
 	{
 		throw std::runtime_error("No board image found");
 	}
-	sprite.setTexture(texture);
+	if (!vaultTexture.loadFromFile("Media/skattkammaren.png"))
+	{
+		throw std::runtime_error("No vault image found");
+	}
+	boardSprite.setTexture(boardTexture);
+	vaultSprite.setTexture(vaultTexture);
+	vaultSprite.setPosition(getSitePosition({ 4, 6 }));
+
+	tileGrid[0][0] = std::make_unique<Tile>();
+	tileGrid[0][columnCount - 1] = std::make_unique<Tile>();
+	tileGrid[rowCount - 1][0] = std::make_unique<Tile>();
+	tileGrid[rowCount - 1][columnCount - 1] = std::make_unique<Tile>();
+	tileGrid[4][6] = std::make_unique<Tile>();
+	tileGrid[5][6] = std::make_unique<Tile>();
 }
 
-void Board::placeTile(std::unique_ptr<Tile>& tile, int row, int column)
+void Board::update(float elapsedTime, float timeDelta)
 {
-	if (hasTile(row, column) || !withinBounds(row, column))
+	// one cycle per second
+	const int wholeSeconds = elapsedTime;
+	float fraction = elapsedTime - wholeSeconds;
+	if (wholeSeconds % 2 == 0)
+	{
+		fraction = 1.0f - fraction;
+	}
+	clickOverlay.setFillColor(sf::Color(0x80 + 0x7f * fraction, 0x80 + 0x7f * fraction, 0x80 + 0x7f * fraction, 0xff * fraction));
+}
+
+void Board::placeTile(std::unique_ptr<Tile> tile, Site site)
+{
+	if (hasTile(site) || !withinBounds(site))
 	{
 		throw std::runtime_error("Illegal tile placement");
 	}
-	constexpr float gridOriginX = 409.f;
-	constexpr float gridOriginY = 119.f;
-	constexpr float tileSize = 175.f;
-	tile->setPosition(gridOriginX + tileSize * column, gridOriginY + tileSize * row);
-	tiles[row][column] = std::move(tile);
-	tile.reset();
+	tile->setPosition(getSitePosition(site));
+	tileGrid[site.row][site.column] = std::move(tile);
+}
+
+sf::Vector2f Board::getSitePosition(Site site) const
+{
+	return sf::Vector2f(gridOriginX + tileSize * site.column, gridOriginY + tileSize * site.row);
+}
+
+Board::Site Board::getSite(sf::Vector2f position) const
+{
+	return { int((position.y - gridOriginY) / tileSize), int((position.x - gridOriginX) / tileSize) };
+}
+
+void Board::setClickSites(const std::vector<Site>& sites)
+{
+	clickSites = sites;
+	clickSiteAnimationStartTime = 0.0f;
+}
+
+bool Board::testClickSites(sf::Vector2f position) const
+{
+	for (Site clickSite : clickSites)
+	{
+		Site site = getSite(position);
+		if (site == clickSite)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void Board::removeClickSite( Site site )
+{
+	for (std::vector<Site>::iterator it = clickSites.begin(); it < clickSites.end(); ++it)
+	{
+		if (*it == site)
+		{
+			clickSites.erase(it);
+			break;
+		}
+	}
+}
+
+void Board::clearClickSites()
+{
+	clickSites.clear();
+}
+
+void Board::addPlayer(const std::string& imagePath, int index)
+{
+	if (players.size() <= index)
+	{
+		players.resize(size_t(index + 1));
+	}
+	Player& player = players[index];
+	player.texture.loadFromFile(imagePath);
+	player.sprite.setTexture(players[index].texture);
+	player.sprite.setScale(1.0f / 3.0f, 1.0f / 3.0f);
+}
+
+void Board::setPlayerSite(int index, Site site)
+{
+	if (players.size() <= index)
+	{
+		throw std::runtime_error("Board: player index out-of-bounds");
+	}
+	players[index].site = site;
+	placePlayer(index);
 }
 
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	states.transform *= getTransform();
-	target.draw(sprite, states);
-	for (const std::array<std::unique_ptr<Tile>, 13>& row : tiles)
+	target.draw(boardSprite, states);
+	target.draw(vaultSprite, states);
+	for (const std::array<std::unique_ptr<Tile>, 13>& row : tileGrid)
 	{
 		for (const std::unique_ptr<Tile>& tile : row)
 		{
@@ -37,14 +130,36 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 			}
 		}
 	}
+	for (Site site : clickSites)
+	{
+		sf::Transform transform = states.transform;
+		sf::Vector2f offset = getSitePosition(site);
+		states.transform.translate(offset.x, offset.y);
+		target.draw(clickOverlay, states);
+		states.transform = transform;
+	}
+	for (const Player& player : players)
+	{
+		target.draw(player.sprite, states);
+	}
 }
 
-bool Board::hasTile(int row, int column)
+bool Board::hasTile(Site site) const
 {
-	return !!tiles[row][column];
+	return !!tileGrid[site.row][site.column];
 }
 
-bool Board::withinBounds(int row, int column)
+bool Board::withinBounds(Site site) const
 {
-	return row >= 0 && row < rowCount && column >= 0 && column < columnCount;
+	return site.row >= 0 && site.row < rowCount && site.column >= 0 && site.column < columnCount;
+}
+
+void Board::placePlayer(int index)
+{
+	Player& player = players[index];
+	sf::Vector2f sitePosition = getSitePosition(player.site);
+	sf::FloatRect bounds = player.sprite.getGlobalBounds();
+	float playerPositionX = sitePosition.x + tileSize / 2.0f - bounds.width / 2.0f;
+	float playerPositionY = sitePosition.y + tileSize / 2.0f - bounds.height / 2.0f;
+	player.sprite.setPosition(playerPositionX, playerPositionY);
 }
