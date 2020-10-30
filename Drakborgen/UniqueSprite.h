@@ -12,11 +12,13 @@ public:
 	UniqueSprite(const std::string& imagePath);
 
 	UniqueSprite(UniqueSprite&) = delete;
-	void operator=(UniqueSprite&) = delete;
+	UniqueSprite& operator=(UniqueSprite&) = delete;
 
 	UniqueSprite(UniqueSprite&& other) noexcept;
 	
-	void operator=(UniqueSprite&& other) noexcept;
+	UniqueSprite& operator=(UniqueSprite&& other) noexcept;
+
+	operator bool() const { return valid; }
 
 	sf::Sprite& get() { return *sprite; }
 	const sf::Sprite& get() const { return *sprite; }
@@ -24,5 +26,6 @@ public:
 private:
 	std::unique_ptr<sf::Texture> texture;
 	std::unique_ptr<sf::Sprite> sprite;
+	bool valid = false;
 };
 

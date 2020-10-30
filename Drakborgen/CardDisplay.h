@@ -12,7 +12,7 @@ public:
 	CardDisplay(sf::Window& window);
 	
 	CardDisplay(CardDisplay&) = delete;
-	void operator=(CardDisplay&) = delete;
+	CardDisplay& operator=(CardDisplay&) = delete;
 	
 	bool empty() const { return cards.empty(); }
 

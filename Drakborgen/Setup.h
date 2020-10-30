@@ -7,7 +7,7 @@ class Setup
 public:
 	Setup() = delete;
 	Setup(Setup&) = delete;
-	void operator=(Setup&) = delete;
+	Setup& operator=(Setup&) = delete;
 
 	static void setUpGame(Game& game);
 

@@ -10,9 +10,10 @@ Card::Card(Card&& other) noexcept
 	*this = std::move(other);
 }
 
-void Card::operator=(Card&& other) noexcept
+Card& Card::operator=(Card&& other) noexcept
 {
 	sprite = std::move(other.sprite);
+	return *this;
 }
 
 void Card::centerAround(sf::Vector2f position)

@@ -1,9 +1,10 @@
 #include "Hero.h"
 
-Hero::Hero(const std::string& id, const std::string& name)
+Hero::Hero(const std::string& id, const std::string& name, int maxLife)
 	: id(id)
 	, name(name)
 	, statCard(std::make_unique<Card>("Media/hjaltekort/" + id + ".png"))
+	, maxLife(maxLife)
 {
 }
 
@@ -12,11 +13,14 @@ Hero::Hero(Hero&& other) noexcept
 	*this = std::move(other);
 }
 
-void Hero::operator=( Hero&& other ) noexcept
+Hero& Hero::operator=(Hero&& other) noexcept
 {
 	id = std::move(other.id);
 	name = std::move(other.name);
 	statCard = std::move(other.statCard);
+	maxLife = other.maxLife;
+	other.maxLife = 0;
+	return *this;
 }
 
 std::unique_ptr<Card> Hero::pullStatsCard()

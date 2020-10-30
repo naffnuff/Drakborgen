@@ -9,13 +9,12 @@ public:
 	Tile(const std::string& imagePath);
 
 	Tile(Tile&) = delete;
-	void operator=(Tile&) = delete;
+	Tile& operator=(Tile&) = delete;
 
 private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
-	sf::Texture texture;
-	sf::Sprite sprite;
+	UniqueSprite sprite;
 };
 

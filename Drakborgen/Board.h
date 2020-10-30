@@ -37,7 +37,7 @@ public:
 	Board();
 
 	Board(Board&) = delete;
-	void operator=(Board&) = delete;
+	Board& operator=(Board&) = delete;
 
 	void update(float elapsedTime, float timeDelta);
 	bool hasTile(Site site) const;
@@ -49,6 +49,7 @@ public:
 	bool testClickSites(sf::Vector2f position) const;
 	void removeClickSite( Site site );
 	void clearClickSites();
+	void showClickSites(bool show) { clickSitesShown = show; }
 
 	void addPlayer(const std::string& imagePath, int index);
 	void setPlayerSite(int index, Site site);
@@ -60,15 +61,14 @@ private:
 	void placePlayer(int index);
 
 private:
-	sf::Texture boardTexture;
-	sf::Sprite boardSprite;
-	sf::Texture vaultTexture;
-	sf::Sprite vaultSprite;
+	UniqueSprite boardSprite;
+	UniqueSprite vaultSprite;
 	sf::RectangleShape clickOverlay;
 	std::vector<Player> players;
 
 	std::array<std::array<std::unique_ptr<Tile>, columnCount>, rowCount> tileGrid;
 	std::vector<Site> clickSites;
+	bool clickSitesShown = false;
 	float clickSiteAnimationStartTime = 0.0f;
 };
 

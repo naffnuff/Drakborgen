@@ -3,6 +3,7 @@
 UniqueSprite::UniqueSprite(const std::string& imagePath)
 	: texture(std::make_unique<sf::Texture>())
 	, sprite(std::make_unique<sf::Sprite>())
+	, valid(true)
 {
 	if (!texture->loadFromFile(imagePath))
 	{
@@ -16,8 +17,9 @@ UniqueSprite::UniqueSprite(UniqueSprite&& other) noexcept
 	*this = std::move(other);
 }
 
-void UniqueSprite::operator=(UniqueSprite&& other) noexcept
+UniqueSprite& UniqueSprite::operator=(UniqueSprite&& other) noexcept
 {
 	sprite = std::move(other.sprite);
 	texture = std::move(other.texture);
+	return *this;
 }

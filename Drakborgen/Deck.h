@@ -15,7 +15,7 @@ public:
 	}
 	
 	Deck(Card&) = delete;
-	void operator=(Deck&) = delete;
+	Deck& operator=(Deck&) = delete;
 
 	void shuffle()
 	{
@@ -28,7 +28,7 @@ public:
 		items.push_back(std::make_unique<T>(args...));
 		if (items.size() > Capacity)
 		{
-			throw std::runtime_error("Deck size exceeds capacity");
+			throw std::logic_error("Deck size exceeds capacity");
 		}
 	}
 
@@ -46,7 +46,7 @@ public:
 	{
 		if (items.size() == 0)
 		{
-			throw std::runtime_error("No items in deck");
+			throw std::logic_error("No items in deck");
 		}
 		std::unique_ptr<T> item = std::move(items.back());
 		items.pop_back();

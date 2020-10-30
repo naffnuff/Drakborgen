@@ -125,7 +125,7 @@ void Setup::createTiles(TileDeck& tiles)
 	createTile(tiles, "114");
 	if (!tiles.isFull())
 	{
-		throw std::runtime_error("Tile dock is not full");
+		throw std::logic_error("Tile dock is not full");
 	}
 }
 

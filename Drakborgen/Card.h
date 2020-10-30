@@ -8,10 +8,10 @@ public:
 	Card(const std::string& imagePath);
 
 	Card(Card&) = delete;
-	void operator=(Card&) = delete;
+	Card& operator=(Card&) = delete;
 	
 	Card(Card&& other) noexcept;
-	void operator=(Card&& other) noexcept;
+	Card& operator=(Card&& other) noexcept;
 
 	void centerAround(sf::Vector2f position);
 	sf::FloatRect getBounds();

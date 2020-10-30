@@ -4,19 +4,11 @@
 
 Board::Board()
 	: clickOverlay(sf::Vector2f(tileSize, tileSize))
+	, boardSprite("Media/spelplan.jpg")
+	, vaultSprite( "Media/skattkammaren.png" )
 {
-	if (!boardTexture.loadFromFile("Media/spelplan.jpg"))
-	{
-		throw std::runtime_error("No board image found");
-	}
-	if (!vaultTexture.loadFromFile("Media/skattkammaren.png"))
-	{
-		throw std::runtime_error("No vault image found");
-	}
-	boardSprite.setTexture(boardTexture);
-	vaultSprite.setTexture(vaultTexture);
-	vaultSprite.setPosition(getSitePosition({ 4, 6 }));
-	vaultSprite.move(0.0f, 5.0f);
+	vaultSprite.get().setPosition(getSitePosition({ 4, 6 }));
+	vaultSprite.get().move(0.0f, 5.0f);
 	//players.reserve(4);
 
 	tileGrid[0][0] = std::make_unique<Tile>();
@@ -43,7 +35,7 @@ void Board::placeTile(std::unique_ptr<Tile> tile, Site site)
 {
 	if (hasTile(site) || !withinBounds(site))
 	{
-		throw std::runtime_error("Illegal tile placement");
+		throw std::logic_error("Illegal tile placement");
 	}
 	tile->setPosition(getSitePosition(site));
 	tileGrid[site.row][site.column] = std::move(tile);
@@ -67,6 +59,10 @@ void Board::setClickSites(const std::vector<Site>& sites)
 
 bool Board::testClickSites(sf::Vector2f position) const
 {
+	if (!clickSitesShown)
+	{
+		throw std::logic_error("Click sites not shown");
+	}
 	for (Site clickSite : clickSites)
 	{
 		Site site = getSite(position);
@@ -99,7 +95,7 @@ void Board::addPlayer(const std::string& imagePath, int index)
 {
 	if (players.size() != index)
 	{
-		throw std::runtime_error("Board: player index mismatch");
+		throw std::logic_error("Board: player index mismatch");
 	}
 	players.push_back({ Card(imagePath), invalidSite });
 	Player& player = players.back();
@@ -110,7 +106,7 @@ void Board::setPlayerSite(int index, Site site)
 {
 	if (players.size() <= index)
 	{
-		throw std::runtime_error("Board: player index out-of-bounds");
+		throw std::logic_error("Board: player index out-of-bounds");
 	}
 	players[index].site = site;
 	placePlayer(index);
@@ -119,8 +115,8 @@ void Board::setPlayerSite(int index, Site site)
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	states.transform *= getTransform();
-	target.draw(boardSprite, states);
-	target.draw(vaultSprite, states);
+	target.draw(boardSprite.get(), states);
+	target.draw(vaultSprite.get(), states);
 	for (const std::array<std::unique_ptr<Tile>, 13>& row : tileGrid)
 	{
 		for (const std::unique_ptr<Tile>& tile : row)
@@ -131,13 +127,16 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 			}
 		}
 	}
-	for (Site site : clickSites)
+	if (clickSitesShown)
 	{
-		sf::Transform transform = states.transform;
-		sf::Vector2f offset = getSitePosition(site);
-		states.transform.translate(offset.x, offset.y);
-		target.draw(clickOverlay, states);
-		states.transform = transform;
+		for(Site site : clickSites)
+		{
+			sf::Transform transform = states.transform;
+			sf::Vector2f offset = getSitePosition(site);
+			states.transform.translate(offset.x, offset.y);
+			target.draw(clickOverlay, states);
+			states.transform = transform;
+		}
 	}
 	for (const Player& player : players)
 	{
