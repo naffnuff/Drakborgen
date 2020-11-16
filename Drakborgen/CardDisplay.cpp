@@ -9,7 +9,7 @@ int CardDisplay::hitTest(sf::Vector2i mousePosition) const
 {
 	for (int i = 0; i < cards.size(); ++i)
 	{
-		if (cards[i]->getBounds().contains(mousePosition.x, mousePosition.y))
+		if (cards[i]->getBounds().contains(float(mousePosition.x), float(mousePosition.y)))
 		{
 			return i;
 		}

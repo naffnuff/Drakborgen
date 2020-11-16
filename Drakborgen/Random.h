@@ -7,8 +7,8 @@ class Random
 public:
 	Random();
 	
-	Random(Random&) = delete;
-	Random& operator=(Random&) = delete;
+	Random(const Random&) = delete;
+	Random& operator=(const Random&) = delete;
 
 	template<typename Container>
 	void shuffle(Container& container);

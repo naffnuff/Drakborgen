@@ -11,8 +11,8 @@ public:
 
 	UniqueSprite(const std::string& imagePath);
 
-	UniqueSprite(UniqueSprite&) = delete;
-	UniqueSprite& operator=(UniqueSprite&) = delete;
+	UniqueSprite(const UniqueSprite&) = delete;
+	UniqueSprite& operator=(const UniqueSprite&) = delete;
 
 	UniqueSprite(UniqueSprite&& other) noexcept;
 	

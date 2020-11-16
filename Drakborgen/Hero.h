@@ -7,8 +7,8 @@ class Hero
 public:
 	Hero(const std::string& id, const std::string& name, int maxLife);
 	
-	Hero(Hero&) = delete;
-	Hero& operator=(Hero&) = delete;
+	Hero(const Hero&) = delete;
+	Hero& operator=(const Hero&) = delete;
 	
 	Hero(Hero&& other) noexcept;
 	Hero& operator=(Hero&& other) noexcept;

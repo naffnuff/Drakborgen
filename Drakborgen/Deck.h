@@ -3,19 +3,21 @@
 #include <memory>
 #include <vector>
 
+#include "System.h"
 #include "Random.h"
 
 template<typename T, int Capacity>
 class Deck
 {
 public:
-	Deck()
+	Deck(Random& random)
+		: random(random)
 	{
 		items.reserve(Capacity);
 	}
 	
-	Deck(Card&) = delete;
-	Deck& operator=(Deck&) = delete;
+	Deck(const Card&) = delete;
+	Deck& operator=(const Deck&) = delete;
 
 	void shuffle()
 	{
@@ -28,7 +30,7 @@ public:
 		items.push_back(std::make_unique<T>(args...));
 		if (items.size() > Capacity)
 		{
-			throw std::logic_error("Deck size exceeds capacity");
+			THROW;
 		}
 	}
 
@@ -46,7 +48,7 @@ public:
 	{
 		if (items.size() == 0)
 		{
-			throw std::logic_error("No items in deck");
+			THROW;
 		}
 		std::unique_ptr<T> item = std::move(items.back());
 		items.pop_back();
@@ -54,7 +56,7 @@ public:
 	}
 
 private:
-	Random random;
+	Random& random;
 	std::vector<std::unique_ptr<T>> items;
 };
 

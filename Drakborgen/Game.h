@@ -33,16 +33,16 @@ private:
 	class StateLogic
 	{
 	public:
-		StateLogic(State state, Game& game) : state(state), game(game) { }
+		StateLogic(State state, Game& game) : thisState(state), mGame(game) { }
 		
 		State execute();
 
 	private:
-		virtual State onLeftMouseClick(State state, Game& game) { return state; };
+		virtual State onLeftMouseClick(State state, Game&) { return state; };
 
 	private:
-		State state;
-		Game& game;
+		const State thisState;
+		Game& mGame;
 	};
 
 	class PickHero : public StateLogic
@@ -69,18 +69,22 @@ private:
 public:
 	Game();
 	
-	Game(Game&) = delete;
-	Game& operator=(Game&) = delete;
+	Game(const Game&) = delete;
+	Game& operator=(const Game&) = delete;
 
 	void run();
+	void onHeroPicked(int heroIndex);
+	Board::Site onStartingTowerPicked(sf::Vector2f mouseBoardPosition);
+	void startNewGame();
+	void startPlayerRound();
 	TileDeck& getTiles() { return tiles; }
 
 private:
+	Random random;
 	sf::RenderWindow window;
 	Board board;
 	CardDisplay cardDisplay;
 	TileDeck tiles;
-	State state = State::PickHero;
 
 	int playerCount = 4;
 	int currentPlayer = 0;
@@ -92,6 +96,8 @@ private:
 
 	std::vector<Hero> heroes;
 	std::vector<Player> players;
+
+	int activePlayer = 0;
 
 	std::map<State, std::unique_ptr<StateLogic>> stateLogicMap;
 

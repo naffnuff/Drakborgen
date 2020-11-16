@@ -1,5 +1,7 @@
 #include "UniqueSprite.h"
 
+#include "System.h"
+
 UniqueSprite::UniqueSprite(const std::string& imagePath)
 	: texture(std::make_unique<sf::Texture>())
 	, sprite(std::make_unique<sf::Sprite>())
@@ -7,7 +9,7 @@ UniqueSprite::UniqueSprite(const std::string& imagePath)
 {
 	if (!texture->loadFromFile(imagePath))
 	{
-		throw std::runtime_error("No image found: " + imagePath);
+		THROW;
 	}
 	sprite->setTexture(*texture);
 }

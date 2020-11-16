@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "System.h"
+
 Board::Board()
 	: clickOverlay(sf::Vector2f(tileSize, tileSize))
 	, boardSprite("Media/spelplan.jpg")
@@ -19,23 +21,27 @@ Board::Board()
 	tileGrid[5][6] = std::make_unique<Tile>();
 }
 
-void Board::update(float elapsedTime, float timeDelta)
+void Board::update(float elapsedTime, float /*timeDelta*/)
 {
 	// one cycle per second
-	const int wholeSeconds = elapsedTime;
-	float fraction = elapsedTime - wholeSeconds;
+	if (clickSiteAnimationStartTime == 0.0f)
+	{
+		clickSiteAnimationStartTime = elapsedTime;
+	}
+	const int wholeSeconds = int(elapsedTime - clickSiteAnimationStartTime);
+	float fraction = elapsedTime - clickSiteAnimationStartTime - wholeSeconds;
 	if (wholeSeconds % 2 == 0)
 	{
 		fraction = 1.0f - fraction;
 	}
-	clickOverlay.setFillColor(sf::Color(0x80 + 0x7f * fraction, 0x80 + 0x7f * fraction, 0x80 + 0x7f * fraction, 0xff * fraction));
+	clickOverlay.setFillColor(sf::Color(uint8_t(0x80 + 0x7f * fraction), uint8_t(0x80 + 0x7f * fraction), uint8_t(0x80 + 0x7f * fraction), uint8_t(0xff * fraction)));
 }
 
 void Board::placeTile(std::unique_ptr<Tile> tile, Site site)
 {
 	if (hasTile(site) || !withinBounds(site))
 	{
-		throw std::logic_error("Illegal tile placement");
+		THROW;
 	}
 	tile->setPosition(getSitePosition(site));
 	tileGrid[site.row][site.column] = std::move(tile);
@@ -51,17 +57,25 @@ Board::Site Board::getSite(sf::Vector2f position) const
 	return { int((position.y - gridOriginY) / tileSize), int((position.x - gridOriginX) / tileSize) };
 }
 
-void Board::setClickSites(const std::vector<Site>& sites)
+void Board::setGameStartClickSites()
 {
-	clickSites = sites;
+	clickSites = { { 0, 0 }, { 0, columnCount - 1 }, { rowCount - 1, 0 }, { rowCount - 1, columnCount - 1 } };
 	clickSiteAnimationStartTime = 0.0f;
+}
+
+void Board::setPlayerMoveClickSites(Site playerSite)
+{
+	if (!hasTile(playerSite))
+	{
+		THROW;
+	}
 }
 
 bool Board::testClickSites(sf::Vector2f position) const
 {
 	if (!clickSitesShown)
 	{
-		throw std::logic_error("Click sites not shown");
+		THROW;
 	}
 	for (Site clickSite : clickSites)
 	{
@@ -91,11 +105,20 @@ void Board::clearClickSites()
 	clickSites.clear();
 }
 
+void Board::showClickSites(bool show)
+{
+	clickSitesShown = show;
+	if (show)
+	{
+		clickSiteAnimationStartTime = 0.0f;
+	}
+}
+
 void Board::addPlayer(const std::string& imagePath, int index)
 {
 	if (players.size() != index)
 	{
-		throw std::logic_error("Board: player index mismatch");
+		THROW;
 	}
 	players.push_back({ Card(imagePath), invalidSite });
 	Player& player = players.back();
@@ -106,7 +129,7 @@ void Board::setPlayerSite(int index, Site site)
 {
 	if (players.size() <= index)
 	{
-		throw std::logic_error("Board: player index out-of-bounds");
+		THROW;
 	}
 	players[index].site = site;
 	placePlayer(index);
@@ -146,7 +169,7 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
 bool Board::hasTile(Site site) const
 {
-	return !!tileGrid[site.row][site.column];
+	return tileGrid[site.row][site.column] != nullptr;
 }
 
 bool Board::withinBounds(Site site) const

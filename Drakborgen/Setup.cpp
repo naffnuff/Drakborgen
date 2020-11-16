@@ -1,5 +1,7 @@
 #include "Setup.h"
 
+#include "System.h"
+
 void Setup::setUpGame(Game& game)
 {
 	TileDeck& tiles = game.getTiles();
@@ -125,7 +127,7 @@ void Setup::createTiles(TileDeck& tiles)
 	createTile(tiles, "114");
 	if (!tiles.isFull())
 	{
-		throw std::logic_error("Tile dock is not full");
+		THROW;
 	}
 }
 

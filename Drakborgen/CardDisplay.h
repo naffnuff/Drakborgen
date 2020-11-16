@@ -11,8 +11,8 @@ class CardDisplay : public sf::Drawable, public sf::Transformable
 public:
 	CardDisplay(sf::Window& window);
 	
-	CardDisplay(CardDisplay&) = delete;
-	CardDisplay& operator=(CardDisplay&) = delete;
+	CardDisplay(const CardDisplay&) = delete;
+	CardDisplay& operator=(const CardDisplay&) = delete;
 	
 	bool empty() const { return cards.empty(); }
 

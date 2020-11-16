@@ -1,9 +1,5 @@
 #include "Tile.h"
 
-Tile::Tile()
-{
-}
-
 Tile::Tile(const std::string& imagePath)
 	: sprite(imagePath)
 {

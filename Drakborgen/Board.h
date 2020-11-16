@@ -36,8 +36,8 @@ public:
 
 	Board();
 
-	Board(Board&) = delete;
-	Board& operator=(Board&) = delete;
+	Board(const Board&) = delete;
+	Board& operator=(const Board&) = delete;
 
 	void update(float elapsedTime, float timeDelta);
 	bool hasTile(Site site) const;
@@ -45,11 +45,12 @@ public:
 	sf::Vector2f getSitePosition(Site site) const;
 	Site getSite(sf::Vector2f position) const;
 
-	void setClickSites(const std::vector<Site>& sites);
+	void setGameStartClickSites();
+	void setPlayerMoveClickSites(Site playerSite);
 	bool testClickSites(sf::Vector2f position) const;
-	void removeClickSite( Site site );
+	void removeClickSite(Site site);
 	void clearClickSites();
-	void showClickSites(bool show) { clickSitesShown = show; }
+	void showClickSites(bool show);
 
 	void addPlayer(const std::string& imagePath, int index);
 	void setPlayerSite(int index, Site site);
@@ -72,7 +73,7 @@ private:
 	float clickSiteAnimationStartTime = 0.0f;
 };
 
-static bool operator==(Board::Site siteOne, Board::Site siteTwo)
+inline bool operator==(Board::Site siteOne, Board::Site siteTwo)
 {
 	return siteOne.row == siteTwo.row && siteOne.column == siteTwo.column;
 }

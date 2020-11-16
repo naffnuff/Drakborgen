@@ -6,8 +6,8 @@ class Setup
 {
 public:
 	Setup() = delete;
-	Setup(Setup&) = delete;
-	Setup& operator=(Setup&) = delete;
+	Setup(const Setup&) = delete;
+	Setup& operator=(const Setup&) = delete;
 
 	static void setUpGame(Game& game);
 

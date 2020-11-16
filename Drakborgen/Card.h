@@ -7,8 +7,8 @@ class Card : public sf::Drawable, public sf::Transformable
 public:
 	Card(const std::string& imagePath);
 
-	Card(Card&) = delete;
-	Card& operator=(Card&) = delete;
+	Card(const Card&) = delete;
+	Card& operator=(const Card&) = delete;
 	
 	Card(Card&& other) noexcept;
 	Card& operator=(Card&& other) noexcept;
