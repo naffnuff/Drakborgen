@@ -61,6 +61,10 @@ private:
 	bool withinBounds(Site site) const;
 	void placePlayer(int index);
 
+	std::unique_ptr<Tile>& getTile(Site site);
+
+	Site step(Site site, TileLogic::Exit exit);
+
 private:
 	UniqueSprite boardSprite;
 	UniqueSprite vaultSprite;

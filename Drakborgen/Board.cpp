@@ -1,8 +1,11 @@
 #include "Board.h"
 
 #include <iostream>
+#include <vector>
 
 #include "System.h"
+#include "TileLogic.h"
+#include "Tower.h"
 
 Board::Board()
 	: clickOverlay(sf::Vector2f(tileSize, tileSize))
@@ -13,12 +16,12 @@ Board::Board()
 	vaultSprite.get().move(0.0f, 5.0f);
 	//players.reserve(4);
 
-	tileGrid[0][0] = std::make_unique<Tile>();
-	tileGrid[0][columnCount - 1] = std::make_unique<Tile>();
-	tileGrid[rowCount - 1][0] = std::make_unique<Tile>();
-	tileGrid[rowCount - 1][columnCount - 1] = std::make_unique<Tile>();
-	tileGrid[4][6] = std::make_unique<Tile>();
-	tileGrid[5][6] = std::make_unique<Tile>();
+	tileGrid[0][0] = Tile::create<Tower>(TileLogic::Exit::East, TileLogic::Exit::South);
+	tileGrid[0][columnCount - 1] = Tile::create<Tower>(TileLogic::Exit::West, TileLogic::Exit::South);
+	tileGrid[rowCount - 1][0] = Tile::create<Tower>(TileLogic::Exit::East, TileLogic::Exit::North);
+	tileGrid[rowCount - 1][columnCount - 1] = Tile::create<Tower>(TileLogic::Exit::West, TileLogic::Exit::North);
+	tileGrid[4][6] = Tile::create<Tower>();
+	tileGrid[5][6] = Tile::create<Tower>();
 }
 
 void Board::update(float elapsedTime, float /*timeDelta*/)
@@ -65,10 +68,11 @@ void Board::setGameStartClickSites()
 
 void Board::setPlayerMoveClickSites(Site playerSite)
 {
-	if (!hasTile(playerSite))
+	for (TileLogic::Exit exit : getTile(playerSite)->getLogic()->getExits())
 	{
-		THROW;
+		clickSites.push_back(step(playerSite, exit));
 	}
+	clickSiteAnimationStartTime = 0.0f;
 }
 
 bool Board::testClickSites(sf::Vector2f position) const
@@ -182,4 +186,36 @@ void Board::placePlayer(int index)
 	Player& player = players[index];
 	sf::Vector2f sitePosition = getSitePosition(player.site);
 	player.avatar.centerAround({ sitePosition.x + tileSize / 2.0f, sitePosition.y + tileSize / 2.0f });
+}
+
+std::unique_ptr<Tile>& Board::getTile(Site site)
+{
+	if (!hasTile(site))
+	{
+		THROW;
+	}
+	return tileGrid[site.row][site.column];
+}
+
+Board::Site Board::step(Site site, TileLogic::Exit exit)
+{
+	switch (exit)
+	{
+	case TileLogic::Exit::North:
+		--site.row;
+		break;
+	case TileLogic::Exit::South:
+		++site.row;
+		break;
+	case TileLogic::Exit::West:
+		--site.column;
+		break;
+	case TileLogic::Exit::East:
+		++site.column;
+		break;
+	default:
+		THROW;
+		break;
+	}
+	return site;
 }

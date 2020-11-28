@@ -195,6 +195,7 @@ void Game::startNewGame()
 
 void Game::startPlayerRound()
 {
-	//Player& player = players[activePlayer];
-
+	Player& player = players[activePlayer];
+	board.setPlayerMoveClickSites(player.boardSite);
+	board.showClickSites(true);
 }

@@ -124,12 +124,13 @@
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>../../SFML/include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../SFML/out/install/x64-Debug/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../SFML/out/build/x64-Debug (default)/lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -148,7 +149,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../SFML/out/install/x64-Release/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../SFML/out/build/x64-Release/lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-system.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -163,6 +164,8 @@
     <ClCompile Include="Setup.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="TileLogic.cpp" />
+    <ClCompile Include="Tower.cpp" />
     <ClCompile Include="UniqueSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +179,8 @@
     <ClInclude Include="Setup.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Tile.h" />
+    <ClInclude Include="TileLogic.h" />
+    <ClInclude Include="Tower.h" />
     <ClInclude Include="UniqueSprite.h" />
   </ItemGroup>
   <ItemGroup>
