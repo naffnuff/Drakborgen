@@ -8,7 +8,7 @@ Tile::Tile(std::unique_ptr<TileLogic> tileLogic)
 Tile::Tile(const std::string& imagePath)
 	: sprite(imagePath)
 {
-	sprite.get().setScale(0.96f, 0.96f);
+	//sprite.get().setScale(0.96f, 0.96f);
 }
 
 std::unique_ptr<TileLogic>& Tile::getLogic()

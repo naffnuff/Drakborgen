@@ -112,14 +112,16 @@ void Game::run()
 	sf::Clock clock;
 	float lastTimestamp = 0.0f;
 	tiles.shuffle();
+	//bool toogle = false;
 	/*for (int row = 0; row < board.rowCount; ++row)
 	{
 		for (int column = 0; column < board.columnCount; ++column)
 		{
-			if (!tiles.isEmpty() && !board.hasTile({ row, column }))
+			if (toogle && !tiles.isEmpty() && !board.hasTile({ row, column }))
 			{
 				board.placeTile(tiles.pullNextItem(), { row, column });
 			}
+			toogle = !toogle;
 		}
 	}*/
 

@@ -11,9 +11,9 @@
 class Board : public sf::Drawable, public sf::Transformable
 {
 public:
-	static constexpr float gridOriginX = 412.f;
+	static constexpr float gridOriginX = 418.f;
 	static constexpr float gridOriginY = 119.f;
-	static constexpr float tileSize = 177.f;
+	static constexpr float tileSize = 178.f;
 
 	struct Site
 	{

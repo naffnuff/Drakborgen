@@ -5,14 +5,16 @@
 
 int main()
 {
-	//try
+	try
 	{
 		Game game;
 		Setup::setUpGame(game);
 		game.run();
 	}
-	/*catch (std::exception& e)
+	catch (std::exception& e)
 	{
-		std::cerr << "Uncaught std::exception: " << e.what();
-	}*/
+		std::cerr << e.what();
+		return 1;
+	}
+	return 0;
 }
