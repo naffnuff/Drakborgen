@@ -7,56 +7,107 @@
 
 Game::Game()
 #ifdef _DEBUG
-	: window(sf::VideoMode::getDesktopMode(), "Drakborgen")
+	: window(sf::VideoMode(1920, 1200), "Drakborgen")
 #else
 	: window(sf::VideoMode::getDesktopMode(), "Drakborgen", sf::Style::Fullscreen)
 #endif // DEBUG
 	, cardDisplay(window)
 	, tiles(random)
 {
+	sf::Vector2f boardSize = board.getSize();
+	sf::Vector2u windowSize = window.getSize();
+	xCenteredBoard = boardSize.x < windowSize.x;
+	yCenteredBoard = boardSize.y < windowSize.y;
+	sf::Vector2f boardPosition;
+	if (xCenteredBoard)
+	{
+		boardPosition.x = float(windowSize.x / 2) - boardSize.x / 2.0f;
+	}
+	if (yCenteredBoard)
+	{
+		boardPosition.y = float(windowSize.y / 2) - boardSize.y / 2.0f;
+	}
+	board.setPosition(boardPosition);
+
 	createStateLogicMap();
 }
 
-Game::State Game::StateLogic::execute()
+Game::State Game::StateLogic::execute(Game& game)
 {
 	State state = thisState;
 	sf::Event event;
-	while (mGame.window.pollEvent(event))
+	while ( game.window.pollEvent(event))
 	{
 		if (event.type == sf::Event::EventType::Closed)
 		{
-			mGame.window.close();
+			game.window.close();
 		}
 		else if (event.type == sf::Event::EventType::MouseButtonPressed)
 		{
 			if (event.mouseButton.button == sf::Mouse::Button::Left)
 			{
-				mGame.leftMouseButtonDown = true;
-				mGame.buttonPressedMousePosition.x = event.mouseButton.x;
-				mGame.buttonPressedMousePosition.y = event.mouseButton.y;
-				mGame.buttonPressedBoardPosition = mGame.board.getPosition();
+				game.leftMouseButtonDown = true;
+				game.buttonPressedMousePosition.x = event.mouseButton.x;
+				game.buttonPressedMousePosition.y = event.mouseButton.y;
+				game.buttonPressedBoardPosition = game.board.getPosition();
+				game.capturedItemIndex = game.cardDisplay.hitTest(game.buttonPressedMousePosition);
 			}
 		}
 		if (event.type == sf::Event::EventType::MouseButtonReleased)
 		{
-			if (event.mouseButton.button == sf::Mouse::Button::Left && mGame.leftMouseButtonDown)
+			if (event.mouseButton.button == sf::Mouse::Button::Left && game.leftMouseButtonDown)
 			{
-				mGame.leftMouseButtonDown = false;
-				mGame.buttonReleasedMousePosition.x = event.mouseButton.x;
-				mGame.buttonReleasedMousePosition.y = event.mouseButton.y;
-				if (mGame.buttonPressedMousePosition == mGame.buttonReleasedMousePosition)
+				game.leftMouseButtonDown = false;
+				game.buttonReleasedMousePosition.x = event.mouseButton.x;
+				game.buttonReleasedMousePosition.y = event.mouseButton.y;
+				if (game.cardDisplay.hitTest(game.buttonReleasedMousePosition) == game.capturedItemIndex)
 				{
-					state = onLeftMouseClick(state, mGame);
+					state = onLeftMouseClick(state, game);
 				}
 			}
 		}
 		if (event.type == sf::Event::EventType::MouseMoved)
 		{
-			if (mGame.leftMouseButtonDown)
+			if (game.leftMouseButtonDown && game.capturedItemIndex == -1)
 			{
-				sf::Vector2f mouseMovementSincePressed(float(event.mouseMove.x - mGame.buttonPressedMousePosition.x), float(event.mouseMove.y - mGame.buttonPressedMousePosition.y));
-				sf::Vector2f newBoardPosition = mGame.buttonPressedBoardPosition + mouseMovementSincePressed;
-				mGame.board.setPosition(newBoardPosition);
+				if (!game.xCenteredBoard || !game.xCenteredBoard)
+				{
+					sf::Vector2f mouseMovementSincePressed(float(event.mouseMove.x - game.buttonPressedMousePosition.x), float(event.mouseMove.y - game.buttonPressedMousePosition.y));
+					sf::Vector2f newBoardPosition = game.buttonPressedBoardPosition + mouseMovementSincePressed;
+					if (game.xCenteredBoard)
+					{
+						newBoardPosition.x = float(game.window.getSize().x / 2) - game.board.getSize().x / 2.0f;
+					}
+					else if (newBoardPosition.x > 0.0f)
+					{
+						newBoardPosition.x = 0.0f;
+						game.buttonPressedMousePosition.x = event.mouseMove.x;
+						game.buttonPressedBoardPosition.x = game.board.getPosition().x;
+					}
+					else if (newBoardPosition.x + game.board.getSize().x < game.window.getSize().x)
+					{
+						newBoardPosition.x = game.window.getSize().x - game.board.getSize().x;
+						game.buttonPressedMousePosition.x = event.mouseMove.x;
+						game.buttonPressedBoardPosition.x = game.board.getPosition().x;
+					}
+					if (game.xCenteredBoard)
+					{
+						newBoardPosition.y = float(game.window.getSize().y / 2) - game.board.getSize().y / 2.0f;
+					}
+					else if (newBoardPosition.y > 0.0f)
+					{
+						newBoardPosition.y = 0.0f;
+						game.buttonPressedMousePosition.y = event.mouseMove.y;
+						game.buttonPressedBoardPosition.y = game.board.getPosition().y;
+					}
+					else if (newBoardPosition.y + game.board.getSize().y < game.window.getSize().y)
+					{
+						newBoardPosition.y = game.window.getSize().y - game.board.getSize().y;
+						game.buttonPressedMousePosition.y = event.mouseMove.y;
+						game.buttonPressedBoardPosition.y = game.board.getPosition().y;
+					}
+					game.board.setPosition(newBoardPosition);
+				}
 			}
 		}
 	}
@@ -142,7 +193,7 @@ void Game::run()
 
 	while (window.isOpen())
 	{
-		state = stateLogicMap[state]->execute();
+		state = stateLogicMap[state]->execute(*this);
 
 		sf::Time time = clock.getElapsedTime();
 		float timestamp = time.asSeconds();

@@ -60,6 +60,11 @@ Board::Site Board::getSite(sf::Vector2f position) const
 	return { int((position.y - gridOriginY) / tileSize), int((position.x - gridOriginX) / tileSize) };
 }
 
+sf::Vector2f Board::getSize() const
+{
+	return boardSprite.get().getLocalBounds().getSize();
+}
+
 void Board::setGameStartClickSites()
 {
 	clickSites = { { 0, 0 }, { 0, columnCount - 1 }, { rowCount - 1, 0 }, { rowCount - 1, columnCount - 1 } };

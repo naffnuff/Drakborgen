@@ -9,7 +9,8 @@
 #include "Deck.h"
 #include "Tile.h"
 
-#define STATE(name) stateLogicMap[State::name] = std::make_unique<name>(State::name, *this);
+#define CLASS(name) class name : public StateLogic { using StateLogic::StateLogic; public: State onLeftMouseClick(State state, Game& game) override; };
+#define STATE(name) stateLogicMap[State::name] = std::make_unique<name>(State::name);
 
 using TileDeck = Deck<Tile, 115>;
 
@@ -28,43 +29,27 @@ private:
 		PickHero,
 		PickStartTower,
 		PlayerMove,
+		NoState
 	};
 
 	class StateLogic
 	{
 	public:
-		StateLogic(State state, Game& game) : thisState(state), mGame(game) { }
+		StateLogic(State thisState) : thisState(thisState) { }
+		virtual ~StateLogic() { }
 		
-		State execute();
+		State execute(Game& game);
 
 	private:
-		virtual State onLeftMouseClick(State state, Game&) { return state; };
+		virtual State onLeftMouseClick(State state, Game&) { return state; }
 
 	private:
-		const State thisState;
-		Game& mGame;
+		State thisState;
 	};
 
-	class PickHero : public StateLogic
-	{
-		using StateLogic::StateLogic;
-	public:
-		State onLeftMouseClick(State state, Game& game);
-	};
-
-	class PickStartTower : public StateLogic
-	{
-		using StateLogic::StateLogic;
-	public:
-		State onLeftMouseClick(State state, Game& game);
-	};
-
-	class PlayerMove : public StateLogic
-	{
-		using StateLogic::StateLogic;
-	public:
-		State onLeftMouseClick(State state, Game& game);
-	};
+	CLASS(PickHero);
+	CLASS(PickStartTower);
+	CLASS(PlayerMove);
 
 public:
 	Game();
@@ -89,10 +74,14 @@ private:
 	int playerCount = 4;
 	int currentPlayer = 0;
 
+	bool xCenteredBoard = false;
+	bool yCenteredBoard = false;
+
 	bool leftMouseButtonDown = false;
 	sf::Vector2f buttonPressedBoardPosition;
 	sf::Vector2i buttonPressedMousePosition;
 	sf::Vector2i buttonReleasedMousePosition;
+	int capturedItemIndex = false;
 
 	std::vector<Hero> heroes;
 	std::vector<Player> players;

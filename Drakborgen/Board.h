@@ -45,6 +45,8 @@ public:
 	sf::Vector2f getSitePosition(Site site) const;
 	Site getSite(sf::Vector2f position) const;
 
+	sf::Vector2f getSize() const;
+
 	void setGameStartClickSites();
 	void setPlayerMoveClickSites(Site playerSite);
 	bool testClickSites(sf::Vector2f position) const;
