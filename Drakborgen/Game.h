@@ -8,6 +8,7 @@
 #include "Board.h"
 #include "Deck.h"
 #include "Tile.h"
+#include "AnimationManager.h"
 
 #define CLASS(name) class name : public StateLogic { using StateLogic::StateLogic; public: State onLeftMouseClick(State state, Game& game) override; };
 #define STATE(name) stateLogicMap[State::name] = std::make_unique<name>(State::name);
@@ -58,8 +59,12 @@ public:
 	Game& operator=(const Game&) = delete;
 
 	void run();
-	void onHeroPicked(int heroIndex);
-	Board::Site onStartingTowerPicked(sf::Vector2f mouseBoardPosition);
+	sf::Vector2f getMouseBoardPosition() const;
+	std::vector<std::unique_ptr<Card>> getHeroCards();
+	void displayCards(std::vector<std::unique_ptr<Card>>&& cards);
+	void createPlayer(int heroIndex);
+	void placeNewPlayer(Board::Site site);
+	void movePlayer(int index, Board::Site site);
 	void startNewGame();
 	void startPlayerRound();
 	TileDeck& getTiles() { return tiles; }
@@ -89,6 +94,8 @@ private:
 	int activePlayer = 0;
 
 	std::map<State, std::unique_ptr<StateLogic>> stateLogicMap;
+
+	AnimationManager animations;
 
 private:
 	void createStateLogicMap()

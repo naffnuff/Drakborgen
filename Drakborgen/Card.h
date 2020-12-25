@@ -13,6 +13,8 @@ public:
 	Card(Card&& other) noexcept;
 	Card& operator=(Card&& other) noexcept;
 
+	sf::Sprite& getSprite();
+
 	void centerAround(sf::Vector2f position);
 	sf::FloatRect getBounds();
 	void setScale(float factorX, float factorY);

@@ -21,9 +21,10 @@ public:
 	void pushCard(std::unique_ptr<Card> card);
 	std::unique_ptr<Card> pullCard(int index = 0);
 
+	std::vector<sf::Vector2f> getLayout(const std::vector<std::unique_ptr<Card>>& cards);
+
 private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-	void placeCards();
 
 private:
 	sf::Window& window;

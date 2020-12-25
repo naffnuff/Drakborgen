@@ -70,7 +70,7 @@ Game::State Game::StateLogic::execute(Game& game)
 		{
 			if (game.leftMouseButtonDown && game.capturedItemIndex == -1)
 			{
-				if (!game.xCenteredBoard || !game.xCenteredBoard)
+				if (!game.xCenteredBoard || !game.yCenteredBoard)
 				{
 					sf::Vector2f mouseMovementSincePressed(float(event.mouseMove.x - game.buttonPressedMousePosition.x), float(event.mouseMove.y - game.buttonPressedMousePosition.y));
 					sf::Vector2f newBoardPosition = game.buttonPressedBoardPosition + mouseMovementSincePressed;
@@ -120,7 +120,8 @@ Game::State Game::PickHero::onLeftMouseClick(State state, Game& game)
 	int heroIndex = game.cardDisplay.hitTest(game.buttonPressedMousePosition);
 	if( heroIndex >= 0 )
 	{
-		game.onHeroPicked(heroIndex);
+		game.createPlayer(heroIndex);
+		game.board.showClickSites(true);
 		std::cout << " -> pick start tower" << std::endl;
 		return State::PickStartTower;
 	}
@@ -131,11 +132,13 @@ Game::State Game::PickHero::onLeftMouseClick(State state, Game& game)
 Game::State Game::PickStartTower::onLeftMouseClick(State state, Game& game)
 {
 	std::cout << "pick start tower ";
-	sf::Vector2f boardPosition = game.board.getPosition();
-	sf::Vector2f mouseBoardPosition = sf::Vector2f(game.buttonReleasedMousePosition.x - boardPosition.x, game.buttonReleasedMousePosition.y - boardPosition.y );
+	sf::Vector2f mouseBoardPosition = game.getMouseBoardPosition();
 	if (game.board.testClickSites(mouseBoardPosition))
 	{
-		Board::Site pickedSite = game.onStartingTowerPicked(mouseBoardPosition);
+		game.board.showClickSites(false);
+		Board::Site site = game.board.getSite(mouseBoardPosition);
+		game.placeNewPlayer(site);
+		game.displayCards(game.getHeroCards());
 		if (game.cardDisplay.empty())
 		{
 			game.startNewGame();
@@ -144,7 +147,7 @@ Game::State Game::PickStartTower::onLeftMouseClick(State state, Game& game)
 		}
 		else
 		{
-			game.board.removeClickSite(pickedSite);
+			game.board.removeClickSite(site);
 			std::cout << " -> pick hero" << std::endl;
 			return State::PickHero;
 		}
@@ -153,8 +156,19 @@ Game::State Game::PickStartTower::onLeftMouseClick(State state, Game& game)
 	return state;
 }
 
-Game::State Game::PlayerMove::onLeftMouseClick(State state, Game& /*game*/)
+Game::State Game::PlayerMove::onLeftMouseClick(State state, Game& game)
 {
+	std::cout << "player move ";
+	sf::Vector2f mouseBoardPosition = game.getMouseBoardPosition();
+	if (game.board.testClickSites(mouseBoardPosition))
+	{
+		game.board.clearClickSites();
+		Board::Site site = game.board.getSite(mouseBoardPosition);
+		game.movePlayer(game.activePlayer, site);
+		//++game.activePlayer;
+		game.startPlayerRound();
+	}
+	std::cout << " -> player move" << std::endl;
 	return state;
 }
 
@@ -183,11 +197,8 @@ void Game::run()
 	heroes.push_back(Hero("bardhor", "Bardhor Bågman", 8));
 
 	board.setGameStartClickSites();
-
-	for (Hero& hero : heroes)
-	{
-		cardDisplay.pushCard(hero.pullStatsCard());
-	}
+	
+	displayCards(getHeroCards());
 
 	State state = State::PickHero;
 
@@ -200,6 +211,8 @@ void Game::run()
 		float timeDelta = timestamp - lastTimestamp;
 		lastTimestamp = timestamp;
 
+		animations.update(timestamp, timeDelta);
+
 		board.update(timestamp, timeDelta);
 
 		window.clear();
@@ -211,7 +224,35 @@ void Game::run()
 	}
 }
 
-void Game::onHeroPicked(int heroIndex)
+sf::Vector2f Game::getMouseBoardPosition() const
+{
+	sf::Vector2f boardPosition = board.getPosition();
+	sf::Vector2f mouseBoardPosition = sf::Vector2f(buttonReleasedMousePosition.x - boardPosition.x, buttonReleasedMousePosition.y - boardPosition.y);
+	return mouseBoardPosition;
+}
+
+std::vector<std::unique_ptr<Card>> Game::getHeroCards()
+{
+	std::vector<std::unique_ptr<Card>> heroCards;
+	for (Hero& hero : heroes)
+	{
+		heroCards.push_back(hero.pullStatsCard());
+	}
+	return heroCards;
+}
+
+void Game::displayCards(std::vector<std::unique_ptr<Card>>&& cards)
+{
+	std::vector<sf::Vector2f> layout = cardDisplay.getLayout(cards);
+	for (int i = 0; i < cards.size(); ++i)
+	{
+		cards[i]->getSprite().setPosition({ 0.0f, 0.0f });
+		animations.add(*cards[i].get(), layout[i], float(i + 1) / float(cards.size()));
+		cardDisplay.pushCard(std::move(cards[i]));
+	}
+}
+
+void Game::createPlayer(int heroIndex)
 {
 	heroes[heroIndex].placeStatsCard(cardDisplay.pullCard(heroIndex));
 	players.push_back({ std::move(heroes[heroIndex]), Board::invalidSite, heroes[heroIndex].getMaxLife() });
@@ -220,23 +261,22 @@ void Game::onHeroPicked(int heroIndex)
 	{
 		heroes[i].placeStatsCard(cardDisplay.pullCard(i));
 	}
-	board.showClickSites(true);
 }
 
-Board::Site Game::onStartingTowerPicked(sf::Vector2f mouseBoardPosition)
+void Game::placeNewPlayer(Board::Site site)
 {
-	board.showClickSites(false);
-	Board::Site site = board.getSite(mouseBoardPosition);
 	int index = int(players.size()) - 1;
 	Player& player = players[index];
 	player.boardSite = site;
 	board.addPlayer("Media/hjaltekort/" + player.hero.getId() + "gubbe.png", index);
 	board.setPlayerSite(index, site);
-	for (int i = 0; i < heroes.size(); ++i)
-	{
-		cardDisplay.pushCard(heroes[i].pullStatsCard());
-	}
-	return site;
+}
+
+void Game::movePlayer(int index, Board::Site site)
+{
+	Player& player = players[index];
+	player.boardSite = site;
+	board.setPlayerSite(index, site);
 }
 
 void Game::startNewGame()

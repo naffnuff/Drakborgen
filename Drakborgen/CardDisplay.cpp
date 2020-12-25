@@ -1,5 +1,7 @@
 #include "CardDisplay.h"
 
+#include "System.h"
+
 CardDisplay::CardDisplay(sf::Window& window)
 	: window(window)
 {
@@ -20,14 +22,12 @@ int CardDisplay::hitTest(sf::Vector2i mousePosition) const
 void CardDisplay::pushCard(std::unique_ptr<Card> card)
 {
 	cards.push_back(std::move(card));
-	placeCards();
 }
 
 std::unique_ptr<Card> CardDisplay::pullCard(int index)
 {
 	std::unique_ptr<Card> card = std::move(cards[index]);
 	cards.erase(cards.begin() + index);
-	placeCards();
 	return card;
 }
 
@@ -40,19 +40,36 @@ void CardDisplay::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 }
 
-void CardDisplay::placeCards()
+std::vector<sf::Vector2f> CardDisplay::getLayout(const std::vector<std::unique_ptr<Card>>& laidOutCards)
 {
+	std::vector<sf::Vector2f> layout(laidOutCards.size());
 	sf::Vector2u windowSize = window.getSize();
-	if (cards.size() == 1)
+	std::vector<std::pair<float, float>> quarters;
+	if (layout.size() == 1)
 	{
-		cards.front().get()->centerAround({ windowSize.x / 2.0f, windowSize.y / 2.0f });
+		quarters = { { 2.0f, 2.0f } };
 	}
-	if (cards.size() == 4)
+	else if (layout.size() == 2)
 	{
-		std::vector<std::pair<float, float>> quarters = { { 1.0f, 1.0f }, { 3.0f, 1.0f }, { 1.0f, 3.0f }, { 3.0f, 3.0f } };
-		for(int i = 0; i < quarters.size(); ++i)
-		{
-			cards[i].get()->centerAround({ windowSize.x * quarters[i].first / 4.0f, windowSize.y * quarters[i].second / 4.0f });
-		}
+		quarters = { { 2.0f, 1.0f }, { 2.0f, 3.0f } };
 	}
+	else if (layout.size() == 3)
+	{
+		quarters = { { 2.0f, 1.0f }, { 1.0f, 3.0f }, { 3.0f, 3.0f } };
+	}
+	else if (layout.size() == 4)
+	{
+		quarters = { { 1.0f, 1.0f }, { 3.0f, 1.0f }, { 1.0f, 3.0f }, { 3.0f, 3.0f } };
+	}
+	if (quarters.size() != layout.size())
+	{
+		THROW;
+	}
+	for (int i = 0; i < quarters.size(); ++i)
+	{
+		layout[i] = { windowSize.x * quarters[i].first / 4.0f, windowSize.y * quarters[i].second / 4.0f };
+		layout[i].x -= laidOutCards[i]->getBounds().width / 2.0f;
+		layout[i].y -= laidOutCards[i]->getBounds().height / 2.0f;
+	}
+	return layout;
 }

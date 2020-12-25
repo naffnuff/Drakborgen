@@ -3,6 +3,10 @@
 #include "Setup.h"
 #include "Game.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 int main()
 {
 	try
@@ -13,7 +17,9 @@ int main()
 	}
 	catch (std::exception& e)
 	{
-		std::cerr << e.what();
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_INTENSITY));
+		std::cerr << std::endl << e.what() << std::endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY));
 		return 1;
 	}
 	return 0;
