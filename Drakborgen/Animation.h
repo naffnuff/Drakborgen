@@ -1,25 +1,25 @@
 #pragma once
 
-#include "Card.h"
+#include <functional>
 
-#include <vector>
+#include "SFML/Graphics.hpp"
 
 class AnimationManager
 {
 private:
 	struct Animation
 	{
-		Card* card;
+		sf::Transformable* transformable;
 		sf::Vector2f start;
 		sf::Vector2f end;
 		float time;
 		float startTime;
+		std::function<void()> doneCallback;
 	};
 
 public:
 	void update(float elapsedTime, float timeDelta);
-	void clear();
-	void add(Card& card, sf::Vector2f target, float time);
+	void add(sf::Transformable& transformable, sf::Vector2f target, float time, std::function<void()> doneCallback);
 
 private:
 	std::vector<Animation> animations;

@@ -36,7 +36,7 @@ Game::State Game::StateLogic::execute(Game& game)
 {
 	State state = thisState;
 	sf::Event event;
-	while ( game.window.pollEvent(event))
+	while (game.window.pollEvent(event))
 	{
 		if (event.type == sf::Event::EventType::Closed)
 		{
@@ -47,10 +47,11 @@ Game::State Game::StateLogic::execute(Game& game)
 			if (event.mouseButton.button == sf::Mouse::Button::Left)
 			{
 				game.leftMouseButtonDown = true;
-				game.buttonPressedMousePosition.x = event.mouseButton.x;
-				game.buttonPressedMousePosition.y = event.mouseButton.y;
+				game.buttonPressedMousePosition.x = float(event.mouseButton.x);
+				game.buttonPressedMousePosition.y = float(event.mouseButton.y);
 				game.buttonPressedBoardPosition = game.board.getPosition();
-				game.capturedItemIndex = game.cardDisplay.hitTest(game.buttonPressedMousePosition);
+				game.capturedItemIndex = game.getMouseOverItemIndex(game.buttonPressedMousePosition);
+
 			}
 		}
 		if (event.type == sf::Event::EventType::MouseButtonReleased)
@@ -58,9 +59,10 @@ Game::State Game::StateLogic::execute(Game& game)
 			if (event.mouseButton.button == sf::Mouse::Button::Left && game.leftMouseButtonDown)
 			{
 				game.leftMouseButtonDown = false;
-				game.buttonReleasedMousePosition.x = event.mouseButton.x;
-				game.buttonReleasedMousePosition.y = event.mouseButton.y;
-				if (game.cardDisplay.hitTest(game.buttonReleasedMousePosition) == game.capturedItemIndex)
+				game.buttonReleasedMousePosition.x = float(event.mouseButton.x);
+				game.buttonReleasedMousePosition.y = float(event.mouseButton.y);
+				int mouseOverItemIndex = game.getMouseOverItemIndex(game.buttonPressedMousePosition);
+				if (mouseOverItemIndex == game.capturedItemIndex)
 				{
 					state = onLeftMouseClick(state, game);
 				}
@@ -81,13 +83,13 @@ Game::State Game::StateLogic::execute(Game& game)
 					else if (newBoardPosition.x > 0.0f)
 					{
 						newBoardPosition.x = 0.0f;
-						game.buttonPressedMousePosition.x = event.mouseMove.x;
+						game.buttonPressedMousePosition.x = float(event.mouseMove.x);
 						game.buttonPressedBoardPosition.x = game.board.getPosition().x;
 					}
 					else if (newBoardPosition.x + game.board.getSize().x < game.window.getSize().x)
 					{
 						newBoardPosition.x = game.window.getSize().x - game.board.getSize().x;
-						game.buttonPressedMousePosition.x = event.mouseMove.x;
+						game.buttonPressedMousePosition.x = float(event.mouseMove.x);
 						game.buttonPressedBoardPosition.x = game.board.getPosition().x;
 					}
 					if (game.xCenteredBoard)
@@ -97,13 +99,13 @@ Game::State Game::StateLogic::execute(Game& game)
 					else if (newBoardPosition.y > 0.0f)
 					{
 						newBoardPosition.y = 0.0f;
-						game.buttonPressedMousePosition.y = event.mouseMove.y;
+						game.buttonPressedMousePosition.y = float(event.mouseMove.y);
 						game.buttonPressedBoardPosition.y = game.board.getPosition().y;
 					}
 					else if (newBoardPosition.y + game.board.getSize().y < game.window.getSize().y)
 					{
 						newBoardPosition.y = game.window.getSize().y - game.board.getSize().y;
-						game.buttonPressedMousePosition.y = event.mouseMove.y;
+						game.buttonPressedMousePosition.y = float(event.mouseMove.y);
 						game.buttonPressedBoardPosition.y = game.board.getPosition().y;
 					}
 					game.board.setPosition(newBoardPosition);
@@ -114,22 +116,38 @@ Game::State Game::StateLogic::execute(Game& game)
 	return state;
 }
 
-Game::State Game::PickHero::onLeftMouseClick(State state, Game& game)
+Game::State Game::PickHeroState::onLeftMouseClick(State state, Game& game)
 {
 	std::cout << "pick hero ";
-	int heroIndex = game.cardDisplay.hitTest(game.buttonPressedMousePosition);
-	if( heroIndex >= 0 )
+	int heroIndex = game.getMouseOverItemIndex(game.buttonPressedMousePosition);
+	if(heroIndex >= 0)
 	{
-		game.createPlayer(heroIndex);
-		game.board.showClickSites(true);
-		std::cout << " -> pick start tower" << std::endl;
-		return State::PickStartTower;
+		if (heroIndex < game.heroes.size())
+		{
+			game.createPlayer(heroIndex);
+			game.board.showClickSites(true);
+			std::cout << " -> pick start tower" << std::endl;
+			return State::PickStartTower;
+		}
+		else
+		{
+			game.buttons.clear();
+			for (int i = int(game.heroes.size()) - 1; i >= 0; --i)
+			{
+				std::unique_ptr<Card> card = game.cardDisplay.pullCard(i);
+				std::cout << game.heroes[i].getId() << " " << card->imagePath << std::endl;
+				game.heroes[i].placeStatsCard(std::move(card));
+			}
+			game.startNewGame();
+			std::cout << " -> pick player move" << std::endl;
+			return State::PlayerMove;
+		}
 	}
 	std::cout << " -> pick hero" << std::endl;
 	return state;
 }
 
-Game::State Game::PickStartTower::onLeftMouseClick(State state, Game& game)
+Game::State Game::PickStartTowerState::onLeftMouseClick(State state, Game& game)
 {
 	std::cout << "pick start tower ";
 	sf::Vector2f mouseBoardPosition = game.getMouseBoardPosition();
@@ -137,9 +155,9 @@ Game::State Game::PickStartTower::onLeftMouseClick(State state, Game& game)
 	{
 		game.board.showClickSites(false);
 		Board::Site site = game.board.getSite(mouseBoardPosition);
+		game.board.removeClickSite(site);
 		game.placeNewPlayer(site);
-		game.displayCards(game.getHeroCards());
-		if (game.cardDisplay.empty())
+		if (game.heroes.empty())
 		{
 			game.startNewGame();
 			std::cout << " -> pick player move" << std::endl;
@@ -147,7 +165,15 @@ Game::State Game::PickStartTower::onLeftMouseClick(State state, Game& game)
 		}
 		else
 		{
-			game.board.removeClickSite(site);
+			sf::Vector2f buttonSize(500.0, 200.0);
+			sf::Vector2f buttonPosition(game.window.getSize().x * 3.0f / 4.0f - buttonSize.x / 2.0f, game.window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
+			game.buttons.push_back(std::make_unique<Button>("Let's rock!", buttonSize, buttonPosition, []() { std::cout << "Click!" << std::endl; }));
+			std::function<void()> cardsDisplayedCallback =
+				[&game]()
+			{
+				std::cout << "Hej" << std::endl;
+			};
+			game.displayCards(game.getHeroCards(), cardsDisplayedCallback);
 			std::cout << " -> pick hero" << std::endl;
 			return State::PickHero;
 		}
@@ -156,7 +182,7 @@ Game::State Game::PickStartTower::onLeftMouseClick(State state, Game& game)
 	return state;
 }
 
-Game::State Game::PlayerMove::onLeftMouseClick(State state, Game& game)
+Game::State Game::PlayerMoveState::onLeftMouseClick(State state, Game& game)
 {
 	std::cout << "player move ";
 	sf::Vector2f mouseBoardPosition = game.getMouseBoardPosition();
@@ -198,7 +224,7 @@ void Game::run()
 
 	board.setGameStartClickSites();
 	
-	displayCards(getHeroCards());
+	displayCards(getHeroCards(), []() { });
 
 	State state = State::PickHero;
 
@@ -219,6 +245,10 @@ void Game::run()
 
 		window.draw(board);
 		window.draw(cardDisplay);
+		for (const std::unique_ptr<Button>& button : buttons)
+		{
+			window.draw(*button);
+		}
 
 		window.display();
 	}
@@ -231,6 +261,23 @@ sf::Vector2f Game::getMouseBoardPosition() const
 	return mouseBoardPosition;
 }
 
+int Game::getMouseOverItemIndex(sf::Vector2f mousePosition) const
+{
+	int index = cardDisplay.hitTest(mousePosition);
+	if (index == -1)
+	{
+		for (int i = 0; i < buttons.size(); ++i)
+		{
+			if (buttons[i]->hitTest(mousePosition, false))
+			{
+				index = cardDisplay.cardCount() + i;
+				break;
+			}
+		}
+	}
+	return index;
+}
+
 std::vector<std::unique_ptr<Card>> Game::getHeroCards()
 {
 	std::vector<std::unique_ptr<Card>> heroCards;
@@ -241,13 +288,13 @@ std::vector<std::unique_ptr<Card>> Game::getHeroCards()
 	return heroCards;
 }
 
-void Game::displayCards(std::vector<std::unique_ptr<Card>>&& cards)
+void Game::displayCards(std::vector<std::unique_ptr<Card>>&& cards, std::function<void()> cardsDisplayedCallback)
 {
 	std::vector<sf::Vector2f> layout = cardDisplay.getLayout(cards);
 	for (int i = 0; i < cards.size(); ++i)
 	{
-		cards[i]->getSprite().setPosition({ 0.0f, 0.0f });
-		animations.add(*cards[i].get(), layout[i], float(i + 1) / float(cards.size()));
+		cards[i]->setPosition({ 0.0f, 0.0f });
+		animations.add(*cards[i], layout[i], float(i + 1) / float(cards.size()), i == 0 ? cardsDisplayedCallback : []() { });
 		cardDisplay.pushCard(std::move(cards[i]));
 	}
 }

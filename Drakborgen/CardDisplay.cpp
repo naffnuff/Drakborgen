@@ -7,11 +7,11 @@ CardDisplay::CardDisplay(sf::Window& window)
 {
 }
 
-int CardDisplay::hitTest(sf::Vector2i mousePosition) const
+int CardDisplay::hitTest(sf::Vector2f mousePosition) const
 {
 	for (int i = 0; i < cards.size(); ++i)
 	{
-		if (cards[i]->getBounds().contains(float(mousePosition.x), float(mousePosition.y)))
+		if (cards[i]->getGlobalBounds().contains(mousePosition))
 		{
 			return i;
 		}
@@ -55,7 +55,7 @@ std::vector<sf::Vector2f> CardDisplay::getLayout(const std::vector<std::unique_p
 	}
 	else if (layout.size() == 3)
 	{
-		quarters = { { 2.0f, 1.0f }, { 1.0f, 3.0f }, { 3.0f, 3.0f } };
+		quarters = { { 1.0f, 1.0f }, { 3.0f, 1.0f }, { 1.0f, 3.0f } };
 	}
 	else if (layout.size() == 4)
 	{
@@ -68,8 +68,8 @@ std::vector<sf::Vector2f> CardDisplay::getLayout(const std::vector<std::unique_p
 	for (int i = 0; i < quarters.size(); ++i)
 	{
 		layout[i] = { windowSize.x * quarters[i].first / 4.0f, windowSize.y * quarters[i].second / 4.0f };
-		layout[i].x -= laidOutCards[i]->getBounds().width / 2.0f;
-		layout[i].y -= laidOutCards[i]->getBounds().height / 2.0f;
+		layout[i].x -= laidOutCards[i]->getGlobalBounds().width / 2.0f;
+		layout[i].y -= laidOutCards[i]->getGlobalBounds().height / 2.0f;
 	}
 	return layout;
 }

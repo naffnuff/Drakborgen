@@ -14,9 +14,9 @@ public:
 	CardDisplay(const CardDisplay&) = delete;
 	CardDisplay& operator=(const CardDisplay&) = delete;
 	
-	bool empty() const { return cards.empty(); }
+	int cardCount() const { return int(cards.size()); }
 
-	int hitTest(sf::Vector2i mousePosition) const;
+	int hitTest(sf::Vector2f mousePosition) const;
 
 	void pushCard(std::unique_ptr<Card> card);
 	std::unique_ptr<Card> pullCard(int index = 0);

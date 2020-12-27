@@ -2,6 +2,7 @@
 
 Card::Card(const std::string& imagePath)
 	: sprite(imagePath)
+	, imagePath(imagePath)
 {
 }
 
@@ -16,29 +17,19 @@ Card& Card::operator=(Card&& other) noexcept
 	return *this;
 }
 
-sf::Sprite& Card::getSprite()
-{
-	return sprite.get();
-}
-
 void Card::centerAround(sf::Vector2f position)
 {
-	sf::FloatRect bounds = getBounds();
-	sprite.get().setPosition({ position.x - float(bounds.width) / 2.0f, position.y - float(bounds.height) / 2.0f });
+	sf::FloatRect bounds = getGlobalBounds();
+	setPosition({ position.x - float(bounds.width) / 2.0f, position.y - float(bounds.height) / 2.0f });
 }
 
-sf::FloatRect Card::getBounds()
+sf::FloatRect Card::getGlobalBounds()
 {
-	return sprite.get().getGlobalBounds();
-}
-
-void Card::setScale( float factorX, float factorY )
-{
-	sprite.get().setScale(factorX, factorY);
+	return getTransform().transformRect(sprite.get().getLocalBounds());
 }
 
 void Card::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	//states.transform *= getTransform();
+	states.transform *= getTransform();
 	target.draw(sprite.get(), states);
 }
