@@ -7,10 +7,11 @@
 #include "Tile.h"
 #include "Tower.h"
 
-Board::Board()
+Board::Board(AnimationManager& animations)
 	: clickOverlay(sf::Vector2f(tileSize, tileSize))
 	, boardSprite("Media/spelplan.jpg")
-	, vaultSprite( "Media/skattkammaren.png" )
+	, vaultSprite("Media/skattkammaren.png")
+	, animations(animations)
 {
 	vaultSprite.get().setPosition(getSitePosition({ 4, 6 }));
 	vaultSprite.get().move(0.0f, 5.0f);
@@ -33,7 +34,7 @@ void Board::update(float elapsedTime, float /*timeDelta*/)
 	}
 	const int wholeSeconds = int(elapsedTime - moveSiteAnimationStartTime);
 	float fraction = elapsedTime - moveSiteAnimationStartTime - wholeSeconds;
-	if (wholeSeconds % 2 == 0)
+	if (wholeSeconds % 2 != 0)
 	{
 		fraction = 1.0f - fraction;
 	}
@@ -76,7 +77,11 @@ void Board::setPlayerMoveSites(Site playerSite)
 {
 	for (Direction exit : getTile(playerSite)->getExits())
 	{
-		moveSites.push_back(createMoveSite(playerSite, exit));
+		MoveSite moveSite = createMoveSite(playerSite, exit);
+		if (withinBounds(moveSite.site))
+		{
+			moveSites.push_back(moveSite);
+		}
 	}
 	moveSiteAnimationStartTime = 0.0f;
 }
@@ -152,14 +157,14 @@ void Board::addPlayer(const std::string& imagePath, int index)
 	player.avatar->setScale(1.0f / 3.0f, 1.0f / 3.0f);
 }
 
-void Board::setPlayerSite(int index, MoveSite moveSite)
+void Board::setPlayerSite(int index, MoveSite moveSite, std::function<void()> callback)
 {
 	if (players.size() <= index)
 	{
 		THROW;
 	}
 	players[index].site = moveSite.site;
-	placePlayer(index, moveSite.direction);
+	placePlayer(index, moveSite.direction, callback);
 }
 
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -204,11 +209,19 @@ bool Board::withinBounds(Site site) const
 	return site.row >= 0 && site.row < rowCount && site.column >= 0 && site.column < columnCount;
 }
 
-void Board::placePlayer(int index, Direction)
+void Board::placePlayer(int index, Direction direction, std::function<void()> callback)
 {
 	Player& player = players[index];
 	sf::Vector2f sitePosition = getSitePosition(player.site);
-	player.avatar->centerAround({ sitePosition.x + tileSize / 2.0f, sitePosition.y + tileSize / 2.0f });
+	sf::Vector2f avatarSize = player.avatar->getGlobalBounds().getSize();
+	sf::Vector2f animationTarget(sitePosition.x + tileSize / 2.0f - avatarSize.x / 2.0f, sitePosition.y + tileSize / 2.0f - avatarSize.y / 2.0f);
+	if (direction == Direction::Invalid)
+	{
+		float avatarStartX = animationTarget.x + (player.site.column == 0 ? -tileSize : tileSize) * 2.0f;
+		float avatarStartY = animationTarget.y + (player.site.row == 0 ? -tileSize : tileSize);
+		player.avatar->setPosition(avatarStartX, avatarStartY);
+	}
+	animations.add(*player.avatar, animationTarget, 0.5f, callback);
 }
 
 std::unique_ptr<Tile>& Board::getTile(Site site)

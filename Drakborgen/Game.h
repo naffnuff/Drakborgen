@@ -21,6 +21,7 @@ private:
 		Hero hero;
 		Board::Site boardSite;
 		int life = 0;
+		int avatarIndex = 0;
 	};
 
 	enum class State
@@ -55,8 +56,10 @@ private:
 	void displayCard(std::unique_ptr<Card>&& card, std::function<void()> cardDisplayedCallback);
 	void displayCards(std::vector<std::unique_ptr<Card>>&& cards, std::function<void()> cardsDisplayedCallback);
 	void createPlayer(int heroIndex);
-	void placeNewPlayer(Board::Site site);
-	void movePlayer(int index, Board::MoveSite moveSite);
+	void placeNewPlayer(Board::Site site, std::function<void()> callback);
+	void movePlayer(int index, Board::MoveSite moveSite, std::function<void()> callback);
+	void onNewPlayerPlaced();
+	void onPlayerMoved();
 	void startNewGame();
 	void startPlayerRound();
 
@@ -70,7 +73,6 @@ private:
 	TileDeck tiles;
 
 	int playerCount = 4;
-	int currentPlayer = 0;
 
 	bool xCenteredBoard = false;
 	bool yCenteredBoard = false;
@@ -86,7 +88,7 @@ private:
 
 	std::vector<std::unique_ptr<Button>> buttons;
 
-	int activePlayer = 0;
+	int activePlayerIndex = 0;
 
 	std::map<State, std::function<State()>> stateLogicMap;
 

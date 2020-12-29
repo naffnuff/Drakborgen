@@ -7,6 +7,7 @@
 
 #include "Tile.h"
 #include "Card.h"
+#include "Animation.h"
 
 class Board : public sf::Drawable, public sf::Transformable
 {
@@ -40,7 +41,7 @@ public:
 	static constexpr int rowCount = 10;
 	static constexpr int columnCount = 13;
 
-	Board();
+	Board(AnimationManager& animations);
 
 	Board(const Board&) = delete;
 	Board& operator=(const Board&) = delete;
@@ -62,13 +63,13 @@ public:
 	void showMoveSites(bool show);
 
 	void addPlayer(const std::string& imagePath, int index);
-	void setPlayerSite(int index, MoveSite moveSite);
+	void setPlayerSite(int index, MoveSite moveSite, std::function<void()> callback);
 
 private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 	bool withinBounds(Site site) const;
-	void placePlayer(int index, Direction direction);
+	void placePlayer(int index, Direction direction, std::function<void()> callback);
 
 	std::unique_ptr<Tile>& getTile(Site site);
 
@@ -84,6 +85,8 @@ private:
 	std::vector<MoveSite> moveSites;
 	bool moveSitesShown = false;
 	float moveSiteAnimationStartTime = 0.0f;
+
+	AnimationManager& animations;
 };
 
 inline bool operator==(Board::Site siteOne, Board::Site siteTwo)
