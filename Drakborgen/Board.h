@@ -21,12 +21,18 @@ public:
 		int column = 0;
 	};
 
+	struct MoveSite
+	{
+		Site site;
+		Direction direction = Direction::Invalid;
+	};
+
 	static constexpr Site invalidSite = { -1, -1 };
 
 private:
 	struct Player
 	{
-		Card avatar;
+		std::unique_ptr<Card> avatar;
 		Site site;
 	};
 
@@ -41,31 +47,32 @@ public:
 
 	void update(float elapsedTime, float timeDelta);
 	bool hasTile(Site site) const;
-	void placeTile(std::unique_ptr<Tile> tile, Site site);
+	void placeTile(std::unique_ptr<Tile> tile, MoveSite moveSite);
 	sf::Vector2f getSitePosition(Site site) const;
 	Site getSite(sf::Vector2f position) const;
 
 	sf::Vector2f getSize() const;
 
-	void setGameStartClickSites();
-	void setPlayerMoveClickSites(Site playerSite);
-	bool testClickSites(sf::Vector2f position) const;
-	void removeClickSite(Site site);
-	void clearClickSites();
-	void showClickSites(bool show);
+	void setGameStartMoveSites();
+	void setPlayerMoveSites(Site playerSite);
+	bool testMoveSites(sf::Vector2f position) const;
+	MoveSite getMoveSite(sf::Vector2f position) const;
+	void removeMoveSite(Site site);
+	void clearMoveSites();
+	void showMoveSites(bool show);
 
 	void addPlayer(const std::string& imagePath, int index);
-	void setPlayerSite(int index, Site site);
+	void setPlayerSite(int index, MoveSite moveSite);
 
 private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 	bool withinBounds(Site site) const;
-	void placePlayer(int index);
+	void placePlayer(int index, Direction direction);
 
 	std::unique_ptr<Tile>& getTile(Site site);
 
-	Site step(Site site, TileLogic::Exit exit);
+	MoveSite createMoveSite(Site site, Direction exit);
 
 private:
 	UniqueSprite boardSprite;
@@ -74,9 +81,9 @@ private:
 	std::vector<Player> players;
 
 	std::array<std::array<std::unique_ptr<Tile>, columnCount>, rowCount> tileGrid;
-	std::vector<Site> clickSites;
-	bool clickSitesShown = false;
-	float clickSiteAnimationStartTime = 0.0f;
+	std::vector<MoveSite> moveSites;
+	bool moveSitesShown = false;
+	float moveSiteAnimationStartTime = 0.0f;
 };
 
 inline bool operator==(Board::Site siteOne, Board::Site siteTwo)

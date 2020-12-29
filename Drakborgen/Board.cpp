@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "System.h"
-#include "TileLogic.h"
+#include "Tile.h"
 #include "Tower.h"
 
 Board::Board()
@@ -16,23 +16,23 @@ Board::Board()
 	vaultSprite.get().move(0.0f, 5.0f);
 	//players.reserve(4);
 
-	tileGrid[0][0] = Tile::create<Tower>(TileLogic::Exit::East, TileLogic::Exit::South);
-	tileGrid[0][columnCount - 1] = Tile::create<Tower>(TileLogic::Exit::West, TileLogic::Exit::South);
-	tileGrid[rowCount - 1][0] = Tile::create<Tower>(TileLogic::Exit::East, TileLogic::Exit::North);
-	tileGrid[rowCount - 1][columnCount - 1] = Tile::create<Tower>(TileLogic::Exit::West, TileLogic::Exit::North);
-	tileGrid[4][6] = Tile::create<Tower>();
-	tileGrid[5][6] = Tile::create<Tower>();
+	tileGrid[0][0] = std::make_unique<Tower>(Direction::East, Direction::South);
+	tileGrid[0][columnCount - 1] = std::make_unique<Tower>(Direction::West, Direction::South);
+	tileGrid[rowCount - 1][0] = std::make_unique<Tower>(Direction::East, Direction::North);
+	tileGrid[rowCount - 1][columnCount - 1] = std::make_unique<Tower>(Direction::West, Direction::North);
+	tileGrid[4][6] = std::make_unique<Tower>();
+	tileGrid[5][6] = std::make_unique<Tower>();
 }
 
 void Board::update(float elapsedTime, float /*timeDelta*/)
 {
 	// one cycle per second
-	if (clickSiteAnimationStartTime == 0.0f)
+	if (moveSiteAnimationStartTime == 0.0f)
 	{
-		clickSiteAnimationStartTime = elapsedTime;
+		moveSiteAnimationStartTime = elapsedTime;
 	}
-	const int wholeSeconds = int(elapsedTime - clickSiteAnimationStartTime);
-	float fraction = elapsedTime - clickSiteAnimationStartTime - wholeSeconds;
+	const int wholeSeconds = int(elapsedTime - moveSiteAnimationStartTime);
+	float fraction = elapsedTime - moveSiteAnimationStartTime - wholeSeconds;
 	if (wholeSeconds % 2 == 0)
 	{
 		fraction = 1.0f - fraction;
@@ -40,14 +40,15 @@ void Board::update(float elapsedTime, float /*timeDelta*/)
 	clickOverlay.setFillColor(sf::Color(uint8_t(0x80 + 0x7f * fraction), uint8_t(0x80 + 0x7f * fraction), uint8_t(0x80 + 0x7f * fraction), uint8_t(0xff * fraction)));
 }
 
-void Board::placeTile(std::unique_ptr<Tile> tile, Site site)
+void Board::placeTile(std::unique_ptr<Tile> tile, MoveSite moveSite)
 {
-	if (hasTile(site) || !withinBounds(site))
+	if (hasTile(moveSite.site) || !withinBounds(moveSite.site))
 	{
 		THROW;
 	}
-	tile->setPosition(getSitePosition(site));
-	tileGrid[site.row][site.column] = std::move(tile);
+	tile->setPosition(getSitePosition(moveSite.site));
+	tile->setOrientation(moveSite.direction);
+	tileGrid[moveSite.site.row][moveSite.site.column] = std::move(tile);
 }
 
 sf::Vector2f Board::getSitePosition(Site site) const
@@ -65,31 +66,31 @@ sf::Vector2f Board::getSize() const
 	return boardSprite.get().getLocalBounds().getSize();
 }
 
-void Board::setGameStartClickSites()
+void Board::setGameStartMoveSites()
 {
-	clickSites = { { 0, 0 }, { 0, columnCount - 1 }, { rowCount - 1, 0 }, { rowCount - 1, columnCount - 1 } };
-	clickSiteAnimationStartTime = 0.0f;
+	moveSites = { { 0, 0 }, { 0, columnCount - 1 }, { rowCount - 1, 0 }, { rowCount - 1, columnCount - 1 } };
+	moveSiteAnimationStartTime = 0.0f;
 }
 
-void Board::setPlayerMoveClickSites(Site playerSite)
+void Board::setPlayerMoveSites(Site playerSite)
 {
-	for (TileLogic::Exit exit : getTile(playerSite)->getLogic()->getExits())
+	for (Direction exit : getTile(playerSite)->getExits())
 	{
-		clickSites.push_back(step(playerSite, exit));
+		moveSites.push_back(createMoveSite(playerSite, exit));
 	}
-	clickSiteAnimationStartTime = 0.0f;
+	moveSiteAnimationStartTime = 0.0f;
 }
 
-bool Board::testClickSites(sf::Vector2f position) const
+bool Board::testMoveSites(sf::Vector2f position) const
 {
-	if (!clickSitesShown)
+	if (!moveSitesShown)
 	{
 		THROW;
 	}
-	for (Site clickSite : clickSites)
+	Site site = getSite(position);
+	for (MoveSite moveSite : moveSites)
 	{
-		Site site = getSite(position);
-		if (site == clickSite)
+		if (site == moveSite.site)
 		{
 			return true;
 		}
@@ -97,29 +98,46 @@ bool Board::testClickSites(sf::Vector2f position) const
 	return false;
 }
 
-void Board::removeClickSite( Site site )
+Board::MoveSite Board::getMoveSite(sf::Vector2f position) const
 {
-	for (std::vector<Site>::iterator it = clickSites.begin(); it < clickSites.end(); ++it)
+	if (!moveSitesShown)
 	{
-		if (*it == site)
+		THROW;
+	}
+	Site site = getSite(position);
+	for (MoveSite moveSite : moveSites)
+	{
+		if (site == moveSite.site)
 		{
-			clickSites.erase(it);
+			return moveSite;
+		}
+	}
+	THROW;
+}
+
+void Board::removeMoveSite(Site site)
+{
+	for (std::vector<MoveSite>::iterator it = moveSites.begin(); it < moveSites.end(); ++it)
+	{
+		if (it->site == site)
+		{
+			moveSites.erase(it);
 			break;
 		}
 	}
 }
 
-void Board::clearClickSites()
+void Board::clearMoveSites()
 {
-	clickSites.clear();
+	moveSites.clear();
 }
 
-void Board::showClickSites(bool show)
+void Board::showMoveSites(bool show)
 {
-	clickSitesShown = show;
+	moveSitesShown = show;
 	if (show)
 	{
-		clickSiteAnimationStartTime = 0.0f;
+		moveSiteAnimationStartTime = 0.0f;
 	}
 }
 
@@ -129,19 +147,19 @@ void Board::addPlayer(const std::string& imagePath, int index)
 	{
 		THROW;
 	}
-	players.push_back({ Card(imagePath), invalidSite });
+	players.push_back({ std::make_unique<Card>(imagePath), invalidSite });
 	Player& player = players.back();
-	player.avatar.setScale(1.0f / 3.0f, 1.0f / 3.0f);
+	player.avatar->setScale(1.0f / 3.0f, 1.0f / 3.0f);
 }
 
-void Board::setPlayerSite(int index, Site site)
+void Board::setPlayerSite(int index, MoveSite moveSite)
 {
 	if (players.size() <= index)
 	{
 		THROW;
 	}
-	players[index].site = site;
-	placePlayer(index);
+	players[index].site = moveSite.site;
+	placePlayer(index, moveSite.direction);
 }
 
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -159,12 +177,12 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 			}
 		}
 	}
-	if (clickSitesShown)
+	if (moveSitesShown)
 	{
-		for(Site site : clickSites)
+		for(MoveSite moveSite : moveSites)
 		{
 			sf::Transform transform = states.transform;
-			sf::Vector2f offset = getSitePosition(site);
+			sf::Vector2f offset = getSitePosition(moveSite.site);
 			states.transform.translate(offset.x, offset.y);
 			target.draw(clickOverlay, states);
 			states.transform = transform;
@@ -172,7 +190,7 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 	for (const Player& player : players)
 	{
-		target.draw(player.avatar, states);
+		target.draw(*player.avatar, states);
 	}
 }
 
@@ -186,11 +204,11 @@ bool Board::withinBounds(Site site) const
 	return site.row >= 0 && site.row < rowCount && site.column >= 0 && site.column < columnCount;
 }
 
-void Board::placePlayer(int index)
+void Board::placePlayer(int index, Direction)
 {
 	Player& player = players[index];
 	sf::Vector2f sitePosition = getSitePosition(player.site);
-	player.avatar.centerAround({ sitePosition.x + tileSize / 2.0f, sitePosition.y + tileSize / 2.0f });
+	player.avatar->centerAround({ sitePosition.x + tileSize / 2.0f, sitePosition.y + tileSize / 2.0f });
 }
 
 std::unique_ptr<Tile>& Board::getTile(Site site)
@@ -202,25 +220,25 @@ std::unique_ptr<Tile>& Board::getTile(Site site)
 	return tileGrid[site.row][site.column];
 }
 
-Board::Site Board::step(Site site, TileLogic::Exit exit)
+Board::MoveSite Board::createMoveSite(Site site, Direction exit)
 {
 	switch (exit)
 	{
-	case TileLogic::Exit::North:
+	case Direction::North:
 		--site.row;
 		break;
-	case TileLogic::Exit::South:
+	case Direction::South:
 		++site.row;
 		break;
-	case TileLogic::Exit::West:
+	case Direction::West:
 		--site.column;
 		break;
-	case TileLogic::Exit::East:
+	case Direction::East:
 		++site.column;
 		break;
 	default:
 		THROW;
 		break;
 	}
-	return site;
+	return { site, exit };
 }

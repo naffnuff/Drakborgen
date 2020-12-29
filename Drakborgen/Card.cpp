@@ -6,7 +6,7 @@ Card::Card(const std::string& imagePath)
 {
 }
 
-Card::Card(Card&& other) noexcept
+/*Card::Card(Card&& other) noexcept
 {
 	*this = std::move(other);
 }
@@ -15,7 +15,7 @@ Card& Card::operator=(Card&& other) noexcept
 {
 	sprite = std::move(other.sprite);
 	return *this;
-}
+}*/
 
 void Card::centerAround(sf::Vector2f position)
 {

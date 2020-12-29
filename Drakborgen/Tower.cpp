@@ -1,6 +1,6 @@
 #include "Tower.h"
 
-std::vector<TileLogic::Exit>& Tower::getExits()
+std::vector<Direction> Tower::getExits() const
 {
 	return exits;
 }

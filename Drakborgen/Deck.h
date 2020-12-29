@@ -24,10 +24,10 @@ public:
 		random.shuffle(items);
 	}
 
-	template<typename... Args>
-	void createItem(Args... args)
+	template<typename Subtype, typename... Args>
+	void createItem(Args&&... args)
 	{
-		items.push_back(std::make_unique<T>(args...));
+		items.push_back(std::make_unique<Subtype>(std::forward<Args>(args)...));
 		if (items.size() > Capacity)
 		{
 			THROW;

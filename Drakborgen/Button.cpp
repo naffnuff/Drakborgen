@@ -2,8 +2,7 @@
 
 #include "System.h"
 
-Button::Button(const std::string& message, sf::Vector2f size, sf::Vector2f position, std::function<void()> callback)
-	: callback(callback)
+Button::Button(const std::wstring& message, sf::Vector2f size, sf::Vector2f position, int textSixe)
 {
 	if (!font.loadFromFile("Media/ITCBLKAD.TTF"))
 	{
@@ -21,7 +20,7 @@ Button::Button(const std::string& message, sf::Vector2f size, sf::Vector2f posit
 	text.setString(message);
 
 	// set the character size
-	text.setCharacterSize(60); // in pixels, not points!
+	text.setCharacterSize(textSixe); // in pixels, not points!
 
 	// set the color
 	text.setFillColor(sf::Color::Red);
@@ -30,18 +29,13 @@ Button::Button(const std::string& message, sf::Vector2f size, sf::Vector2f posit
 	text.setStyle(sf::Text::Bold);
 
 	sf::Vector2f textSize = text.getGlobalBounds().getSize();
-	text.setPosition({ position.x + size.x / 2.0f - textSize.x / 2.0f, position.y + size.y / 2.0f - textSize.y });
+	text.setPosition({ position.x + size.x / 2.0f - textSize.x / 2.0f, position.y + size.y / 2.0f - 45.0f });
 }
 
-bool Button::hitTest(sf::Vector2f point, bool callbackOnHit) const
+bool Button::hitTest(sf::Vector2f point) const
 {
 	sf::FloatRect buttonRectangle = background.getGlobalBounds();
-	bool isHit = buttonRectangle.contains(point);
-	if (isHit && callbackOnHit)
-	{
-		callback();
-	}
-	return isHit;
+	return buttonRectangle.contains(point);
 }
 
 void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const

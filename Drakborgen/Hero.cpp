@@ -1,6 +1,6 @@
 #include "Hero.h"
 
-Hero::Hero(const std::string& id, const std::string& name, int maxLife)
+Hero::Hero(const std::string& id, const std::wstring& name, int maxLife)
 	: id(id)
 	, name(name)
 	, statCard(std::make_unique<Card>("Media/hjaltekort/" + id + ".png"))
@@ -19,7 +19,6 @@ Hero& Hero::operator=(Hero&& other) noexcept
 	name = std::move(other.name);
 	statCard = std::move(other.statCard);
 	maxLife = other.maxLife;
-	other.maxLife = 0;
 	return *this;
 }
 

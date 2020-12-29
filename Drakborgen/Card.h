@@ -10,8 +10,8 @@ public:
 	Card(const Card&) = delete;
 	Card& operator=(const Card&) = delete;
 	
-	Card(Card&& other) noexcept;
-	Card& operator=(Card&& other) noexcept;
+	//Card(Card&& other) noexcept;
+	//Card& operator=(Card&& other) noexcept;
 
 	void centerAround(sf::Vector2f position);
 	sf::FloatRect getGlobalBounds();

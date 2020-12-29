@@ -1,8 +1,8 @@
 #pragma once
 
-#include "TileLogic.h"
+#include "Tile.h"
 
-class Tower : public TileLogic
+class Tower : public Tile
 {
 public:
 	template<typename... Args>
@@ -11,9 +11,9 @@ public:
 		(exits.push_back(args), ...);
 	}
 
-	virtual std::vector<Exit>& getExits() override;
+	virtual std::vector<Direction> getExits() const override;
 
 private:
-	std::vector<Exit> exits;
+	std::vector<Direction> exits;
 };
 

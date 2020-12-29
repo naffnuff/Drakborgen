@@ -11,9 +11,6 @@
 #include "Animation.h"
 #include "Button.h"
 
-#define CLASS(name) class name##State: public StateLogic { using StateLogic::StateLogic; public: State onLeftMouseClick(State state, Game& game) override; };
-#define STATE(name) stateLogicMap[State::name] = std::make_unique<name##State>(State::name);
-
 using TileDeck = Deck<Tile, 115>;
 
 class Game
@@ -31,27 +28,9 @@ private:
 		PickHero,
 		PickStartTower,
 		PlayerMove,
+		ViewStatsCard,
 		NoState
 	};
-
-	class StateLogic
-	{
-	public:
-		StateLogic(State thisState) : thisState(thisState) { }
-		virtual ~StateLogic() { }
-		
-		State execute(Game& game);
-
-	private:
-		virtual State onLeftMouseClick(State state, Game&) { return state; }
-
-	private:
-		State thisState;
-	};
-
-	CLASS(PickHero);
-	CLASS(PickStartTower);
-	CLASS(PlayerMove);
 
 public:
 	Game();
@@ -59,17 +38,29 @@ public:
 	Game(const Game&) = delete;
 	Game& operator=(const Game&) = delete;
 
+	TileDeck& getTiles() { return tiles; }
+
 	void run();
+
+private:
+	State processEvents(State state);
+
+	template<State>
+	State onLeftMouseClick(State state);
+
+	void placeAtOrigin(std::unique_ptr<Card>& card) const;
 	sf::Vector2f getMouseBoardPosition() const;
 	int getMouseOverItemIndex(sf::Vector2f mousePosition) const;
 	std::vector<std::unique_ptr<Card>> getHeroCards();
+	void displayCard(std::unique_ptr<Card>&& card, std::function<void()> cardDisplayedCallback);
 	void displayCards(std::vector<std::unique_ptr<Card>>&& cards, std::function<void()> cardsDisplayedCallback);
 	void createPlayer(int heroIndex);
 	void placeNewPlayer(Board::Site site);
-	void movePlayer(int index, Board::Site site);
+	void movePlayer(int index, Board::MoveSite moveSite);
 	void startNewGame();
 	void startPlayerRound();
-	TileDeck& getTiles() { return tiles; }
+
+	void createStateLogicMap();
 
 private:
 	Random random;
@@ -90,23 +81,15 @@ private:
 	sf::Vector2f buttonReleasedMousePosition;
 	int capturedItemIndex = 0;
 
-	std::vector<Hero> heroes;
+	std::vector<Hero> idleHeroes;
 	std::vector<Player> players;
 
 	std::vector<std::unique_ptr<Button>> buttons;
 
 	int activePlayer = 0;
 
-	std::map<State, std::unique_ptr<StateLogic>> stateLogicMap;
+	std::map<State, std::function<State()>> stateLogicMap;
 
 	AnimationManager animations;
-
-private:
-	void createStateLogicMap()
-	{
-		STATE(PickHero);
-		STATE(PickStartTower);
-		STATE(PlayerMove);
-	}
 };
 

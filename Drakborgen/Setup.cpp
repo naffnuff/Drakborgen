@@ -1,6 +1,7 @@
 #include "Setup.h"
 
 #include "System.h"
+#include "Room.h"
 
 void Setup::setUpGame(Game& game)
 {
@@ -132,6 +133,6 @@ void Setup::createTiles(TileDeck& tiles)
 }
 
 void Setup::createTile(TileDeck& tiles, const std::string& number)
-{
-	tiles.createItem("Media/rumsbrickor/rumsbricka0" + number + ".png");
+{	
+	tiles.createItem<Room>("Media/rumsbrickor/rumsbricka0" + number + ".png");
 }

@@ -47,11 +47,11 @@ std::vector<sf::Vector2f> CardDisplay::getLayout(const std::vector<std::unique_p
 	std::vector<std::pair<float, float>> quarters;
 	if (layout.size() == 1)
 	{
-		quarters = { { 2.0f, 2.0f } };
+		quarters = { { 1.0f, 1.0f } };
 	}
 	else if (layout.size() == 2)
 	{
-		quarters = { { 2.0f, 1.0f }, { 2.0f, 3.0f } };
+		quarters = { { 1.0f, 1.0f }, { 3.0f, 1.0f } };
 	}
 	else if (layout.size() == 3)
 	{
