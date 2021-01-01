@@ -20,6 +20,7 @@ private:
 public:
 	void update(float elapsedTime, float timeDelta);
 	void add(sf::Transformable& transformable, sf::Vector2f target, float time, std::function<void()> doneCallback);
+	void remove(sf::Transformable& transformable);
 
 private:
 	std::vector<Animation> animations;

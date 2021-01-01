@@ -1,5 +1,7 @@
 #include "Animation.h"
 
+#include "System.h"
+
 void AnimationManager::update(float elapsedTime, float)
 {
 	std::vector<std::function<void()>> doneCallbacks;
@@ -35,5 +37,33 @@ void AnimationManager::update(float elapsedTime, float)
 
 void AnimationManager::add(sf::Transformable& transformable, sf::Vector2f target, float time, std::function<void()> doneCallback)
 {
-	animations.push_back({ &transformable, transformable.getPosition(), target, time, 0.0f, doneCallback });
+	int i = 0;
+	for (; i < animations.size(); ++i)
+	{
+		if (animations[i].transformable == &transformable)
+		{
+			break;
+		}
+	}
+	if (i == animations.size())
+	{
+		animations.emplace_back();
+	}
+	if (animations[i].transformable != nullptr && animations[i].transformable != &transformable)
+	{
+		THROW;
+	}
+	animations[i] = { &transformable, transformable.getPosition(), target, time, 0.0f, doneCallback };
+}
+
+void AnimationManager::remove(sf::Transformable& transformable)
+{
+	for (int i = 0; i < animations.size(); ++i)
+	{
+		if (animations[i].transformable == &transformable)
+		{
+			animations.erase(animations.begin() + i);
+			break;
+		}
+	}
 }

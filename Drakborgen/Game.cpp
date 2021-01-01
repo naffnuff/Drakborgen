@@ -7,7 +7,8 @@
 #include "Tile.h"
 
 Game::Game()
-#ifndef _DEBUG
+#ifdef _DEBUG
+	//: window(sf::VideoMode::getDesktopMode(), "Drakborgen")
 	: window(sf::VideoMode(1920, 1200), "Drakborgen")
 #else
 	: window(sf::VideoMode::getDesktopMode(), "Drakborgen", sf::Style::Fullscreen)
@@ -81,6 +82,20 @@ void Game::run()
 
 		window.draw(board);
 		window.draw(cardDisplay);
+		if (preGameSetup)
+		{
+			for (Hero& hero : idleHeroes)
+			{
+				if (hero.getStatsCard())
+				{
+					window.draw(*hero.getStatsCard());
+				}
+			}
+		}
+		if (activePlayerIndex >= 0 && players[activePlayerIndex].hero.getStatsCard())
+		{
+			window.draw(*players[activePlayerIndex].hero.getStatsCard());
+		}
 		for (const std::unique_ptr<Button>& button : buttons)
 		{
 			window.draw(*button);
@@ -134,46 +149,55 @@ Game::State Game::processEvents(State state)
 			{
 				if (!xCenteredBoard || !yCenteredBoard)
 				{
+					animations.remove(board);
 					sf::Vector2f mouseMovementSincePressed(float(event.mouseMove.x - buttonPressedMousePosition.x), float(event.mouseMove.y - buttonPressedMousePosition.y));
 					sf::Vector2f newBoardPosition = buttonPressedBoardPosition + mouseMovementSincePressed;
-					if (xCenteredBoard)
+					sf::Vector2f correctedBoardPosition = correctBoardPosition(newBoardPosition);
+					board.setPosition(correctedBoardPosition);
+					if (newBoardPosition.x != correctedBoardPosition.x)
 					{
-						newBoardPosition.x = float(window.getSize().x / 2) - board.getSize().x / 2.0f;
-					}
-					else if (newBoardPosition.x > 0.0f)
-					{
-						newBoardPosition.x = 0.0f;
 						buttonPressedMousePosition.x = float(event.mouseMove.x);
-						buttonPressedBoardPosition.x = board.getPosition().x;
+						buttonPressedBoardPosition.x = correctedBoardPosition.x;
 					}
-					else if (newBoardPosition.x + board.getSize().x < window.getSize().x)
+					if (newBoardPosition.y != correctedBoardPosition.y)
 					{
-						newBoardPosition.x = window.getSize().x - board.getSize().x;
-						buttonPressedMousePosition.x = float(event.mouseMove.x);
-						buttonPressedBoardPosition.x = board.getPosition().x;
-					}
-					if (xCenteredBoard)
-					{
-						newBoardPosition.y = float(window.getSize().y / 2) - board.getSize().y / 2.0f;
-					}
-					else if (newBoardPosition.y > 0.0f)
-					{
-						newBoardPosition.y = 0.0f;
 						buttonPressedMousePosition.y = float(event.mouseMove.y);
-						buttonPressedBoardPosition.y = board.getPosition().y;
+						buttonPressedBoardPosition.y = correctedBoardPosition.y;
 					}
-					else if (newBoardPosition.y + board.getSize().y < window.getSize().y)
-					{
-						newBoardPosition.y = window.getSize().y - board.getSize().y;
-						buttonPressedMousePosition.y = float(event.mouseMove.y);
-						buttonPressedBoardPosition.y = board.getPosition().y;
-					}
-					board.setPosition(newBoardPosition);
 				}
 			}
 		}
 	}
 	return state;
+}
+
+sf::Vector2f Game::correctBoardPosition(sf::Vector2f boardPostion)
+{
+	if (xCenteredBoard)
+	{
+		boardPostion.x = float(window.getSize().x / 2) - board.getSize().x / 2.0f;
+	}
+	else if (boardPostion.x > 0.0f)
+	{
+		boardPostion.x = 0.0f;
+	}
+	else if (boardPostion.x + board.getSize().x < window.getSize().x)
+	{
+		boardPostion.x = window.getSize().x - board.getSize().x;
+	}
+	if (xCenteredBoard)
+	{
+		boardPostion.y = float(window.getSize().y / 2) - board.getSize().y / 2.0f;
+	}
+	else if (boardPostion.y > 0.0f)
+	{
+		boardPostion.y = 0.0f;
+	}
+	else if (boardPostion.y + board.getSize().y < window.getSize().y)
+	{
+		boardPostion.y = window.getSize().y - board.getSize().y;
+	}
+	return boardPostion;
 }
 
 template<>
@@ -195,7 +219,12 @@ Game::State Game::onLeftMouseClick<Game::State::PickHero>(State state)
 			for (int i = int(idleHeroes.size()) - 1; i >= 0; --i)
 			{
 				std::unique_ptr<Card> card = cardDisplay.pullCard(i);
-				std::cout << idleHeroes[i].getId() << " " << card->imagePath << std::endl;
+				std::function<void()> callback = []() { };
+				if (i == idleHeroes.size() - 1)
+				{
+					callback = [this]() { preGameSetup = false; };
+				}
+				moveOffScreen(card, float(i + 1) / float(idleHeroes.size()), callback);
 				idleHeroes[i].placeStatsCard(std::move(card));
 			}
 			startNewGame();
@@ -241,6 +270,10 @@ Game::State Game::onLeftMouseClick<Game::State::PlayerMove>(State state)
 	{
 		//board.showMoveSites(false);
 		std::unique_ptr<Card> card = players[activePlayerIndex].hero.pullStatsCard();
+		if (!card)
+		{
+			THROW;
+		}
 		displayCard(std::move(card), []() {});
 		std::cout << "-> view stats card" << std::endl;
 		return State::ViewStatsCard;
@@ -275,7 +308,9 @@ Game::State Game::onLeftMouseClick<Game::State::ViewStatsCard>(State state)
 	std::cout << "view stats card ";
 	if (capturedItemIndex > -1)
 	{
-		players[activePlayerIndex].hero.placeStatsCard(cardDisplay.pullCard());
+		std::unique_ptr<Card> card = cardDisplay.pullCard();
+		moveOffScreen(card, 0.5f, [this]() { placeAtOrigin(players[activePlayerIndex].hero.getStatsCard()); });
+		players[activePlayerIndex].hero.placeStatsCard(std::move(card));
 		//board.showMoveSites(true);
 		std::cout << " -> pick player move" << std::endl;
 		return State::PlayerMove;
@@ -289,6 +324,21 @@ void Game::placeAtOrigin(std::unique_ptr<Card>& card) const
 	sf::Vector2u windowSize = window.getSize();
 	sf::Vector2f cardSize = card->getGlobalBounds().getSize();
 	card->setPosition({ -cardSize.x, float(windowSize.y) });
+}
+
+void Game::moveOffScreen(std::unique_ptr<Card>& card, float time, std::function<void()> callback)
+{
+	sf::Vector2u windowSize = window.getSize();
+	sf::Vector2f cardSize = card->getGlobalBounds().getSize();
+	animations.add(*card, { float(windowSize.x), -cardSize.y }, time, callback);
+}
+
+void Game::moveToCenter(std::unique_ptr<Card>& card, std::function<void()> callback)
+{
+	sf::Vector2f cardSize = card->getGlobalBounds().getSize();
+	sf::Vector2u windowSize = window.getSize();
+	sf::Vector2f animationTarget(windowSize.x / 2.0f - cardSize.x / 2.0f, windowSize.y / 2.0f - cardSize.y / 2.0f);
+	animations.add(*card, animationTarget, 0.5f, callback);
 }
 
 sf::Vector2f Game::getMouseBoardPosition() const
@@ -325,46 +375,81 @@ std::vector<std::unique_ptr<Card>> Game::getHeroCards()
 	return heroCards;
 }
 
-void Game::displayCard(std::unique_ptr<Card>&& card, std::function<void()> cardDisplayedCallback)
+void Game::displayCard(std::unique_ptr<Card>&& card, std::function<void()> callback)
 {
-	placeAtOrigin(card);
-	sf::Vector2f cardSize = card->getGlobalBounds().getSize();
-	sf::Vector2u windowSize = window.getSize();
-	sf::Vector2f animationTarget(windowSize.x / 2.0f - cardSize.x / 2.0f, windowSize.y / 2.0f - cardSize.y / 2.0f);
-	animations.add(*card, animationTarget, 0.5f, cardDisplayedCallback);
+	//placeAtOrigin(card);
+	moveToCenter(card, callback);
 	cardDisplay.pushCard(std::move(card));
 }
 
-void Game::displayCards(std::vector<std::unique_ptr<Card>>&& cards, std::function<void()> cardsDisplayedCallback)
+void Game::displayCards(std::vector<std::unique_ptr<Card>>&& cards, std::function<void()> callback)
 {
 	std::vector<sf::Vector2f> layout = cardDisplay.getLayout(cards);
 	for (int i = 0; i < cards.size(); ++i)
 	{
 		placeAtOrigin(cards[i]);
-		animations.add(*cards[i], layout[i], float(i + 1) / float(cards.size()), i == 0 ? cardsDisplayedCallback : []() { });
+		animations.add(*cards[i], layout[i], float(i + 1) / float(cards.size()), i == cards.size() - 1 ? callback : []() { });
 		cardDisplay.pushCard(std::move(cards[i]));
 	}
 }
 
 void Game::createPlayer(int heroIndex)
 {
-	idleHeroes[heroIndex].placeStatsCard(cardDisplay.pullCard(heroIndex));
+	std::unique_ptr<Card> pickedCard = cardDisplay.pullCard(heroIndex);
+	moveToCenter(pickedCard, []() { });
 	players.push_back({ std::move(idleHeroes[heroIndex]), Board::invalidSite, idleHeroes[heroIndex].getMaxLife() });
+	++activePlayerIndex;
 	idleHeroes.erase(idleHeroes.begin() + heroIndex);
 	for (int i = int(idleHeroes.size()) - 1; i >= 0; --i)
 	{
-		idleHeroes[i].placeStatsCard(cardDisplay.pullCard(i));
+		std::unique_ptr<Card> card = cardDisplay.pullCard(i);
+		moveOffScreen(card, float(i + 1) / float(idleHeroes.size()), []() { });
+		idleHeroes[i].placeStatsCard(std::move(card));
 	}
+	cardDisplay.pushCard(std::move(pickedCard));
 }
 
 void Game::placeNewPlayer(Board::Site site, std::function<void()> callback)
 {
+	if (players.size() == 0)
+	{
+		THROW;
+	}
 	int index = int(players.size()) - 1;
 	Player& player = players[index];
 	player.boardSite = site;
 	player.avatarIndex = index;
-	board.addPlayer("Media/hjaltekort/" + player.hero.getId() + "gubbe.png", index);
-	board.setPlayerSite(index, { site, Direction::Invalid }, callback);
+	if (cardDisplay.cardCount() != 1)
+	{
+		THROW;
+	}
+	std::unique_ptr<Card> card = cardDisplay.pullCard(0);
+	std::function<void()> cardAnimationCallback = [this, &player, site, callback]() {
+		board.addPlayer("Media/hjaltekort/" + player.hero.getId() + "gubbe.png", player.avatarIndex);
+		board.setPlayerSite(player.avatarIndex, { site, Direction::Invalid }, callback);
+		placeAtOrigin(player.hero.getStatsCard());
+	};
+	sf::Vector2f target;
+	sf::Vector2f cardSize = card->getGlobalBounds().getSize();
+	sf::Vector2u windowSize = window.getSize();
+	if (site.column == 0)
+	{
+		target.x = -cardSize.x;
+	}
+	else if (site.column == board.columnCount - 1)
+	{
+		target.x = float(windowSize.x);
+	}
+	if (site.row == 0)
+	{
+		target.y = -cardSize.y;
+	}
+	else if (site.row == board.rowCount - 1)
+	{
+		target.y = float(windowSize.y);
+	}
+	animations.add(*card, target, 0.5f, cardAnimationCallback);
+	player.hero.placeStatsCard(std::move(card));
 }
 
 void Game::movePlayer(int index, Board::MoveSite moveSite, std::function<void()> callback)
@@ -388,7 +473,6 @@ void Game::onNewPlayerPlaced()
 		std::function<void()> cardsDisplayedCallback =
 			[this]()
 		{
-			std::cout << "Hej" << std::endl;
 		};
 		displayCards(getHeroCards(), cardsDisplayedCallback);
 	}
@@ -396,7 +480,6 @@ void Game::onNewPlayerPlaced()
 
 void Game::onPlayerMoved()
 {
-	//++game.activePlayer;
 	startPlayerRound();
 }
 
@@ -404,11 +487,13 @@ void Game::startNewGame()
 {
 	board.clearMoveSites();
 	random.shuffle(players);
+	activePlayerIndex = 0;
 	startPlayerRound();
 }
 
 void Game::startPlayerRound()
 {
+	activePlayerIndex = (activePlayerIndex + 1) % int(players.size());
 	Player& player = players[activePlayerIndex];
 	sf::Vector2f size(270.0f, 100.0f);
 	sf::Vector2f position(0.0f, 370.0f);
@@ -418,6 +503,9 @@ void Game::startPlayerRound()
 	buttons.emplace_back(std::make_unique<Button>(ss.str(), size, position, 30));
 	board.setPlayerMoveSites(player.boardSite);
 	board.showMoveSites(true);
+	sf::Vector2u windowSize = window.getSize();
+	sf::Vector2f avatarCenter = board.getAvatarCenter(player.avatarIndex);
+	animations.add(board, correctBoardPosition({ windowSize.x / 2.0f - avatarCenter.x, windowSize.y / 2.0f - avatarCenter.y }), 0.5f, []() {});
 }
 
 #define STATE(state, event) stateLogicMap[State::state] = [this]() { return on##event##<Game::State::##state##>(State::state); }

@@ -46,15 +46,19 @@ public:
 private:
 	State processEvents(State state);
 
+	sf::Vector2f correctBoardPosition(sf::Vector2f boardPostion);
+
 	template<State>
 	State onLeftMouseClick(State state);
 
 	void placeAtOrigin(std::unique_ptr<Card>& card) const;
+	void moveOffScreen(std::unique_ptr<Card>& card, float time, std::function<void()> callback);
+	void moveToCenter(std::unique_ptr<Card>& card, std::function<void()> callback);
 	sf::Vector2f getMouseBoardPosition() const;
 	int getMouseOverItemIndex(sf::Vector2f mousePosition) const;
 	std::vector<std::unique_ptr<Card>> getHeroCards();
-	void displayCard(std::unique_ptr<Card>&& card, std::function<void()> cardDisplayedCallback);
-	void displayCards(std::vector<std::unique_ptr<Card>>&& cards, std::function<void()> cardsDisplayedCallback);
+	void displayCard(std::unique_ptr<Card>&& card, std::function<void()> callback);
+	void displayCards(std::vector<std::unique_ptr<Card>>&& cards, std::function<void()> callback);
 	void createPlayer(int heroIndex);
 	void placeNewPlayer(Board::Site site, std::function<void()> callback);
 	void movePlayer(int index, Board::MoveSite moveSite, std::function<void()> callback);
@@ -83,12 +87,14 @@ private:
 	sf::Vector2f buttonReleasedMousePosition;
 	int capturedItemIndex = 0;
 
+	bool preGameSetup = true;
+
 	std::vector<Hero> idleHeroes;
 	std::vector<Player> players;
 
 	std::vector<std::unique_ptr<Button>> buttons;
 
-	int activePlayerIndex = 0;
+	int activePlayerIndex = -1;
 
 	std::map<State, std::function<State()>> stateLogicMap;
 

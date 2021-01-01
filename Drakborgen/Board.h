@@ -51,6 +51,7 @@ public:
 	void placeTile(std::unique_ptr<Tile> tile, MoveSite moveSite);
 	sf::Vector2f getSitePosition(Site site) const;
 	Site getSite(sf::Vector2f position) const;
+	sf::Vector2f getAvatarCenter(int index) const;
 
 	sf::Vector2f getSize() const;
 

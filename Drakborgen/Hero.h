@@ -20,10 +20,12 @@ public:
 	std::unique_ptr<Card> pullStatsCard();
 	void placeStatsCard(std::unique_ptr<Card> card);
 
+	std::unique_ptr<Card>& getStatsCard() { return statsCard; }
+
 private:
 	std::string id;
 	std::wstring name;
 	int maxLife = 0;
-	std::unique_ptr<Card> statCard;
+	std::unique_ptr<Card> statsCard;
 };
 

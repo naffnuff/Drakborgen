@@ -62,6 +62,12 @@ Board::Site Board::getSite(sf::Vector2f position) const
 	return { int((position.y - gridOriginY) / tileSize), int((position.x - gridOriginX) / tileSize) };
 }
 
+sf::Vector2f Board::getAvatarCenter(int index) const
+{
+	sf::FloatRect bounds = players[index].avatar->getGlobalBounds();
+	return { bounds.left + bounds.width / 2.0f, bounds.top + bounds.height / 2.0f };
+}
+
 sf::Vector2f Board::getSize() const
 {
 	return boardSprite.get().getLocalBounds().getSize();
