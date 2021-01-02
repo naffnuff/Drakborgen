@@ -10,6 +10,8 @@ public:
 	Random(const Random&) = delete;
 	Random& operator=(const Random&) = delete;
 
+	bool nextBool();
+
 	template<typename Container>
 	void shuffle(Container& container);
 

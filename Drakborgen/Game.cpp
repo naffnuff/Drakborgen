@@ -207,14 +207,15 @@ Game::State Game::onLeftMouseClick<Game::State::PickHero>(State state)
 	if (capturedItemIndex >= 0)
 	{
 		buttons.clear();
-		if (capturedItemIndex < cardDisplay.cardCount())
+		if (capturedItemIndex < cardDisplay.cardCount()) // hero card clicked
 		{
+			panToNextFreeTower();
 			createPlayer(capturedItemIndex);
-			board.showMoveSites(true);
+			board.showMoveSites(true);			
 			std::cout << " -> pick start tower" << std::endl;
 			return State::PickStartTower;
 		}
-		else
+		else // begin-game button clicked
 		{
 			for (int i = int(idleHeroes.size()) - 1; i >= 0; --i)
 			{
@@ -393,6 +394,60 @@ void Game::displayCards(std::vector<std::unique_ptr<Card>>&& cards, std::functio
 	}
 }
 
+void Game::panToNextFreeTower()
+{
+	sf::Vector2f boardTarget(0.0f, 0.0f);
+	sf::Vector2u windowSize = window.getSize();
+	if (players.size() == 0)
+	{
+		if (random.nextBool())
+		{
+			boardTarget.y = -float(windowSize.y);
+		}
+		if (random.nextBool())
+		{
+			boardTarget.x = -float(windowSize.x);
+		}
+	}
+	else
+	{
+		Board::Site lastSite = players.back().boardSite;
+		int oppositeRow = lastSite.row == 0 ? Board::rowCount - 1 : 0;
+		int oppositeColumn = lastSite.column == 0 ? Board::columnCount - 1 : 0;
+		std::vector<Board::Site> candidates = {
+			{ oppositeRow, oppositeColumn },
+			{ lastSite.row, oppositeColumn },
+			{ oppositeRow, lastSite.column }
+		};
+		//random.shuffle(candidates);
+		for (Board::Site candidate : candidates)
+		{
+			bool goodCandidate = true;
+			for (int i = 0; i < int(players.size()) - 1; ++i)
+			{
+				if (players[i].boardSite == candidate)
+				{
+					goodCandidate = false;
+					break;
+				}
+			}
+			if (goodCandidate)
+			{
+				if (candidate.row > 0)
+				{
+					boardTarget.y = -float(windowSize.y);
+				}
+				if (candidate.column > 0)
+				{
+					boardTarget.x = -float(windowSize.x);
+				}
+				break;
+			}
+		}
+	}
+	animations.add(board, correctBoardPosition(boardTarget), 0.75f, []() { });
+}
+
 void Game::createPlayer(int heroIndex)
 {
 	std::unique_ptr<Card> pickedCard = cardDisplay.pullCard(heroIndex);
@@ -505,7 +560,7 @@ void Game::startPlayerRound()
 	board.showMoveSites(true);
 	sf::Vector2u windowSize = window.getSize();
 	sf::Vector2f avatarCenter = board.getAvatarCenter(player.avatarIndex);
-	animations.add(board, correctBoardPosition({ windowSize.x / 2.0f - avatarCenter.x, windowSize.y / 2.0f - avatarCenter.y }), 0.5f, []() {});
+	animations.add(board, correctBoardPosition({ windowSize.x / 2.0f - avatarCenter.x, windowSize.y / 2.0f - avatarCenter.y }), 0.75f, []() {});
 }
 
 #define STATE(state, event) stateLogicMap[State::state] = [this]() { return on##event##<Game::State::##state##>(State::state); }

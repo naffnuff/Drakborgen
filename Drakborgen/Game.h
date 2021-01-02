@@ -59,6 +59,7 @@ private:
 	std::vector<std::unique_ptr<Card>> getHeroCards();
 	void displayCard(std::unique_ptr<Card>&& card, std::function<void()> callback);
 	void displayCards(std::vector<std::unique_ptr<Card>>&& cards, std::function<void()> callback);
+	void panToNextFreeTower();
 	void createPlayer(int heroIndex);
 	void placeNewPlayer(Board::Site site, std::function<void()> callback);
 	void movePlayer(int index, Board::MoveSite moveSite, std::function<void()> callback);
