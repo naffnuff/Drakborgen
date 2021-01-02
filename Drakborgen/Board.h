@@ -74,7 +74,7 @@ private:
 
 	std::unique_ptr<Tile>& getTile(Site site);
 
-	MoveSite createMoveSite(Site site, Direction exit);
+	MoveSite createMoveSite(Site site, const std::vector<Direction>& exits);
 
 private:
 	UniqueSprite boardSprite;

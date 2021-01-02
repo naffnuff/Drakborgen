@@ -1,12 +1,6 @@
 #include "Room.h"
 
-Room::Room(const std::string& imagePath)
-	: Tile::Tile(imagePath)
+std::vector<std::vector<Direction>> Room::getExits() const
 {
-
-}
-
-std::vector<Direction> Room::getExits() const
-{
-	return { Direction::East, Direction::West, Direction::North, Direction::South };
+	return { { Direction::East }, { Direction::West }, { Direction::North }, { Direction::South } };
 }

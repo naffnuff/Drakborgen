@@ -176,6 +176,7 @@
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="Tower.cpp" />
     <ClCompile Include="UniqueSprite.cpp" />
+    <ClCompile Include="Vault.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="Tile.h" />
     <ClInclude Include="Tower.h" />
     <ClInclude Include="UniqueSprite.h" />
+    <ClInclude Include="Vault.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Media\dorrkort\dorrkort0000.png" />

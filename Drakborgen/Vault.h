@@ -2,14 +2,16 @@
 
 #include "Tile.h"
 
-class Tower : public Tile
+class Vault : public Tile
 {
 public:
 	template<typename... Args>
-	Tower(Args... args)
+	Vault(Args... args)
 	{
 		(exits.push_back({ args }), ...);
 	}
+
+	static std::unique_ptr<Vault> makeVault(Direction section);
 
 	std::vector<std::vector<Direction>> getExits() const override;
 

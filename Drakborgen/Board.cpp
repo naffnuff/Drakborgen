@@ -6,6 +6,7 @@
 #include "System.h"
 #include "Tile.h"
 #include "Tower.h"
+#include "Vault.h"
 
 Board::Board(AnimationManager& animations)
 	: clickOverlay(sf::Vector2f(tileSize, tileSize))
@@ -21,8 +22,8 @@ Board::Board(AnimationManager& animations)
 	tileGrid[0][columnCount - 1] = std::make_unique<Tower>(Direction::West, Direction::South);
 	tileGrid[rowCount - 1][0] = std::make_unique<Tower>(Direction::East, Direction::North);
 	tileGrid[rowCount - 1][columnCount - 1] = std::make_unique<Tower>(Direction::West, Direction::North);
-	tileGrid[4][6] = std::make_unique<Tower>();
-	tileGrid[5][6] = std::make_unique<Tower>();
+	tileGrid[4][6] = Vault::makeVault(Direction::North);
+	tileGrid[5][6] = Vault::makeVault(Direction::South);
 }
 
 void Board::update(float elapsedTime, float /*timeDelta*/)
@@ -81,9 +82,9 @@ void Board::setGameStartMoveSites()
 
 void Board::setPlayerMoveSites(Site playerSite)
 {
-	for (Direction exit : getTile(playerSite)->getExits())
+	for (const std::vector<Direction>& exits : getTile(playerSite)->getExits())
 	{
-		MoveSite moveSite = createMoveSite(playerSite, exit);
+		MoveSite moveSite = createMoveSite(playerSite, exits);
 		if (withinBounds(moveSite.site))
 		{
 			moveSites.push_back(moveSite);
@@ -239,25 +240,28 @@ std::unique_ptr<Tile>& Board::getTile(Site site)
 	return tileGrid[site.row][site.column];
 }
 
-Board::MoveSite Board::createMoveSite(Site site, Direction exit)
+Board::MoveSite Board::createMoveSite(Site site, const std::vector<Direction>& exits)
 {
-	switch (exit)
+	for (Direction exit : exits)
 	{
-	case Direction::North:
-		--site.row;
-		break;
-	case Direction::South:
-		++site.row;
-		break;
-	case Direction::West:
-		--site.column;
-		break;
-	case Direction::East:
-		++site.column;
-		break;
-	default:
-		THROW;
-		break;
+		switch (exit)
+		{
+		case Direction::North:
+			--site.row;
+			break;
+		case Direction::South:
+			++site.row;
+			break;
+		case Direction::West:
+			--site.column;
+			break;
+		case Direction::East:
+			++site.column;
+			break;
+		default:
+			THROW;
+			break;
+		}
 	}
-	return { site, exit };
+	return { site, exits.back() };
 }

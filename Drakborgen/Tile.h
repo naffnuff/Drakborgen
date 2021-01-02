@@ -23,7 +23,7 @@ public:
 	
 	virtual ~Tile() { }
 
-	virtual std::vector<Direction> getExits() const = 0;
+	virtual std::vector<std::vector<Direction>> getExits() const = 0;
 
 	void setOrientation(Direction direction);
 
