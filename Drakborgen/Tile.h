@@ -5,11 +5,12 @@
 
 enum class Direction
 {
-	North,
-	East,
-	South,
-	West,
-	Invalid
+	Invalid = -1,
+	North = 0,
+	East = 1,
+	South = 2,
+	West = 3,
+	Count = 4
 };
 
 class Tile : public sf::Drawable, public sf::Transformable
@@ -23,9 +24,12 @@ public:
 	
 	virtual ~Tile() { }
 
-	virtual std::vector<std::vector<Direction>> getExits() const = 0;
+	virtual std::vector<std::vector<Direction>> getExits(Direction entrance) const = 0;
 
 	void setOrientation(Direction direction);
+	Direction applyOrientation(Direction direction, bool invert) const;
+
+	void transposeExits(std::vector<std::vector<Direction>>& exits) const;
 
 private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
@@ -35,4 +39,3 @@ private:
 
 	Direction orientation = Direction::North;
 };
-

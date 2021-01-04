@@ -19,7 +19,7 @@ private:
 	struct Player
 	{
 		Hero hero;
-		Board::Site boardSite;
+		Board::MoveSite boardSite;
 		int life = 0;
 		int avatarIndex = 0;
 	};

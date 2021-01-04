@@ -411,7 +411,7 @@ void Game::panToNextFreeTower()
 	}
 	else
 	{
-		Board::Site lastSite = players.back().boardSite;
+		Board::Site lastSite = players.back().boardSite.site;
 		int oppositeRow = lastSite.row == 0 ? Board::rowCount - 1 : 0;
 		int oppositeColumn = lastSite.column == 0 ? Board::columnCount - 1 : 0;
 		std::vector<Board::Site> candidates = {
@@ -425,7 +425,7 @@ void Game::panToNextFreeTower()
 			bool goodCandidate = true;
 			for (int i = 0; i < int(players.size()) - 1; ++i)
 			{
-				if (players[i].boardSite == candidate)
+				if (players[i].boardSite.site == candidate)
 				{
 					goodCandidate = false;
 					break;
@@ -452,7 +452,7 @@ void Game::createPlayer(int heroIndex)
 {
 	std::unique_ptr<Card> pickedCard = cardDisplay.pullCard(heroIndex);
 	moveToCenter(pickedCard, []() { });
-	players.push_back({ std::move(idleHeroes[heroIndex]), Board::invalidSite, idleHeroes[heroIndex].getMaxLife() });
+	players.push_back({ std::move(idleHeroes[heroIndex]), Board::invalidMoveSite, idleHeroes[heroIndex].getMaxLife() });
 	++activePlayerIndex;
 	idleHeroes.erase(idleHeroes.begin() + heroIndex);
 	for (int i = int(idleHeroes.size()) - 1; i >= 0; --i)
@@ -472,7 +472,7 @@ void Game::placeNewPlayer(Board::Site site, std::function<void()> callback)
 	}
 	int index = int(players.size()) - 1;
 	Player& player = players[index];
-	player.boardSite = site;
+	player.boardSite = { site };
 	player.avatarIndex = index;
 	if (cardDisplay.cardCount() != 1)
 	{
@@ -510,7 +510,7 @@ void Game::placeNewPlayer(Board::Site site, std::function<void()> callback)
 void Game::movePlayer(int index, Board::MoveSite moveSite, std::function<void()> callback)
 {
 	Player& player = players[index];
-	player.boardSite = moveSite.site;
+	player.boardSite = moveSite;
 	board.setPlayerSite(player.avatarIndex, moveSite, callback);
 }
 

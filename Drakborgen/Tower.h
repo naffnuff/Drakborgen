@@ -11,7 +11,7 @@ public:
 		(exits.push_back({ args }), ...);
 	}
 
-	std::vector<std::vector<Direction>> getExits() const override;
+	std::vector<std::vector<Direction>> getExits(Direction entrance) const override;
 
 private:
 	std::vector<std::vector<Direction>> exits;

@@ -30,6 +30,22 @@ void Tile::setOrientation(Direction direction)
 	}
 }
 
+Direction Tile::applyOrientation(Direction direction, bool invert) const
+{
+	return Direction((int(direction) + (invert ? -int(orientation) : int(orientation))) % int(Direction::Count));
+}
+
+void Tile::transposeExits(std::vector<std::vector<Direction>>& exits) const
+{
+	for (std::vector<Direction>& exit : exits)
+	{
+		for (Direction& direction : exit)
+		{
+			direction = applyOrientation(direction, false);
+		}
+	}
+}
+
 void Tile::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	if(sprite)

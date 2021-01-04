@@ -29,6 +29,7 @@ public:
 	};
 
 	static constexpr Site invalidSite = { -1, -1 };
+	static constexpr MoveSite invalidMoveSite = { invalidSite, Direction::Invalid };
 
 private:
 	struct Player
@@ -56,7 +57,7 @@ public:
 	sf::Vector2f getSize() const;
 
 	void setGameStartMoveSites();
-	void setPlayerMoveSites(Site playerSite);
+	void setPlayerMoveSites(MoveSite playerSite);
 	bool testMoveSites(sf::Vector2f position) const;
 	MoveSite getMoveSite(sf::Vector2f position) const;
 	void removeMoveSite(Site site);

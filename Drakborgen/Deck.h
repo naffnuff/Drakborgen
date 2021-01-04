@@ -50,8 +50,10 @@ public:
 		{
 			THROW;
 		}
-		std::unique_ptr<T> item = std::move(items.back());
-		items.pop_back();
+		std::unique_ptr<T> item = std::move(items.front());
+		items.erase(items.begin());
+		//std::unique_ptr<T> item = std::move(items.back());
+		//items.pop_back();
 		return item;
 	}
 

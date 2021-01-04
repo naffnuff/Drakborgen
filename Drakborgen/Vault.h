@@ -13,7 +13,7 @@ public:
 
 	static std::unique_ptr<Vault> makeVault(Direction section);
 
-	std::vector<std::vector<Direction>> getExits() const override;
+	std::vector<std::vector<Direction>> getExits(Direction entrance) const override;
 
 private:
 	std::vector<std::vector<Direction>> exits;

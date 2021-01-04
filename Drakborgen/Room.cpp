@@ -1,6 +1,14 @@
 #include "Room.h"
 
-std::vector<std::vector<Direction>> Room::getExits() const
+#include "System.h"
+
+std::vector<std::vector<Direction>> Room::getExits(Direction entrance) const
 {
-	return { { Direction::East }, { Direction::West }, { Direction::North }, { Direction::South } };
+	if (entrance == Direction::Invalid || entrance == Direction::Count)
+	{
+		THROW;
+	}
+	std::vector<std::vector<Direction>> result = exits;
+	transposeExits(result);
+	return result;
 }

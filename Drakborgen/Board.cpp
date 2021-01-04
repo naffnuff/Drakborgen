@@ -80,11 +80,11 @@ void Board::setGameStartMoveSites()
 	moveSiteAnimationStartTime = 0.0f;
 }
 
-void Board::setPlayerMoveSites(Site playerSite)
+void Board::setPlayerMoveSites(MoveSite playerSite)
 {
-	for (const std::vector<Direction>& exits : getTile(playerSite)->getExits())
+	for (const std::vector<Direction>& exits : getTile(playerSite.site)->getExits(playerSite.direction))
 	{
-		MoveSite moveSite = createMoveSite(playerSite, exits);
+		MoveSite moveSite = createMoveSite(playerSite.site, exits);
 		if (withinBounds(moveSite.site))
 		{
 			moveSites.push_back(moveSite);

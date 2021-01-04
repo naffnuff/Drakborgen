@@ -29,7 +29,7 @@ std::unique_ptr<Vault> Vault::makeVault(Direction section)
 	}
 }
 
-std::vector<std::vector<Direction>> Vault::getExits() const
+std::vector<std::vector<Direction>> Vault::getExits(Direction) const
 {
 	return exits;
 }
