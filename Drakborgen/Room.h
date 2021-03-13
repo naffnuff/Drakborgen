@@ -14,6 +14,8 @@ public:
 
 	std::vector<std::vector<Direction>> getExits(Direction entrance) const override;
 
+	State enter() const override;
+
 private:
 	std::vector<std::vector<Direction>> exits;
 };

@@ -2,6 +2,7 @@
 
 #include "UniqueSprite.h"
 
+#include "State.h"
 #include "Hero.h"
 #include "Card.h"
 #include "CardDisplay.h"
@@ -24,15 +25,6 @@ private:
 		int avatarIndex = 0;
 	};
 
-	enum class State
-	{
-		PickHero,
-		PickStartTower,
-		PlayerMove,
-		ViewStatsCard,
-		NoState
-	};
-
 public:
 	Game();
 	
@@ -44,12 +36,17 @@ public:
 	void run();
 
 private:
-	State processEvents(State state);
+	State processEvents();
+
+	State invokeEventHandler(std::map<State, std::function<State()>>& eventMap);
 
 	sf::Vector2f correctBoardPosition(sf::Vector2f boardPostion);
 
 	template<State>
-	State onLeftMouseClick(State state);
+	State onTick();
+
+	template<State>
+	State onLeftMouseClick();
 
 	void placeAtOrigin(std::unique_ptr<Card>& card) const;
 	void moveOffScreen(std::unique_ptr<Card>& card, float time, std::function<void()> callback);
@@ -64,7 +61,7 @@ private:
 	void placeNewPlayer(Board::Site site, std::function<void()> callback);
 	void movePlayer(int index, Board::MoveSite moveSite, std::function<void()> callback);
 	void onNewPlayerPlaced();
-	void onPlayerMoved();
+	void onPlayerMoved(Tile& tile);
 	void startNewGame();
 	void startPlayerRound();
 
@@ -76,6 +73,8 @@ private:
 	Board board;
 	CardDisplay cardDisplay;
 	TileDeck tiles;
+
+	State state = State::PickHero;
 
 	int playerCount = 4;
 
@@ -97,7 +96,8 @@ private:
 
 	int activePlayerIndex = -1;
 
-	std::map<State, std::function<State()>> stateLogicMap;
+	std::map<State, std::function<State()>> onTickMap;
+	std::map<State, std::function<State()>> onLeftMouseClickMap;
 
 	AnimationManager animations;
 };

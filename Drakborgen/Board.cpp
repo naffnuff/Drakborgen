@@ -15,7 +15,7 @@ Board::Board(AnimationManager& animations)
 	, animations(animations)
 {
 	vaultSprite.get().setPosition(getSitePosition({ 4, 6 }));
-	vaultSprite.get().move(0.0f, 5.0f);
+	vaultSprite.get().move(0.0f, 10.0f);
 	//players.reserve(4);
 
 	tileGrid[0][0] = std::make_unique<Tower>(Direction::East, Direction::South);
@@ -211,6 +211,15 @@ bool Board::hasTile(Site site) const
 	return tileGrid[site.row][site.column] != nullptr;
 }
 
+std::unique_ptr<Tile>& Board::getTile(Site site)
+{
+	if (!hasTile(site))
+	{
+		THROW;
+	}
+	return tileGrid[site.row][site.column];
+}
+
 bool Board::withinBounds(Site site) const
 {
 	return site.row >= 0 && site.row < rowCount && site.column >= 0 && site.column < columnCount;
@@ -229,15 +238,6 @@ void Board::placePlayer(int index, Direction direction, std::function<void()> ca
 		player.avatar->setPosition(avatarStartX, avatarStartY);
 	}
 	animations.add(*player.avatar, animationTarget, 0.5f, callback);
-}
-
-std::unique_ptr<Tile>& Board::getTile(Site site)
-{
-	if (!hasTile(site))
-	{
-		THROW;
-	}
-	return tileGrid[site.row][site.column];
 }
 
 Board::MoveSite Board::createMoveSite(Site site, const std::vector<Direction>& exits)
