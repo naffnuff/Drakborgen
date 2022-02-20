@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Tile.h"
+
+#include "State.h"
 #include "UniqueSprite.h"
 
 enum class Direction
@@ -26,6 +28,8 @@ public:
 
 	virtual std::vector<std::vector<Direction>> getExits(Direction entrance) const = 0;
 
+	virtual State enter() const = 0;
+
 	void setOrientation(Direction direction);
 	Direction applyOrientation(Direction direction, bool invert) const;
 
@@ -35,6 +39,8 @@ private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
+	std::string imagePath;
+
 	UniqueSprite sprite;
 
 	Direction orientation = Direction::North;

@@ -49,6 +49,7 @@ public:
 
 	void update(float elapsedTime, float timeDelta);
 	bool hasTile(Site site) const;
+	std::unique_ptr<Tile>& getTile(Site site);
 	void placeTile(std::unique_ptr<Tile> tile, MoveSite moveSite);
 	sf::Vector2f getSitePosition(Site site) const;
 	Site getSite(sf::Vector2f position) const;
@@ -72,8 +73,6 @@ private:
 
 	bool withinBounds(Site site) const;
 	void placePlayer(int index, Direction direction, std::function<void()> callback);
-
-	std::unique_ptr<Tile>& getTile(Site site);
 
 	MoveSite createMoveSite(Site site, const std::vector<Direction>& exits);
 

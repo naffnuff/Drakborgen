@@ -1,5 +1,7 @@
 #include "Vault.h"
 
+#include <iostream>
+
 #include "System.h"
 
 std::unique_ptr<Vault> Vault::makeVault(Direction section)
@@ -32,4 +34,10 @@ std::unique_ptr<Vault> Vault::makeVault(Direction section)
 std::vector<std::vector<Direction>> Vault::getExits(Direction) const
 {
 	return exits;
+}
+
+State Vault::enter() const
+{
+	std::cout << " -> turn end" << std::endl;
+	return State::TurnEnd;
 }

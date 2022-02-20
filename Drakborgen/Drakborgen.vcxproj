@@ -166,6 +166,7 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="CardDisplay.cpp" />
+    <ClCompile Include="Corridor.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Hero.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="Button.h" />
     <ClInclude Include="Card.h" />
     <ClInclude Include="CardDisplay.h" />
+    <ClInclude Include="Corridor.h" />
     <ClInclude Include="Deck.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Hero.h" />
@@ -192,6 +194,7 @@
     <ClInclude Include="Room.h" />
     <ClInclude Include="Setup.h" />
     <ClInclude Include="SplitRoom.h" />
+    <ClInclude Include="State.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="Tower.h" />

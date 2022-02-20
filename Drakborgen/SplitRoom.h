@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Tile.h"
+#include "Room.h"
 
-class SplitRoom : public Tile
+class SplitRoom : public Room
 {
 public:
 	SplitRoom(const std::string& imagePath)
-		: Tile(imagePath)
+		: Room(imagePath)
 	{
 	}
 

@@ -1,11 +1,14 @@
 #include "Tile.h"
 
+#include <iostream>
+
 Tile::Tile()
 {
 }
 
 Tile::Tile(const std::string& imagePath)
-	: sprite(imagePath)
+	: imagePath(imagePath)
+	, sprite(imagePath)
 {
 }
 
@@ -44,6 +47,7 @@ void Tile::transposeExits(std::vector<std::vector<Direction>>& exits) const
 			direction = applyOrientation(direction, false);
 		}
 	}
+	std::cout << imagePath << std::endl;
 }
 
 void Tile::draw(sf::RenderTarget& target, sf::RenderStates states) const
