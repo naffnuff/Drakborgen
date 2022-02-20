@@ -2,7 +2,7 @@
 
 #include "System.h"
 
-Button::Button(const std::wstring& message, sf::Vector2f size, sf::Vector2f position, int textSixe)
+Button::Button(const std::string& message, sf::Vector2f size, sf::Vector2f position, int textSixe)
 {
 	if (!font.loadFromFile("Media/ITCBLKAD.TTF"))
 	{
@@ -17,7 +17,7 @@ Button::Button(const std::wstring& message, sf::Vector2f size, sf::Vector2f posi
 	text.setFont(font); // font is a sf::Font
 
 	// set the string to display
-	text.setString(message);
+	text.setString(sf::String::fromUtf8(message.begin(), message.end()));
 
 	// set the character size
 	text.setCharacterSize(textSixe); // in pixels, not points!

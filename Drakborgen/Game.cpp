@@ -54,17 +54,29 @@ void Game::run()
 	}*/
 
 	idleHeroes.reserve(4);
-	idleHeroes.push_back(Hero("rohan", L"Riddar Rohan", 17));
-	idleHeroes.push_back(Hero("sigeir", L"Sigeir Skarpyxe", 16));
-	idleHeroes.push_back(Hero("aelfric", L"Aelfric Brunkåpa", 15));
-	idleHeroes.push_back(Hero("bardhor", L"Bardhor Bågman", 11));
+	idleHeroes.push_back(Hero("rohan", "Riddar Rohan", 17));
+	idleHeroes.push_back(Hero("sigeir", "Sigeir Skarpyxe", 16));
+	idleHeroes.push_back(Hero("aelfric", "Aelfric Brunkåpa", 15));
+	idleHeroes.push_back(Hero("bardhor", "Bardhor Bågman", 11));
 
 	board.setGameStartMoveSites();
 
 	displayCards(getHeroCards(), []() {});
 
+	int fpsCount = 0;
+	sf::Clock fpsTimer;
+
 	while (window.isOpen())
 	{
+		// update the fps text every second
+		if (fpsTimer.getElapsedTime().asSeconds() >= 1)
+		{
+			std::cout << fpsCount << " fps" << std::endl;
+			fpsTimer.restart();
+			fpsCount = 0;
+		}
+		++fpsCount;
+
 		sf::Time time = clock.getElapsedTime();
 		float timestamp = time.asSeconds();
 		float timeDelta = timestamp - lastTimestamp;
@@ -545,7 +557,7 @@ void Game::onNewPlayerPlaced()
 	{
 		sf::Vector2f buttonSize(500.0, 200.0);
 		sf::Vector2f buttonPosition(window.getSize().x * 3.0f / 4.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
-		buttons.push_back(std::make_unique<Button>(L"Låt äventyret börja!", buttonSize, buttonPosition, 60));
+		buttons.push_back(std::make_unique<Button>("Låt äventyret börja!", buttonSize, buttonPosition, 60));
 		std::function<void()> cardsDisplayedCallback =
 			[this]()
 		{
@@ -572,9 +584,9 @@ void Game::startPlayerRound()
 	Player& player = players[activePlayerIndex];
 	sf::Vector2f size(270.0f, 100.0f);
 	sf::Vector2f position(0.0f, 370.0f);
-	std::wstringstream ss;
+	std::stringstream ss;
 	ss << player.hero.getName() << std::endl;
-	ss << L"Kroppspoäng: " << player.life << " / " << player.hero.getMaxLife();
+	ss << "Kroppspoäng: " << player.life << " / " << player.hero.getMaxLife();
 	buttons.emplace_back(std::make_unique<Button>(ss.str(), size, position, 30));
 	board.setPlayerMoveSites(player.boardSite);
 	board.showMoveSites(true);
