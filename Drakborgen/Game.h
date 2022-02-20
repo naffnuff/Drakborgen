@@ -12,6 +12,8 @@
 #include "Animation.h"
 #include "Button.h"
 
+#include <map>
+
 using TileDeck = Deck<Tile, 115>;
 
 class Game

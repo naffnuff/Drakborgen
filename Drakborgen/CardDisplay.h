@@ -24,7 +24,7 @@ public:
 	std::vector<sf::Vector2f> getLayout(const std::vector<std::unique_ptr<Card>>& cards);
 
 private:
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+	void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
 
 private:
 	sf::Window& window;

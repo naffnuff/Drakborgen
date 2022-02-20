@@ -15,7 +15,7 @@ Board::Board(AnimationManager& animations)
 	, animations(animations)
 {
 	vaultSprite.get().setPosition(getSitePosition({ 4, 6 }));
-	vaultSprite.get().move(0.0f, 10.0f);
+	vaultSprite.get().move(sf::Vector2f(0.0f, 10.0f));
 	//players.reserve(4);
 
 	tileGrid[0][0] = std::make_unique<Tower>(Direction::East, Direction::South);
@@ -161,7 +161,7 @@ void Board::addPlayer(const std::string& imagePath, int index)
 	}
 	players.push_back({ std::make_unique<Card>(imagePath), invalidSite });
 	Player& player = players.back();
-	player.avatar->setScale(1.0f / 3.0f, 1.0f / 3.0f);
+	player.avatar->setScale(sf::Vector2f(1.0f / 3.0f, 1.0f / 3.0f));
 }
 
 void Board::setPlayerSite(int index, MoveSite moveSite, std::function<void()> callback)
@@ -174,8 +174,9 @@ void Board::setPlayerSite(int index, MoveSite moveSite, std::function<void()> ca
 	placePlayer(index, moveSite.direction, callback);
 }
 
-void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void Board::draw(sf::RenderTarget& target, const sf::RenderStates& statesRef) const
 {
+	sf::RenderStates states = statesRef;
 	states.transform *= getTransform();
 	target.draw(boardSprite.get(), states);
 	target.draw(vaultSprite.get(), states);
@@ -195,7 +196,7 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		{
 			sf::Transform transform = states.transform;
 			sf::Vector2f offset = getSitePosition(moveSite.site);
-			states.transform.translate(offset.x, offset.y);
+			states.transform.translate(offset);
 			target.draw(clickOverlay, states);
 			states.transform = transform;
 		}
@@ -235,7 +236,7 @@ void Board::placePlayer(int index, Direction direction, std::function<void()> ca
 	{
 		float avatarStartX = animationTarget.x + (player.site.column == 0 ? -tileSize : tileSize) * 2.0f;
 		float avatarStartY = animationTarget.y + (player.site.row == 0 ? -tileSize : tileSize);
-		player.avatar->setPosition(avatarStartX, avatarStartY);
+		player.avatar->setPosition(sf::Vector2f(avatarStartX, avatarStartY));
 	}
 	animations.add(*player.avatar, animationTarget, 0.5f, callback);
 }
