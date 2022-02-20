@@ -7,7 +7,7 @@
 class Button : public sf::Drawable
 {
 public:
-	Button(const std::wstring& message, sf::Vector2f size, sf::Vector2f position, int textSixe);
+	Button(const std::string& message, sf::Vector2f size, sf::Vector2f position, int textSixe);
 
 	Button(const Button&) = delete;
 	Button& operator=(const Button&) = delete;

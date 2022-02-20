@@ -1,6 +1,6 @@
 #include "Hero.h"
 
-Hero::Hero(const std::string& id, const std::wstring& name, int maxLife)
+Hero::Hero(const std::string& id, const std::string& name, int maxLife)
 	: id(id)
 	, name(name)
 	, statsCard(std::make_unique<Card>("Media/hjaltekort/" + id + ".png"))
