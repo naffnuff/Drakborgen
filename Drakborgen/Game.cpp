@@ -9,7 +9,7 @@
 Game::Game()
 #if BLESS_THIS_MESS
 	: window(sf::VideoMode::getDesktopMode(), "Drakborgen")
-	//: window(sf::VideoMode(1920, 1200), "Drakborgen")
+	//: window(sf::VideoMode(1024, 768), "Drakborgen")
 #else
 	: window(sf::VideoMode::getDesktopMode(), "Drakborgen", sf::Style::Fullscreen)
 #endif // BLESS_THIS_MESS
@@ -55,7 +55,7 @@ void Game::run()
 		}
 	}*/
 
-	setState(State::StartGame);
+	setState(State::SelectNetRole);
 
 	int fpsCount = 0;
 	sf::Clock fpsTimer;
@@ -139,7 +139,7 @@ void Game::processSystemEvents()
 				int mouseOverItemIndex = getMouseOverItemIndex(buttonReleasedMousePosition);
 				if (mouseOverItemIndex == capturedItemIndex)
 				{
-					invokeEventHandler(onLeftMouseClickMap);
+					invokeEventHandler(onLeftMouseClickTable);
 				}
 			}
 		}
@@ -170,24 +170,25 @@ void Game::processSystemEvents()
 	}
 }
 
-void Game::invokeEventHandler(const EventMap& eventMap)
+void Game::invokeEventHandler(const EventTable& eventTable)
 {
-	EventMap::const_iterator handler = eventMap.find(state);
-	if (handler == eventMap.end())
+	if (std::function<void(Game&)> function = eventTable[int(state)])
 	{
-		return;
+		function(*this);
 	}
-	handler->second();
+	else
+	{
+		THROW;
+	}
 }
-
 
 void Game::setState(State newState)
 {
 	if (newState != state)
 	{
-		invokeEventHandler(onEndMap);
+		invokeEventHandler(onEndTable);
 		state = newState;
-		invokeEventHandler(onBeginMap);
+		invokeEventHandler(onBeginTable);
 	}
 }
 
@@ -221,13 +222,99 @@ sf::Vector2f Game::correctBoardPosition(sf::Vector2f boardPostion)
 }
 
 template<>
-void Game::onBegin<State::StartGame>()
+void Game::onBegin<State::SelectNetRole>()
 {
-	idleHeroes.reserve(4);
-	idleHeroes.push_back(Hero("rohan", "Riddar Rohan", 17));
-	idleHeroes.push_back(Hero("sigeir", "Sigeir Skarpyxe", 16));
-	idleHeroes.push_back(Hero("aelfric", "Aelfric Brunkåpa", 15));
-	idleHeroes.push_back(Hero("bardhor", "Bardhor Bågman", 11));
+	sf::Vector2f buttonSize(800.0, 200.0);
+	sf::Vector2f upperButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y / 3.0f - buttonSize.y / 2.0f);
+	buttons.push_back(std::make_unique<Button>("Håll gästabud", buttonSize, upperButtonPosition, 60));
+	sf::Vector2f lowerButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 3.0f - buttonSize.y / 2.0f);
+	buttons.push_back(std::make_unique<Button>("Snylta", buttonSize, lowerButtonPosition, 60));
+}
+
+template<>
+void Game::onEnd<State::SelectNetRole>()
+{
+	buttons.clear();
+}
+
+template<>
+void Game::onLeftMouseClick<State::SelectNetRole>()
+{
+	if (capturedItemIndex == 0)
+	{
+		setState(State::SetupServer);
+	}
+	else
+	{
+		setState(State::SetupClient);
+	}
+}
+
+template<>
+void Game::onBegin<State::SetupServer>()
+{
+	sf::Vector2f buttonSize(600.0, 130.0);
+	sf::Vector2f firstButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y / 5.0f - buttonSize.y / 2.0f);
+	buttons.push_back(std::make_unique<Button>("Snåla", buttonSize, firstButtonPosition, 60));
+	sf::Vector2f secondButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+	buttons.push_back(std::make_unique<Button>("Bjud in en gäst", buttonSize, secondButtonPosition, 60));
+	sf::Vector2f thirdButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 5.0f - buttonSize.y / 2.0f);
+	buttons.push_back(std::make_unique<Button>("Bjud in två gäster", buttonSize, thirdButtonPosition, 60));
+	sf::Vector2f fourthButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 4.0f / 5.0f - buttonSize.y / 2.0f);
+	buttons.push_back(std::make_unique<Button>("Bjud in tre gäster", buttonSize, fourthButtonPosition, 60));
+}
+
+template<>
+void Game::onEnd<State::SetupServer>()
+{
+	buttons.clear();
+}
+
+template<>
+void Game::onLeftMouseClick<State::SetupServer>()
+{
+	if (capturedItemIndex > -1)
+	{
+		clientCount = capturedItemIndex;
+		if (clientCount == 0)
+		{
+			setState(State::SetupGame);
+		}
+		else
+		{
+			setState(State::AwaitingConnections);
+		}
+	}
+}
+
+template<>
+void Game::onBegin<State::SetupClient>()
+{
+
+}
+
+template<>
+void Game::onEnd<State::SetupClient>()
+{
+	buttons.clear();
+}
+
+template<>
+void Game::onLeftMouseClick<State::SetupClient>()
+{
+}
+
+template<>
+void Game::onBegin<State::SetupGame>()
+{
+	if (idleHeroes.size() == 0)
+	{
+		idleHeroes.reserve(4);
+		idleHeroes.push_back(Hero("rohan", "Riddar Rohan", 17));
+		idleHeroes.push_back(Hero("sigeir", "Sigeir Skarpyxe", 16));
+		idleHeroes.push_back(Hero("aelfric", "Aelfric Brunkåpa", 15));
+		idleHeroes.push_back(Hero("bardhor", "Bardhor Bågman", 11));
+	}
 
 	board.setGameStartMoveSites();
 
@@ -606,18 +693,32 @@ void Game::startPlayerRound()
 	animations.add(board, correctBoardPosition({ windowSize.x / 2.0f - avatarCenter.x, windowSize.y / 2.0f - avatarCenter.y }), 0.75f, []() {});
 }
 
-#define STATE(state, event) event##Map[state] = [this]() { return event##<##state##>(); }
+template<State state>
+struct StateHandlerInitializer
+{
+	StateHandlerInitializer(Game& game)
+		: next(game)
+	{
+		game.onBeginTable[int(state)] = &Game::onBegin<state>;
+		game.onEndTable[int(state)] = &Game::onEnd<state>;
+		game.onLeftMouseClickTable[int(state)] = &Game::onLeftMouseClick<state>;
+	}
+
+	StateHandlerInitializer<State(int(state) + 1)> next;
+};
+
+template<>
+struct StateHandlerInitializer<State::StateCount>
+{
+	StateHandlerInitializer(Game& game)
+	{
+		game.onBeginTable.resize(int(State::StateCount));
+		game.onEndTable.resize(int(State::StateCount));
+		game.onLeftMouseClickTable.resize(int(State::StateCount));
+	}
+};
 
 void Game::createStateLogicMap()
 {
-	STATE(State::StartGame, onBegin);
-	STATE(State::PickHero, onLeftMouseClick);
-	STATE(State::PickStartTower, onBegin);
-	STATE(State::PickStartTower, onLeftMouseClick);
-	STATE(State::PlayerMove, onLeftMouseClick);
-	STATE(State::ViewStatsCard, onBegin);
-	STATE(State::ViewStatsCard, onEnd);
-	STATE(State::ViewStatsCard, onLeftMouseClick);
-	STATE(State::TurnContinue, onBegin);
-	STATE(State::TurnEnd, onBegin);
+	StateHandlerInitializer<State::NoState>(*this);
 }

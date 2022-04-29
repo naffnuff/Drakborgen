@@ -40,21 +40,21 @@ public:
 private:
 	void processSystemEvents();
 
-	using EventMap = std::map<State, std::function<void()>>;
-	void invokeEventHandler(const EventMap& eventMap);
+	using EventTable = std::vector<std::function<void(Game&)>>;
+	void invokeEventHandler(const EventTable& eventTable);
 
 	void setState(State newState);
 
 	sf::Vector2f correctBoardPosition(sf::Vector2f boardPostion);
 
 	template<State>
-	void onBegin();
+	void onBegin() {}
 
 	template<State>
-	void onEnd();
+	void onEnd() {}
 
 	template<State>
-	void onLeftMouseClick();
+	void onLeftMouseClick() {}
 
 	void placeAtOrigin(std::unique_ptr<Card>& card) const;
 	void moveOffScreen(std::unique_ptr<Card>& card, float time, std::function<void()> callback);
@@ -76,6 +76,9 @@ private:
 	void createStateLogicMap();
 
 private:
+	template<State state>
+	friend struct StateHandlerInitializer;
+
 	Random random;
 	sf::RenderWindow window;
 	Board board;
@@ -85,6 +88,8 @@ private:
 	State state = State::NoState;
 
 	int playerCount = 4;
+
+	int clientCount = 0;
 
 	bool xCenteredBoard = false;
 	bool yCenteredBoard = false;
@@ -104,9 +109,9 @@ private:
 
 	int activePlayerIndex = -1;
 
-	EventMap onBeginMap;
-	EventMap onEndMap;
-	EventMap onLeftMouseClickMap;
+	EventTable onBeginTable;
+	EventTable onEndTable;
+	EventTable onLeftMouseClickTable;
 
 	AnimationManager animations;
 };
