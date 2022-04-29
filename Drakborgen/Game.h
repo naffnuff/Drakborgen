@@ -12,6 +12,8 @@
 #include "Animation.h"
 #include "Button.h"
 
+#define BLESS_THIS_MESS 1
+
 using TileDeck = Deck<Tile, 115>;
 
 class Game
@@ -36,17 +38,23 @@ public:
 	void run();
 
 private:
-	State processEvents();
+	void processSystemEvents();
 
-	State invokeEventHandler(std::map<State, std::function<State()>>& eventMap);
+	using EventMap = std::map<State, std::function<void()>>;
+	void invokeEventHandler(const EventMap& eventMap);
+
+	void setState(State newState);
 
 	sf::Vector2f correctBoardPosition(sf::Vector2f boardPostion);
 
 	template<State>
-	State onTick();
+	void onBegin();
 
 	template<State>
-	State onLeftMouseClick();
+	void onEnd();
+
+	template<State>
+	void onLeftMouseClick();
 
 	void placeAtOrigin(std::unique_ptr<Card>& card) const;
 	void moveOffScreen(std::unique_ptr<Card>& card, float time, std::function<void()> callback);
@@ -74,7 +82,7 @@ private:
 	CardDisplay cardDisplay;
 	TileDeck tiles;
 
-	State state = State::PickHero;
+	State state = State::NoState;
 
 	int playerCount = 4;
 
@@ -96,8 +104,9 @@ private:
 
 	int activePlayerIndex = -1;
 
-	std::map<State, std::function<State()>> onTickMap;
-	std::map<State, std::function<State()>> onLeftMouseClickMap;
+	EventMap onBeginMap;
+	EventMap onEndMap;
+	EventMap onLeftMouseClickMap;
 
 	AnimationManager animations;
 };

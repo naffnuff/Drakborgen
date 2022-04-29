@@ -7,16 +7,18 @@
 #include "Tile.h"
 
 Game::Game()
-#ifdef _DEBUG
-	//: window(sf::VideoMode::getDesktopMode(), "Drakborgen")
-	: window(sf::VideoMode(1920, 1200), "Drakborgen")
+#if BLESS_THIS_MESS
+	: window(sf::VideoMode::getDesktopMode(), "Drakborgen")
+	//: window(sf::VideoMode(1920, 1200), "Drakborgen")
 #else
 	: window(sf::VideoMode::getDesktopMode(), "Drakborgen", sf::Style::Fullscreen)
-#endif // DEBUG
+#endif // BLESS_THIS_MESS
 	, board(animations)
 	, cardDisplay(window)
 	, tiles(random)
 {
+	window.setVerticalSyncEnabled(true);
+
 	sf::Vector2f boardSize = board.getSize();
 	sf::Vector2u windowSize = window.getSize();
 	xCenteredBoard = boardSize.x < windowSize.x;
@@ -53,15 +55,7 @@ void Game::run()
 		}
 	}*/
 
-	idleHeroes.reserve(4);
-	idleHeroes.push_back(Hero("rohan", "Riddar Rohan", 17));
-	idleHeroes.push_back(Hero("sigeir", "Sigeir Skarpyxe", 16));
-	idleHeroes.push_back(Hero("aelfric", "Aelfric Brunkåpa", 15));
-	idleHeroes.push_back(Hero("bardhor", "Bardhor Bågman", 11));
-
-	board.setGameStartMoveSites();
-
-	displayCards(getHeroCards(), []() {});
+	setState(State::StartGame);
 
 	int fpsCount = 0;
 	sf::Clock fpsTimer;
@@ -86,9 +80,7 @@ void Game::run()
 
 		board.update(timestamp, timeDelta);
 
-		state = invokeEventHandler(onTickMap);
-
-		state = processEvents();
+		processSystemEvents();
 
 		window.clear();
 
@@ -117,7 +109,7 @@ void Game::run()
 	}
 }
 
-State Game::processEvents()
+void Game::processSystemEvents()
 {
 	sf::Event event;
 	while (window.pollEvent(event))
@@ -147,7 +139,7 @@ State Game::processEvents()
 				int mouseOverItemIndex = getMouseOverItemIndex(buttonReleasedMousePosition);
 				if (mouseOverItemIndex == capturedItemIndex)
 				{
-					state = invokeEventHandler(onLeftMouseClickMap);
+					invokeEventHandler(onLeftMouseClickMap);
 				}
 			}
 		}
@@ -176,17 +168,27 @@ State Game::processEvents()
 			}
 		}
 	}
-	return state;
 }
 
-State Game::invokeEventHandler(std::map<State, std::function<State()>>& eventMap)
+void Game::invokeEventHandler(const EventMap& eventMap)
 {
-	if (eventMap.find(state) == eventMap.end())
+	EventMap::const_iterator handler = eventMap.find(state);
+	if (handler == eventMap.end())
 	{
-		return state;
+		return;
 	}
-	state = eventMap[state]();
-	return state;
+	handler->second();
+}
+
+
+void Game::setState(State newState)
+{
+	if (newState != state)
+	{
+		invokeEventHandler(onEndMap);
+		state = newState;
+		invokeEventHandler(onBeginMap);
+	}
 }
 
 sf::Vector2f Game::correctBoardPosition(sf::Vector2f boardPostion)
@@ -219,19 +221,30 @@ sf::Vector2f Game::correctBoardPosition(sf::Vector2f boardPostion)
 }
 
 template<>
-State Game::onLeftMouseClick<State::PickHero>()
+void Game::onBegin<State::StartGame>()
 {
-	std::cout << "pick hero ";
+	idleHeroes.reserve(4);
+	idleHeroes.push_back(Hero("rohan", "Riddar Rohan", 17));
+	idleHeroes.push_back(Hero("sigeir", "Sigeir Skarpyxe", 16));
+	idleHeroes.push_back(Hero("aelfric", "Aelfric Brunkåpa", 15));
+	idleHeroes.push_back(Hero("bardhor", "Bardhor Bågman", 11));
+
+	board.setGameStartMoveSites();
+
+	displayCards(getHeroCards(), []() {});
+
+	setState(State::PickHero);
+}
+
+template<>
+void Game::onLeftMouseClick<State::PickHero>()
+{
 	if (capturedItemIndex >= 0)
 	{
 		buttons.clear();
 		if (capturedItemIndex < cardDisplay.cardCount()) // hero card clicked
 		{
-			panToNextFreeTower();
-			createPlayer(capturedItemIndex);
-			board.showMoveSites(true);			
-			std::cout << " -> pick start tower" << std::endl;
-			return State::PickStartTower;
+			setState(State::PickStartTower);
 		}
 		else // begin-game button clicked
 		{
@@ -247,18 +260,22 @@ State Game::onLeftMouseClick<State::PickHero>()
 				idleHeroes[i].placeStatsCard(std::move(card));
 			}
 			startNewGame();
-			std::cout << " -> pick player move" << std::endl;
-			return State::PlayerMove;
+			setState(State::PlayerMove);
 		}
 	}
-	std::cout << " -> pick hero" << std::endl;
-	return State::PickHero;
 }
 
 template<>
-State Game::onLeftMouseClick<State::PickStartTower>()
+void Game::onBegin<State::PickStartTower>()
 {
-	std::cout << "pick start tower ";
+	panToNextFreeTower();
+	createPlayer(capturedItemIndex);
+	board.showMoveSites(true);
+}
+
+template<>
+void Game::onLeftMouseClick<State::PickStartTower>()
+{
 	sf::Vector2f mouseBoardPosition = getMouseBoardPosition();
 	if (board.testMoveSites(mouseBoardPosition))
 	{
@@ -268,34 +285,21 @@ State Game::onLeftMouseClick<State::PickStartTower>()
 		placeNewPlayer(site, [this]() { onNewPlayerPlaced(); });
 		if (idleHeroes.empty())
 		{
-			std::cout << " -> pick player move" << std::endl;
-			return State::PlayerMove;
+			setState(State::PlayerMove);
 		}
 		else
 		{
-			std::cout << " -> pick hero" << std::endl;
-			return State::PickHero;
+			setState(State::PickHero);
 		}
 	}
-	std::cout << " -> pick start tower" << std::endl;
-	return State::PickStartTower;
 }
 
 template<>
-State Game::onLeftMouseClick<State::PlayerMove>()
+void Game::onLeftMouseClick<State::PlayerMove>()
 {
-	std::cout << "player move ";
 	if (capturedItemIndex >= cardDisplay.cardCount())
 	{
-		//board.showMoveSites(false);
-		std::unique_ptr<Card> card = players[activePlayerIndex].hero.pullStatsCard();
-		if (!card)
-		{
-			THROW;
-		}
-		displayCard(std::move(card), []() {});
-		std::cout << "-> view stats card" << std::endl;
-		return State::ViewStatsCard;
+		setState(State::ViewStatsCard);
 	}
 	else
 	{
@@ -311,46 +315,53 @@ State Game::onLeftMouseClick<State::PlayerMove>()
 			Tile& tile = *board.getTile(moveSite.site);
 			movePlayer(activePlayerIndex, moveSite, [this, &tile]() { onPlayerMoved(tile); });
 			board.clearMoveSites();
+			// setting new state async
 		}
 	}
-	std::cout << " -> player move" << std::endl;
-	return State::PlayerMove;
 }
 
 template<>
-State Game::onLeftMouseClick<State::ViewStatsCard>()
+void Game::onBegin<State::ViewStatsCard>()
 {
-	std::cout << "view stats card ";
+	//board.showMoveSites(false);
+	std::unique_ptr<Card> card = players[activePlayerIndex].hero.pullStatsCard();
+	if (!card)
+	{
+		THROW;
+	}
+	displayCard(std::move(card), []() {});
+}
+
+template<>
+void Game::onEnd<State::ViewStatsCard>()
+{
+	std::unique_ptr<Card> card = cardDisplay.pullCard();
+	moveOffScreen(card, 0.5f, [this]() { placeAtOrigin(players[activePlayerIndex].hero.getStatsCard()); });
+	players[activePlayerIndex].hero.placeStatsCard(std::move(card));
+	//board.showMoveSites(true);
+}
+
+template<>
+void Game::onLeftMouseClick<State::ViewStatsCard>()
+{
 	if (capturedItemIndex > -1)
 	{
-		std::unique_ptr<Card> card = cardDisplay.pullCard();
-		moveOffScreen(card, 0.5f, [this]() { placeAtOrigin(players[activePlayerIndex].hero.getStatsCard()); });
-		players[activePlayerIndex].hero.placeStatsCard(std::move(card));
-		//board.showMoveSites(true);
-		std::cout << " -> player move" << std::endl;
-		return State::PlayerMove;
+		setState(State::PlayerMove);
 	}
-	std::cout << "-> view stats card" << std::endl;
-	return State::ViewStatsCard;
 }
 
 template<>
-State Game::onTick<State::TurnContinue>()
+void Game::onBegin<State::TurnContinue>()
 {
-	std::cout << "turn continue ";
 	startPlayerRound();
-	std::cout << " -> player move" << std::endl;
-	return State::PlayerMove;
+	setState(State::PlayerMove);
 }
 
 template<>
-State Game::onTick<State::TurnEnd>()
+void Game::onBegin<State::TurnEnd>()
 {
-	std::cout << "turn end ";
 	activePlayerIndex = (activePlayerIndex + 1) % int(players.size());
-	startPlayerRound();
-	std::cout << " -> player move" << std::endl;
-	return State::PlayerMove;
+	onBegin<State::TurnContinue>();
 }
 
 void Game::placeAtOrigin(std::unique_ptr<Card>& card) const
@@ -568,7 +579,7 @@ void Game::onNewPlayerPlaced()
 
 void Game::onPlayerMoved(Tile& tile)
 {
-	state = tile.enter();
+	setState(tile.enter());
 }
 
 void Game::startNewGame()
@@ -595,14 +606,18 @@ void Game::startPlayerRound()
 	animations.add(board, correctBoardPosition({ windowSize.x / 2.0f - avatarCenter.x, windowSize.y / 2.0f - avatarCenter.y }), 0.75f, []() {});
 }
 
-#define STATE(state, event) on##event##Map[State::state] = [this]() { return on##event##<State::##state##>(); }
+#define STATE(state, event) event##Map[state] = [this]() { return event##<##state##>(); }
 
 void Game::createStateLogicMap()
 {
-	STATE(PickHero, LeftMouseClick);
-	STATE(PickStartTower, LeftMouseClick);
-	STATE(PlayerMove, LeftMouseClick);
-	STATE(ViewStatsCard, LeftMouseClick);
-	STATE(TurnContinue, Tick);
-	STATE(TurnEnd, Tick);
+	STATE(State::StartGame, onBegin);
+	STATE(State::PickHero, onLeftMouseClick);
+	STATE(State::PickStartTower, onBegin);
+	STATE(State::PickStartTower, onLeftMouseClick);
+	STATE(State::PlayerMove, onLeftMouseClick);
+	STATE(State::ViewStatsCard, onBegin);
+	STATE(State::ViewStatsCard, onEnd);
+	STATE(State::ViewStatsCard, onLeftMouseClick);
+	STATE(State::TurnContinue, onBegin);
+	STATE(State::TurnEnd, onBegin);
 }

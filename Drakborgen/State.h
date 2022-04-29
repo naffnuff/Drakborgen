@@ -2,6 +2,8 @@
 
 enum class State
 {
+	SelectNetRole,
+	StartGame,
 	PickHero,
 	PickStartTower,
 	PlayerMove,
