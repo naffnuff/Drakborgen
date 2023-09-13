@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SFML/Network.hpp>
+
 #include "UniqueSprite.h"
 
 #include "State.h"
@@ -84,6 +86,8 @@ private:
 	Board board;
 	CardDisplay cardDisplay;
 	TileDeck tiles;
+
+	std::vector<std::unique_ptr<sf::TcpSocket>> sockets;
 
 	State state = State::NoState;
 

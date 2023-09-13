@@ -17,7 +17,7 @@ Button::Button(const std::string& message, sf::Vector2f size, sf::Vector2f posit
 	text.setFont(font); // font is a sf::Font
 
 	// set the string to display
-	text.setString(sf::String::fromUtf8(message.begin(), message.end()));
+	setText(message);
 
 	// set the character size
 	text.setCharacterSize(textSixe); // in pixels, not points!
@@ -42,4 +42,14 @@ void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	target.draw(background, states);
 	target.draw(text, states);
+}
+
+void Button::setText(const std::string& value)
+{
+	text.setString(sf::String::fromUtf8(value.begin(), value.end()));
+}
+
+std::string Button::getText() const
+{
+	return text.getString();
 }

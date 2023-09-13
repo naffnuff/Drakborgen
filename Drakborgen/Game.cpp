@@ -224,11 +224,15 @@ sf::Vector2f Game::correctBoardPosition(sf::Vector2f boardPostion)
 template<>
 void Game::onBegin<State::SelectNetRole>()
 {
-	sf::Vector2f buttonSize(800.0, 200.0);
-	sf::Vector2f upperButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y / 3.0f - buttonSize.y / 2.0f);
-	buttons.push_back(std::make_unique<Button>("Håll gästabud", buttonSize, upperButtonPosition, 60));
-	sf::Vector2f lowerButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 3.0f - buttonSize.y / 2.0f);
-	buttons.push_back(std::make_unique<Button>("Snylta", buttonSize, lowerButtonPosition, 60));
+	sf::Vector2f buttonSize(800.0f, 200.0f);
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y / 3.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Håll gästabud", buttonSize, buttonPosition, 60));
+	}
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 3.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Snylta", buttonSize, buttonPosition, 60));
+	}
 }
 
 template<>
@@ -253,15 +257,23 @@ void Game::onLeftMouseClick<State::SelectNetRole>()
 template<>
 void Game::onBegin<State::SetupServer>()
 {
-	sf::Vector2f buttonSize(600.0, 130.0);
-	sf::Vector2f firstButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y / 5.0f - buttonSize.y / 2.0f);
-	buttons.push_back(std::make_unique<Button>("Snåla", buttonSize, firstButtonPosition, 60));
-	sf::Vector2f secondButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
-	buttons.push_back(std::make_unique<Button>("Bjud in en gäst", buttonSize, secondButtonPosition, 60));
-	sf::Vector2f thirdButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 5.0f - buttonSize.y / 2.0f);
-	buttons.push_back(std::make_unique<Button>("Bjud in två gäster", buttonSize, thirdButtonPosition, 60));
-	sf::Vector2f fourthButtonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 4.0f / 5.0f - buttonSize.y / 2.0f);
-	buttons.push_back(std::make_unique<Button>("Bjud in tre gäster", buttonSize, fourthButtonPosition, 60));
+	sf::Vector2f buttonSize(600.0f, 130.0f);
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y / 5.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Snåla", buttonSize, buttonPosition, 60));
+	}
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Bjud in en gäst", buttonSize, buttonPosition, 60));
+	}
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 5.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Bjud in två gäster", buttonSize, buttonPosition, 60));
+	}
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 4.0f / 5.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Bjud in tre gäster", buttonSize, buttonPosition, 60));
+	}
 }
 
 template<>
@@ -282,7 +294,7 @@ void Game::onLeftMouseClick<State::SetupServer>()
 		}
 		else
 		{
-			setState(State::AwaitingConnections);
+			setState(State::AwaitClients);
 		}
 	}
 }
@@ -290,7 +302,37 @@ void Game::onLeftMouseClick<State::SetupServer>()
 template<>
 void Game::onBegin<State::SetupClient>()
 {
-
+	{
+		{
+			sf::Vector2f buttonSize(800.0f, 80.0f);
+			sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 3.0f - buttonSize.y / 2.0f);
+			//buttons.push_back(std::make_unique<Button>("Varthän?", buttonSize, buttonPosition, 60));
+		}
+		{
+			sf::Vector2f buttonSize(800.0f, 200.0f);
+			sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 3.0f - buttonSize.y / 2.0f);
+			buttons.push_back(std::make_unique<Button>("Låt färden gå!", buttonSize, buttonPosition, 60));
+		}
+	}
+	{
+		sf::Vector2f buttonSize(150.0f, 130.0f);
+		{
+			sf::Vector2f buttonPosition(window.getSize().x * 3.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+			buttons.push_back(std::make_unique<Button>("127", buttonSize, buttonPosition, 60));
+		}
+		{
+			sf::Vector2f buttonPosition(window.getSize().x * 4.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+			buttons.push_back(std::make_unique<Button>("0", buttonSize, buttonPosition, 60));
+		}
+		{
+			sf::Vector2f buttonPosition(window.getSize().x * 5.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+			buttons.push_back(std::make_unique<Button>("0", buttonSize, buttonPosition, 60));
+		}
+		{
+			sf::Vector2f buttonPosition(window.getSize().x * 6.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+			buttons.push_back(std::make_unique<Button>("1", buttonSize, buttonPosition, 60));
+		}
+	}
 }
 
 template<>
@@ -302,6 +344,46 @@ void Game::onEnd<State::SetupClient>()
 template<>
 void Game::onLeftMouseClick<State::SetupClient>()
 {
+}
+
+template<>
+void Game::onBegin<State::ConnectToServer>()
+{
+	sockets.push_back(std::make_unique<sf::TcpSocket>());
+	sf::Socket::Status status = sockets[0]->connect("127.0.0.1", 53000);
+	if (status != sf::Socket::Done)
+	{
+		THROW;
+	}
+
+	setState(State::SetupGame);
+}
+
+template<>
+void Game::onBegin<State::AwaitClients>()
+{
+	sf::TcpListener listener;
+
+	// bind the listener to a port
+	if (listener.listen(53000) != sf::Socket::Done)
+	{
+		THROW;
+	}
+
+	// accept a new connection
+	for (int i = 0; i < clientCount; ++i)
+	{
+		sockets.push_back(std::make_unique<sf::TcpSocket>());
+		if (listener.accept(*sockets[i]) != sf::Socket::Done)
+		{
+			THROW;
+		}
+	}
+
+	setState(State::SetupGame);
+
+	// use "client" to communicate with the connected client,
+	// and continue to accept new connections with the listener
 }
 
 template<>
@@ -653,7 +735,7 @@ void Game::onNewPlayerPlaced()
 	}
 	else
 	{
-		sf::Vector2f buttonSize(500.0, 200.0);
+		sf::Vector2f buttonSize(500.0f, 200.0f);
 		sf::Vector2f buttonPosition(window.getSize().x * 3.0f / 4.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
 		buttons.push_back(std::make_unique<Button>("Låt äventyret börja!", buttonSize, buttonPosition, 60));
 		std::function<void()> cardsDisplayedCallback =
