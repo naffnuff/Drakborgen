@@ -17,6 +17,8 @@ Game::Game()
 	, cardDisplay(window)
 	, tiles(random)
 {
+	window.setVerticalSyncEnabled(true);
+
 	sf::Vector2f boardSize = board.getSize();
 	sf::Vector2u windowSize = window.getSize();
 	xCenteredBoard = boardSize.x < windowSize.x;
