@@ -16,6 +16,8 @@
 
 #define BLESS_THIS_MESS 1
 
+#include <map>
+
 using TileDeck = Deck<Tile, 115>;
 
 class Game
