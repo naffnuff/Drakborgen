@@ -7,12 +7,12 @@
 #include "Tile.h"
 
 Game::Game()
-#ifdef _DEBUG
-	//: window(sf::VideoMode::getDesktopMode(), "Drakborgen")
-	: window(sf::VideoMode(1920, 1200), "Drakborgen")
+#if BLESS_THIS_MESS
+	: window(sf::VideoMode::getDesktopMode(), "Drakborgen")
+	//: window(sf::VideoMode(1024, 768), "Drakborgen")
 #else
 	: window(sf::VideoMode::getDesktopMode(), "Drakborgen", sf::Style::Fullscreen)
-#endif // DEBUG
+#endif // BLESS_THIS_MESS
 	, board(animations)
 	, cardDisplay(window)
 	, tiles(random)
@@ -55,15 +55,7 @@ void Game::run()
 		}
 	}*/
 
-	idleHeroes.reserve(4);
-	idleHeroes.push_back(Hero("rohan", "Riddar Rohan", 17));
-	idleHeroes.push_back(Hero("sigeir", "Sigeir Skarpyxe", 16));
-	idleHeroes.push_back(Hero("aelfric", "Aelfric Brunkåpa", 15));
-	idleHeroes.push_back(Hero("bardhor", "Bardhor Bågman", 11));
-
-	board.setGameStartMoveSites();
-
-	displayCards(getHeroCards(), []() {});
+	setState(State::SelectNetRole);
 
 	int fpsCount = 0;
 	sf::Clock fpsTimer;
@@ -88,9 +80,7 @@ void Game::run()
 
 		board.update(timestamp, timeDelta);
 
-		state = invokeEventHandler(onTickMap);
-
-		state = processEvents();
+		processSystemEvents();
 
 		window.clear();
 
@@ -119,7 +109,7 @@ void Game::run()
 	}
 }
 
-State Game::processEvents()
+void Game::processSystemEvents()
 {
 	sf::Event event;
 	while (window.pollEvent(event))
@@ -149,7 +139,7 @@ State Game::processEvents()
 				int mouseOverItemIndex = getMouseOverItemIndex(buttonReleasedMousePosition);
 				if (mouseOverItemIndex == capturedItemIndex)
 				{
-					state = invokeEventHandler(onLeftMouseClickMap);
+					invokeEventHandler(onLeftMouseClickTable);
 				}
 			}
 		}
@@ -178,17 +168,28 @@ State Game::processEvents()
 			}
 		}
 	}
-	return state;
 }
 
-State Game::invokeEventHandler(std::map<State, std::function<State()>>& eventMap)
+void Game::invokeEventHandler(const EventTable& eventTable)
 {
-	if (eventMap.find(state) == eventMap.end())
+	if (std::function<void(Game&)> function = eventTable[int(state)])
 	{
-		return state;
+		function(*this);
 	}
-	state = eventMap[state]();
-	return state;
+	else
+	{
+		THROW;
+	}
+}
+
+void Game::setState(State newState)
+{
+	if (newState != state)
+	{
+		invokeEventHandler(onEndTable);
+		state = newState;
+		invokeEventHandler(onBeginTable);
+	}
 }
 
 sf::Vector2f Game::correctBoardPosition(sf::Vector2f boardPostion)
@@ -221,19 +222,198 @@ sf::Vector2f Game::correctBoardPosition(sf::Vector2f boardPostion)
 }
 
 template<>
-State Game::onLeftMouseClick<State::PickHero>()
+void Game::onBegin<State::SelectNetRole>()
 {
-	std::cout << "pick hero ";
+	sf::Vector2f buttonSize(800.0f, 200.0f);
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y / 3.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Håll gästabud", buttonSize, buttonPosition, 60));
+	}
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 3.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Snylta", buttonSize, buttonPosition, 60));
+	}
+}
+
+template<>
+void Game::onEnd<State::SelectNetRole>()
+{
+	buttons.clear();
+}
+
+template<>
+void Game::onLeftMouseClick<State::SelectNetRole>()
+{
+	if (capturedItemIndex == 0)
+	{
+		setState(State::SetupServer);
+	}
+	else
+	{
+		setState(State::SetupClient);
+	}
+}
+
+template<>
+void Game::onBegin<State::SetupServer>()
+{
+	sf::Vector2f buttonSize(600.0f, 130.0f);
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y / 5.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Snåla", buttonSize, buttonPosition, 60));
+	}
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Bjud in en gäst", buttonSize, buttonPosition, 60));
+	}
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 5.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Bjud in två gäster", buttonSize, buttonPosition, 60));
+	}
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 4.0f / 5.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Bjud in tre gäster", buttonSize, buttonPosition, 60));
+	}
+}
+
+template<>
+void Game::onEnd<State::SetupServer>()
+{
+	buttons.clear();
+}
+
+template<>
+void Game::onLeftMouseClick<State::SetupServer>()
+{
+	if (capturedItemIndex > -1)
+	{
+		clientCount = capturedItemIndex;
+		if (clientCount == 0)
+		{
+			setState(State::SetupGame);
+		}
+		else
+		{
+			setState(State::AwaitClients);
+		}
+	}
+}
+
+template<>
+void Game::onBegin<State::SetupClient>()
+{
+	{
+		{
+			sf::Vector2f buttonSize(800.0f, 80.0f);
+			sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 3.0f - buttonSize.y / 2.0f);
+			//buttons.push_back(std::make_unique<Button>("Varthän?", buttonSize, buttonPosition, 60));
+		}
+		{
+			sf::Vector2f buttonSize(800.0f, 200.0f);
+			sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 3.0f - buttonSize.y / 2.0f);
+			buttons.push_back(std::make_unique<Button>("Låt färden gå!", buttonSize, buttonPosition, 60));
+		}
+	}
+	{
+		sf::Vector2f buttonSize(150.0f, 130.0f);
+		{
+			sf::Vector2f buttonPosition(window.getSize().x * 3.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+			buttons.push_back(std::make_unique<Button>("127", buttonSize, buttonPosition, 60));
+		}
+		{
+			sf::Vector2f buttonPosition(window.getSize().x * 4.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+			buttons.push_back(std::make_unique<Button>("0", buttonSize, buttonPosition, 60));
+		}
+		{
+			sf::Vector2f buttonPosition(window.getSize().x * 5.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+			buttons.push_back(std::make_unique<Button>("0", buttonSize, buttonPosition, 60));
+		}
+		{
+			sf::Vector2f buttonPosition(window.getSize().x * 6.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+			buttons.push_back(std::make_unique<Button>("1", buttonSize, buttonPosition, 60));
+		}
+	}
+}
+
+template<>
+void Game::onEnd<State::SetupClient>()
+{
+	buttons.clear();
+}
+
+template<>
+void Game::onLeftMouseClick<State::SetupClient>()
+{
+}
+
+template<>
+void Game::onBegin<State::ConnectToServer>()
+{
+	sockets.push_back(std::make_unique<sf::TcpSocket>());
+	sf::Socket::Status status = sockets[0]->connect("127.0.0.1", 53000);
+	if (status != sf::Socket::Done)
+	{
+		THROW;
+	}
+
+	setState(State::SetupGame);
+}
+
+template<>
+void Game::onBegin<State::AwaitClients>()
+{
+	sf::TcpListener listener;
+
+	// bind the listener to a port
+	if (listener.listen(53000) != sf::Socket::Done)
+	{
+		THROW;
+	}
+
+	// accept a new connection
+	for (int i = 0; i < clientCount; ++i)
+	{
+		sockets.push_back(std::make_unique<sf::TcpSocket>());
+		if (listener.accept(*sockets[i]) != sf::Socket::Done)
+		{
+			THROW;
+		}
+	}
+
+	setState(State::SetupGame);
+
+	// use "client" to communicate with the connected client,
+	// and continue to accept new connections with the listener
+}
+
+template<>
+void Game::onBegin<State::SetupGame>()
+{
+	if (idleHeroes.size() == 0)
+	{
+		idleHeroes.reserve(4);
+		idleHeroes.push_back(Hero("rohan", "Riddar Rohan", 17));
+		idleHeroes.push_back(Hero("sigeir", "Sigeir Skarpyxe", 16));
+		idleHeroes.push_back(Hero("aelfric", "Aelfric Brunkåpa", 15));
+		idleHeroes.push_back(Hero("bardhor", "Bardhor Bågman", 11));
+	}
+
+	board.setGameStartMoveSites();
+
+	displayCards(getHeroCards(), []() {});
+
+	setState(State::PickHero);
+}
+
+template<>
+void Game::onLeftMouseClick<State::PickHero>()
+{
 	if (capturedItemIndex >= 0)
 	{
 		buttons.clear();
 		if (capturedItemIndex < cardDisplay.cardCount()) // hero card clicked
 		{
-			panToNextFreeTower();
-			createPlayer(capturedItemIndex);
-			board.showMoveSites(true);			
-			std::cout << " -> pick start tower" << std::endl;
-			return State::PickStartTower;
+			setState(State::PickStartTower);
 		}
 		else // begin-game button clicked
 		{
@@ -249,18 +429,22 @@ State Game::onLeftMouseClick<State::PickHero>()
 				idleHeroes[i].placeStatsCard(std::move(card));
 			}
 			startNewGame();
-			std::cout << " -> pick player move" << std::endl;
-			return State::PlayerMove;
+			setState(State::PlayerMove);
 		}
 	}
-	std::cout << " -> pick hero" << std::endl;
-	return State::PickHero;
 }
 
 template<>
-State Game::onLeftMouseClick<State::PickStartTower>()
+void Game::onBegin<State::PickStartTower>()
 {
-	std::cout << "pick start tower ";
+	panToNextFreeTower();
+	createPlayer(capturedItemIndex);
+	board.showMoveSites(true);
+}
+
+template<>
+void Game::onLeftMouseClick<State::PickStartTower>()
+{
 	sf::Vector2f mouseBoardPosition = getMouseBoardPosition();
 	if (board.testMoveSites(mouseBoardPosition))
 	{
@@ -270,34 +454,21 @@ State Game::onLeftMouseClick<State::PickStartTower>()
 		placeNewPlayer(site, [this]() { onNewPlayerPlaced(); });
 		if (idleHeroes.empty())
 		{
-			std::cout << " -> pick player move" << std::endl;
-			return State::PlayerMove;
+			setState(State::PlayerMove);
 		}
 		else
 		{
-			std::cout << " -> pick hero" << std::endl;
-			return State::PickHero;
+			setState(State::PickHero);
 		}
 	}
-	std::cout << " -> pick start tower" << std::endl;
-	return State::PickStartTower;
 }
 
 template<>
-State Game::onLeftMouseClick<State::PlayerMove>()
+void Game::onLeftMouseClick<State::PlayerMove>()
 {
-	std::cout << "player move ";
 	if (capturedItemIndex >= cardDisplay.cardCount())
 	{
-		//board.showMoveSites(false);
-		std::unique_ptr<Card> card = players[activePlayerIndex].hero.pullStatsCard();
-		if (!card)
-		{
-			THROW;
-		}
-		displayCard(std::move(card), []() {});
-		std::cout << "-> view stats card" << std::endl;
-		return State::ViewStatsCard;
+		setState(State::ViewStatsCard);
 	}
 	else
 	{
@@ -313,46 +484,53 @@ State Game::onLeftMouseClick<State::PlayerMove>()
 			Tile& tile = *board.getTile(moveSite.site);
 			movePlayer(activePlayerIndex, moveSite, [this, &tile]() { onPlayerMoved(tile); });
 			board.clearMoveSites();
+			// setting new state async
 		}
 	}
-	std::cout << " -> player move" << std::endl;
-	return State::PlayerMove;
 }
 
 template<>
-State Game::onLeftMouseClick<State::ViewStatsCard>()
+void Game::onBegin<State::ViewStatsCard>()
 {
-	std::cout << "view stats card ";
+	//board.showMoveSites(false);
+	std::unique_ptr<Card> card = players[activePlayerIndex].hero.pullStatsCard();
+	if (!card)
+	{
+		THROW;
+	}
+	displayCard(std::move(card), []() {});
+}
+
+template<>
+void Game::onEnd<State::ViewStatsCard>()
+{
+	std::unique_ptr<Card> card = cardDisplay.pullCard();
+	moveOffScreen(card, 0.5f, [this]() { placeAtOrigin(players[activePlayerIndex].hero.getStatsCard()); });
+	players[activePlayerIndex].hero.placeStatsCard(std::move(card));
+	//board.showMoveSites(true);
+}
+
+template<>
+void Game::onLeftMouseClick<State::ViewStatsCard>()
+{
 	if (capturedItemIndex > -1)
 	{
-		std::unique_ptr<Card> card = cardDisplay.pullCard();
-		moveOffScreen(card, 0.5f, [this]() { placeAtOrigin(players[activePlayerIndex].hero.getStatsCard()); });
-		players[activePlayerIndex].hero.placeStatsCard(std::move(card));
-		//board.showMoveSites(true);
-		std::cout << " -> player move" << std::endl;
-		return State::PlayerMove;
+		setState(State::PlayerMove);
 	}
-	std::cout << "-> view stats card" << std::endl;
-	return State::ViewStatsCard;
 }
 
 template<>
-State Game::onTick<State::TurnContinue>()
+void Game::onBegin<State::TurnContinue>()
 {
-	std::cout << "turn continue ";
 	startPlayerRound();
-	std::cout << " -> player move" << std::endl;
-	return State::PlayerMove;
+	setState(State::PlayerMove);
 }
 
 template<>
-State Game::onTick<State::TurnEnd>()
+void Game::onBegin<State::TurnEnd>()
 {
-	std::cout << "turn end ";
 	activePlayerIndex = (activePlayerIndex + 1) % int(players.size());
-	startPlayerRound();
-	std::cout << " -> player move" << std::endl;
-	return State::PlayerMove;
+	onBegin<State::TurnContinue>();
 }
 
 void Game::placeAtOrigin(std::unique_ptr<Card>& card) const
@@ -557,7 +735,7 @@ void Game::onNewPlayerPlaced()
 	}
 	else
 	{
-		sf::Vector2f buttonSize(500.0, 200.0);
+		sf::Vector2f buttonSize(500.0f, 200.0f);
 		sf::Vector2f buttonPosition(window.getSize().x * 3.0f / 4.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
 		buttons.push_back(std::make_unique<Button>("Låt äventyret börja!", buttonSize, buttonPosition, 60));
 		std::function<void()> cardsDisplayedCallback =
@@ -570,7 +748,7 @@ void Game::onNewPlayerPlaced()
 
 void Game::onPlayerMoved(Tile& tile)
 {
-	state = tile.enter();
+	setState(tile.enter());
 }
 
 void Game::startNewGame()
@@ -597,14 +775,32 @@ void Game::startPlayerRound()
 	animations.add(board, correctBoardPosition({ windowSize.x / 2.0f - avatarCenter.x, windowSize.y / 2.0f - avatarCenter.y }), 0.75f, []() {});
 }
 
-#define STATE(state, event) on##event##Map[State::state] = [this]() { return on##event##<State::##state##>(); }
+template<State state>
+struct StateHandlerInitializer
+{
+	StateHandlerInitializer(Game& game)
+		: next(game)
+	{
+		game.onBeginTable[int(state)] = &Game::onBegin<state>;
+		game.onEndTable[int(state)] = &Game::onEnd<state>;
+		game.onLeftMouseClickTable[int(state)] = &Game::onLeftMouseClick<state>;
+	}
+
+	StateHandlerInitializer<State(int(state) + 1)> next;
+};
+
+template<>
+struct StateHandlerInitializer<State::StateCount>
+{
+	StateHandlerInitializer(Game& game)
+	{
+		game.onBeginTable.resize(int(State::StateCount));
+		game.onEndTable.resize(int(State::StateCount));
+		game.onLeftMouseClickTable.resize(int(State::StateCount));
+	}
+};
 
 void Game::createStateLogicMap()
 {
-	STATE(PickHero, LeftMouseClick);
-	STATE(PickStartTower, LeftMouseClick);
-	STATE(PlayerMove, LeftMouseClick);
-	STATE(ViewStatsCard, LeftMouseClick);
-	STATE(TurnContinue, Tick);
-	STATE(TurnEnd, Tick);
+	StateHandlerInitializer<State::NoState>(*this);
 }

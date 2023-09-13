@@ -2,11 +2,18 @@
 
 enum class State
 {
+	NoState,
+	SelectNetRole,
+	SetupServer,
+	SetupClient,
+	ConnectToServer,
+	AwaitClients,
+	SetupGame,
 	PickHero,
 	PickStartTower,
 	PlayerMove,
 	ViewStatsCard,
 	TurnContinue,
 	TurnEnd,
-	NoState
+	StateCount
 };

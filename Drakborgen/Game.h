@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SFML/Network.hpp>
+
 #include "UniqueSprite.h"
 
 #include "State.h"
@@ -11,6 +13,8 @@
 #include "Tile.h"
 #include "Animation.h"
 #include "Button.h"
+
+#define BLESS_THIS_MESS 1
 
 #include <map>
 
@@ -38,17 +42,23 @@ public:
 	void run();
 
 private:
-	State processEvents();
+	void processSystemEvents();
 
-	State invokeEventHandler(std::map<State, std::function<State()>>& eventMap);
+	using EventTable = std::vector<std::function<void(Game&)>>;
+	void invokeEventHandler(const EventTable& eventTable);
+
+	void setState(State newState);
 
 	sf::Vector2f correctBoardPosition(sf::Vector2f boardPostion);
 
 	template<State>
-	State onTick();
+	void onBegin() {}
 
 	template<State>
-	State onLeftMouseClick();
+	void onEnd() {}
+
+	template<State>
+	void onLeftMouseClick() {}
 
 	void placeAtOrigin(std::unique_ptr<Card>& card) const;
 	void moveOffScreen(std::unique_ptr<Card>& card, float time, std::function<void()> callback);
@@ -70,15 +80,22 @@ private:
 	void createStateLogicMap();
 
 private:
+	template<State state>
+	friend struct StateHandlerInitializer;
+
 	Random random;
 	sf::RenderWindow window;
 	Board board;
 	CardDisplay cardDisplay;
 	TileDeck tiles;
 
-	State state = State::PickHero;
+	std::vector<std::unique_ptr<sf::TcpSocket>> sockets;
+
+	State state = State::NoState;
 
 	int playerCount = 4;
+
+	int clientCount = 0;
 
 	bool xCenteredBoard = false;
 	bool yCenteredBoard = false;
@@ -98,8 +115,9 @@ private:
 
 	int activePlayerIndex = -1;
 
-	std::map<State, std::function<State()>> onTickMap;
-	std::map<State, std::function<State()>> onLeftMouseClickMap;
+	EventTable onBeginTable;
+	EventTable onEndTable;
+	EventTable onLeftMouseClickTable;
 
 	AnimationManager animations;
 };

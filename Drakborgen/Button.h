@@ -16,6 +16,9 @@ public:
 
 	void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
 
+	void setText(const std::string& value);
+	std::string getText() const;
+
 private:
 	sf::Font font;
 	sf::Text text;
