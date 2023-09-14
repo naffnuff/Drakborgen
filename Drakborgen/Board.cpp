@@ -174,9 +174,8 @@ void Board::setPlayerSite(int index, MoveSite moveSite, std::function<void()> ca
 	placePlayer(index, moveSite.direction, callback);
 }
 
-void Board::draw(sf::RenderTarget& target, const sf::RenderStates& statesRef) const
+void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	sf::RenderStates states = statesRef;
 	states.transform *= getTransform();
 	target.draw(boardSprite.get(), states);
 	target.draw(vaultSprite.get(), states);

@@ -38,7 +38,7 @@ bool Button::hitTest(sf::Vector2f point) const
 	return buttonRectangle.contains(point);
 }
 
-void Button::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	target.draw(background, states);
 	target.draw(text, states);
