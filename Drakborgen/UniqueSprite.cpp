@@ -4,7 +4,7 @@
 
 UniqueSprite::UniqueSprite(const std::string& imagePath)
 	: texture(std::make_unique<sf::Texture>())
-	, sprite(std::make_unique<sf::Sprite>())
+	, sprite(std::make_unique<sf::Sprite>(texture))
 	, valid(true)
 {
 	if (!texture->loadFromFile(imagePath))

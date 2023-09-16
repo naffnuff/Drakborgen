@@ -350,8 +350,8 @@ template<>
 void Game::onBegin<State::ConnectToServer>()
 {
 	sockets.push_back(std::make_unique<sf::TcpSocket>());
-	sf::Socket::Status status = sockets[0]->connect("127.0.0.1", 53000);
-	if (status != sf::Socket::Done)
+	sf::Socket::Status status = sockets[0]->connect(sf::IpAddress(127, 0, 0, 1), 53000);
+	if (status != sf::Socket::Status::Done)
 	{
 		THROW;
 	}
@@ -365,7 +365,7 @@ void Game::onBegin<State::AwaitClients>()
 	sf::TcpListener listener;
 
 	// bind the listener to a port
-	if (listener.listen(53000) != sf::Socket::Done)
+	if (listener.listen(53000) != sf::Socket::Status::Done)
 	{
 		THROW;
 	}
@@ -374,7 +374,7 @@ void Game::onBegin<State::AwaitClients>()
 	for (int i = 0; i < clientCount; ++i)
 	{
 		sockets.push_back(std::make_unique<sf::TcpSocket>());
-		if (listener.accept(*sockets[i]) != sf::Socket::Done)
+		if (listener.accept(*sockets[i]) != sf::Socket::Status::Done)
 		{
 			THROW;
 		}

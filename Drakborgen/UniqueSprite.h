@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include <SFML/Graphics/Sprite.hpp>
 #include "SFML/Graphics.hpp"
 
 class UniqueSprite

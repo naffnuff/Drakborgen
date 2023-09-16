@@ -2,7 +2,8 @@
 
 #include "System.h"
 
-Button::Button(const std::string& message, sf::Vector2f size, sf::Vector2f position, int textSixe)
+Button::Button(const std::string& message, sf::Vector2f size, sf::Vector2f position, int textSize)
+	: text(font, message, textSize)
 {
 	if (!font.loadFromFile("Media/ITCBLKAD.TTF"))
 	{
@@ -20,7 +21,7 @@ Button::Button(const std::string& message, sf::Vector2f size, sf::Vector2f posit
 	setText(message);
 
 	// set the character size
-	text.setCharacterSize(textSixe); // in pixels, not points!
+	text.setCharacterSize(textSize); // in pixels, not points!
 
 	// set the color
 	text.setFillColor(sf::Color::Red);
@@ -28,8 +29,8 @@ Button::Button(const std::string& message, sf::Vector2f size, sf::Vector2f posit
 	// set the text style
 	text.setStyle(sf::Text::Bold);
 
-	sf::Vector2f textSize = text.getGlobalBounds().getSize();
-	text.setPosition({ position.x + size.x / 2.0f - textSize.x / 2.0f, position.y + size.y / 2.0f - 45.0f });
+	sf::Vector2f globalTextSize = text.getGlobalBounds().getSize();
+	text.setPosition({ position.x + size.x / 2.0f - globalTextSize.x / 2.0f, position.y + size.y / 2.0f - 45.0f });
 }
 
 bool Button::hitTest(sf::Vector2f point) const
