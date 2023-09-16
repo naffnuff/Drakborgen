@@ -3,7 +3,6 @@
 #include "System.h"
 
 Button::Button(const std::string& message, sf::Vector2f size, sf::Vector2f position, int textSize)
-	: text(font, message, textSize)
 {
 	if (!font.loadFromFile("Media/ITCBLKAD.TTF"))
 	{
