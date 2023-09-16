@@ -31,8 +31,9 @@ std::unique_ptr<Card> CardDisplay::pullCard(int index)
 	return card;
 }
 
-void CardDisplay::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void CardDisplay::draw(sf::RenderTarget& target, const sf::RenderStates& statesRef) const
 {
+	sf::RenderStates states = statesRef;
 	states.transform *= getTransform();
 	for (const std::unique_ptr<Card>& card : cards)
 	{

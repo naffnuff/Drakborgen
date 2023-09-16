@@ -36,7 +36,7 @@ public:
 	void transposeExits(std::vector<std::vector<Direction>>& exits) const;
 
 private:
-	void draw(sf::RenderTarget& target, const sf::RenderStates states) const override;
+	void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
 
 private:
 	std::string imagePath;

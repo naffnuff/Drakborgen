@@ -28,8 +28,9 @@ sf::FloatRect Card::getGlobalBounds()
 	return getTransform().transformRect(sprite.get().getLocalBounds());
 }
 
-void Card::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void Card::draw(sf::RenderTarget& target, const sf::RenderStates& statesRef) const
 {
+	sf::RenderStates states = statesRef;
 	states.transform *= getTransform();
 	target.draw(sprite.get(), states);
 }

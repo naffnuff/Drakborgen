@@ -16,7 +16,7 @@ void Tile::setOrientation(Direction direction)
 {
 	orientation = direction;
 	sf::Vector2f size = sprite.get().getGlobalBounds().getSize();
-	setRotation(float(orientation) * 90.0f);
+	setRotation(sf::degrees(float(orientation) * 90.0f));
 	switch (orientation)
 	{
 	case Direction::East:
@@ -50,10 +50,11 @@ void Tile::transposeExits(std::vector<std::vector<Direction>>& exits) const
 	std::cout << imagePath << std::endl;
 }
 
-void Tile::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void Tile::draw(sf::RenderTarget& target, const sf::RenderStates& statesRef ) const
 {
-	if (sprite)
+	if(sprite)
 	{
+		sf::RenderStates states = statesRef;
 		states.transform *= getTransform();
 		target.draw(sprite.get(), states);
 	}
