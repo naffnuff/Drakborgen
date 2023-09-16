@@ -14,7 +14,7 @@ public:
 
 	bool hitTest(sf::Vector2f point) const;
 
-	void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 	void setText(const std::string& value);
 	std::string getText() const;

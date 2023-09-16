@@ -69,7 +69,7 @@ public:
 	void setPlayerSite(int index, MoveSite moveSite, std::function<void()> callback);
 
 private:
-	void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 	bool withinBounds(Site site) const;
 	void placePlayer(int index, Direction direction, std::function<void()> callback);
