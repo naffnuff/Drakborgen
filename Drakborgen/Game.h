@@ -55,10 +55,13 @@ private:
 	void onBegin() {}
 
 	template<State>
-	void onEnd() {}
+	void onTick() {}
 
 	template<State>
 	void onLeftMouseClick() {}
+
+	template<State>
+	void onEnd() {}
 
 	void placeAtOrigin(std::unique_ptr<Card>& card) const;
 	void moveOffScreen(std::unique_ptr<Card>& card, float time, std::function<void()> callback);
@@ -116,9 +119,12 @@ private:
 	int activePlayerIndex = -1;
 
 	EventTable onBeginTable;
-	EventTable onEndTable;
+	EventTable onTickTable;
 	EventTable onLeftMouseClickTable;
+	EventTable onEndTable;
 
 	AnimationManager animations;
+
+	std::array<sf::Uint8, 4> serverIpAddress = { 192, 168, 1, 121 };
 };
 
