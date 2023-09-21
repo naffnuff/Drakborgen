@@ -105,9 +105,9 @@ void NetworkRunner::runServer()
 
 		while (network.connected)
 		{
-			Sleep(1000);
+			Sleep(5000);
 
-			for (int i = 0; i < network.clientCount; ++i)
+			for (int i = 0; i < network.clientCount && network.connected; ++i)
 			{
 				char data[10];
 				size_t received = 0;
@@ -137,6 +137,8 @@ void NetworkRunner::runServer()
 				}
 
 				std::cout << std::endl;
+
+				network.connected = status == sf::Socket::Done;
 			}
 		}
 	}
@@ -183,7 +185,7 @@ void NetworkRunner::runClient()
 
 		while (network.connected)
 		{
-			Sleep(1000);
+			Sleep(5000);
 
 			const char data[] = { 'g' };
 			size_t sent = 0;
@@ -212,6 +214,8 @@ void NetworkRunner::runClient()
 			}
 
 			std::cout << std::endl;
+
+			network.connected = status == sf::Socket::Done;
 		}
 	}
 }
