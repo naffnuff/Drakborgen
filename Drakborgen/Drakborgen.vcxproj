@@ -170,6 +170,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Hero.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Network.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="Setup.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="Deck.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Hero.h" />
+    <ClInclude Include="Network.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="Setup.h" />

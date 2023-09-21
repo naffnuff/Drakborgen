@@ -290,13 +290,13 @@ void Game::onLeftMouseClick<State::SetupServer>()
 {
 	if (capturedItemIndex > -1)
 	{
-		clientCount = capturedItemIndex;
-		if (clientCount == 0)
+		if (capturedItemIndex == 0)
 		{
 			setState(State::SetupGame);
 		}
 		else
 		{
+			network.setClientCount(capturedItemIndex);
 			setState(State::AwaitClients);
 		}
 	}
@@ -305,58 +305,13 @@ void Game::onLeftMouseClick<State::SetupServer>()
 template<>
 void Game::onBegin<State::AwaitClients>()
 {
-	sf::TcpListener listener;
-
-	// bind the listener to a port
-	if (listener.listen(53000) != sf::Socket::Status::Done)
-	{
-		THROW;
-	}
-
-	// accept a new connection
-	for (int i = 0; i < clientCount; ++i)
-	{
-		sockets.push_back(std::make_unique<sf::TcpSocket>());
-		sockets[i]->setBlocking(false);
-		listener.setBlocking(false);
-		listener.accept(*sockets[i]);
-	}
-
-	// use "client" to communicate with the connected client,
-	// and continue to accept new connections with the listener
+	network.start(NetRole::Server);
 }
 
 template<>
 void Game::onTick<State::AwaitClients>()
 {
-	const char data[] = { 'g' };
-	size_t sent = 0;
-	sf::Socket::Status status = sockets[0]->send(data, 1, sent);
-	std::cout << "sent " << sent << " bytes with status ";
 
-	switch (status)
-	{
-	case sf::Socket::Done:
-		std::cout << "Done";
-		setState(State::SetupGame);
-		break;
-	case sf::Socket::NotReady:
-		std::cout << "NotReady";
-		break;
-	case sf::Socket::Partial:
-		std::cout << "Partial";
-		break;
-	case sf::Socket::Disconnected:
-		std::cout << "Disconnected";
-		break;
-	case sf::Socket::Error:
-		std::cout << "Error";
-		break;
-	default:
-		break;
-	}
-
-	std::cout << std::endl;
 }
 
 // Client setup
@@ -415,45 +370,12 @@ void Game::onLeftMouseClick<State::SetupClient>()
 template<>
 void Game::onBegin<State::ConnectToServer>()
 {
-	sockets.push_back(std::make_unique<sf::TcpSocket>());
-	sockets[0]->setBlocking(false);
-	sockets[0]->connect(sf::IpAddress(serverIpAddress[0], serverIpAddress[1], serverIpAddress[2], serverIpAddress[3]), 53000);
+	network.start(NetRole::Client);
 }
 
 template<>
 void Game::onTick<State::ConnectToServer>()
 {
-	char data[10];
-	size_t received = 0;
-	sf::Socket::Status status = sockets[0]->receive(data, 10, received);
-
-	std::cout << "received " << received << " bytes with status ";
-
-	switch (status)
-	{
-	case sf::Socket::Done:
-		std::cout << "Done, " << data[0] << " was the message";
-		setState(State::SetupGame);
-		break;
-	case sf::Socket::NotReady:
-		std::cout << "NotReady";
-		break;
-	case sf::Socket::Partial:
-		std::cout << "Partial";
-		break;
-	case sf::Socket::Disconnected:
-		std::cout << "Disconnected";
-		break;
-	case sf::Socket::Error:
-		std::cout << "Error";
-		break;
-	default:
-		break;
-	}
-	
-	std::cout << std::endl;
-
-	//
 }
 
 template<>

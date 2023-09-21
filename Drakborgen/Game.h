@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SFML/Network.hpp>
-
 #include "UniqueSprite.h"
 
 #include "State.h"
@@ -13,6 +11,7 @@
 #include "Tile.h"
 #include "Animation.h"
 #include "Button.h"
+#include "Network.h"
 
 #define BLESS_THIS_MESS 1
 
@@ -86,19 +85,17 @@ private:
 	template<State state>
 	friend struct StateHandlerInitializer;
 
+	Network network;
+
 	Random random;
 	sf::RenderWindow window;
 	Board board;
 	CardDisplay cardDisplay;
 	TileDeck tiles;
 
-	std::vector<std::unique_ptr<sf::TcpSocket>> sockets;
-
 	State state = State::NoState;
 
 	int playerCount = 4;
-
-	int clientCount = 0;
 
 	bool xCenteredBoard = false;
 	bool yCenteredBoard = false;
@@ -124,7 +121,5 @@ private:
 	EventTable onEndTable;
 
 	AnimationManager animations;
-
-	std::array<sf::Uint8, 4> serverIpAddress = { 192, 168, 1, 121 };
 };
 
