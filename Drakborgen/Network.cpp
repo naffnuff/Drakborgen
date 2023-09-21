@@ -69,6 +69,9 @@ void NetworkRunner::runServer()
 			// accept a new connection
 			for (int i = 0; i < network.clientCount; ++i)
 			{
+				// TODO: find out if this client is already connected
+				// Datastructure saying if each client is connected and its game initialized
+
 				std::cout << "Connecting client " << i << std::endl;
 
 				sockets.push_back(std::make_unique<sf::TcpSocket>());
