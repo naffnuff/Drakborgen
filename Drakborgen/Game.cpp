@@ -65,7 +65,7 @@ void Game::run()
 		// update the fps text every second
 		if (fpsTimer.getElapsedTime().asSeconds() >= 1)
 		{
-			std::cout << fpsCount << " fps" << std::endl;
+			//std::cout << fpsCount << " fps" << std::endl;
 			fpsTimer.restart();
 			fpsCount = 0;
 			invokeEventHandler(onTickTable);
@@ -335,19 +335,19 @@ void Game::onBegin<State::SetupClient>()
 		sf::Vector2f buttonSize(150.0f, 130.0f);
 		{
 			sf::Vector2f buttonPosition(window.getSize().x * 3.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
-			buttons.push_back(std::make_unique<Button>(std::to_string(serverIpAddress[0]), buttonSize, buttonPosition, 60));
+			buttons.push_back(std::make_unique<Button>(std::to_string(network.serverIpAddress[0]), buttonSize, buttonPosition, 60));
 		}
 		{
 			sf::Vector2f buttonPosition(window.getSize().x * 4.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
-			buttons.push_back(std::make_unique<Button>(std::to_string(serverIpAddress[1]), buttonSize, buttonPosition, 60));
+			buttons.push_back(std::make_unique<Button>(std::to_string(network.serverIpAddress[1]), buttonSize, buttonPosition, 60));
 		}
 		{
 			sf::Vector2f buttonPosition(window.getSize().x * 5.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
-			buttons.push_back(std::make_unique<Button>(std::to_string(serverIpAddress[2]), buttonSize, buttonPosition, 60));
+			buttons.push_back(std::make_unique<Button>(std::to_string(network.serverIpAddress[2]), buttonSize, buttonPosition, 60));
 		}
 		{
 			sf::Vector2f buttonPosition(window.getSize().x * 6.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
-			buttons.push_back(std::make_unique<Button>(std::to_string(serverIpAddress[3]), buttonSize, buttonPosition, 60));
+			buttons.push_back(std::make_unique<Button>(std::to_string(network.serverIpAddress[3]), buttonSize, buttonPosition, 60));
 		}
 	}
 }

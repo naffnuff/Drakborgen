@@ -69,10 +69,12 @@ void NetworkRunner::runServer()
 			// accept a new connection
 			for (int i = 0; i < network.clientCount; ++i)
 			{
+				std::cout << "Connecting client " << i << std::endl;
+
 				sockets.push_back(std::make_unique<sf::TcpSocket>());
 				sf::Socket::Status status = listener.accept(*sockets[i]);
 
-				std::cout << "Server accepted with status ";
+				std::cout << "Client " << i << " connected with status ";
 
 				switch (status)
 				{
@@ -146,10 +148,12 @@ void NetworkRunner::runClient()
 	{
 		while (!network.connected)
 		{
-			sockets.push_back(std::make_unique<sf::TcpSocket>());
-			sf::Socket::Status status = sockets[0]->connect(sf::IpAddress(network.serverIpAddress[0], network.serverIpAddress[1], network.serverIpAddress[2], network.serverIpAddress[3]), 53000);
+			std::cout << "Connecting to server" << std::endl;
 
-			std::cout << "Client connected with status ";
+			sockets.push_back(std::make_unique<sf::TcpSocket>());
+			sf::Socket::Status status = sockets[0]->connect(sf::IpAddress(sf::Uint8(network.serverIpAddress[0]), sf::Uint8(network.serverIpAddress[1]), sf::Uint8(network.serverIpAddress[2]), sf::Uint8(network.serverIpAddress[3])), 53000);
+
+			std::cout << "Server accepted with status ";
 
 			switch (status)
 			{

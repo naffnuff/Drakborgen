@@ -2,6 +2,7 @@
 
 #include <thread>
 #include <array>
+#include <iostream>
 
 enum class NetRole
 {
@@ -16,11 +17,15 @@ public:
 
 	~Network()
 	{
+		std::cout << "Network destructor start" << std::endl;
+
 		run = false;
 		if (networkThreadStarted)
 		{
 			networkThread.join();
 		}
+
+		std::cout << "Network destructor end" << std::endl;
 	}
 
 	void start(NetRole netRole);
@@ -30,6 +35,9 @@ public:
 		clientCount = count;
 	}
 
+public:
+	std::array<int, 4> serverIpAddress = { 192, 168, 1, 121 };
+
 private:
 	bool networkThreadStarted = false;
 
@@ -38,8 +46,6 @@ private:
 	bool connected = false;
 
 	int clientCount = 0;
-
-	std::array<sf::Uint8, 4> serverIpAddress = { 192, 168, 1, 121 };
 
 	std::thread networkThread;
 
