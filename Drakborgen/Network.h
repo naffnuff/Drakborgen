@@ -25,6 +25,11 @@ public:
 	void startServer(int clientCount);
 	void startClient(const std::string& serverAddress);
 
+	bool isConnected() const
+	{
+		return connected;
+	}
+
 private:
 	bool networkThreadStarted = false;
 

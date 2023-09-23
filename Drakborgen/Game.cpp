@@ -68,7 +68,6 @@ void Game::run()
 			//std::cout << fpsCount << " fps" << std::endl;
 			fpsTimer.restart();
 			fpsCount = 0;
-			invokeEventHandler(onTickTable);
 		}
 		++fpsCount;
 
@@ -76,6 +75,20 @@ void Game::run()
 		float timestamp = time.asSeconds();
 		float timeDelta = timestamp - lastTimestamp;
 		lastTimestamp = timestamp;
+
+		if (state == State::AwaitingConnection)
+		{
+			if (network.isConnected())
+			{
+				setState(State::SetupGame);
+			}
+		}
+		else if (!network.isConnected())
+		{
+			setState(State::AwaitingConnection);
+		}
+
+		invokeEventHandler(onTickTable);
 
 		animations.update(timestamp, timeDelta);
 
@@ -297,20 +310,8 @@ void Game::onLeftMouseClick<State::SetupServer>()
 		else
 		{
 			network.startServer(capturedItemIndex);
-			setState(State::AwaitClients);
 		}
 	}
-}
-
-template<>
-void Game::onBegin<State::AwaitClients>()
-{
-}
-
-template<>
-void Game::onTick<State::AwaitClients>()
-{
-
 }
 
 // Client setup
@@ -319,16 +320,14 @@ template<>
 void Game::onBegin<State::SetupClient>()
 {
 	{
-		{
-			sf::Vector2f buttonSize(800.0f, 200.0f);
-			sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 3.0f - buttonSize.y / 2.0f);
-			buttons.push_back(std::make_unique<Button>("Låt färden gå!", buttonSize, buttonPosition, 60));
-		}
-		{
-			sf::Vector2f buttonSize(800.0f, 80.0f);
-			sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 3.0f - buttonSize.y / 2.0f);
-			//buttons.push_back(std::make_unique<Button>("Varthän?", buttonSize, buttonPosition, 60));
-		}
+		sf::Vector2f buttonSize(800.0f, 200.0f);
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 3.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Låt färden gå!", buttonSize, buttonPosition, 60));
+	}
+	{
+		sf::Vector2f buttonSize(800.0f, 80.0f);
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 3.0f - buttonSize.y / 2.0f);
+		//buttons.push_back(std::make_unique<Button>("Varthän?", buttonSize, buttonPosition, 60));
 	}
 	{
 		sf::Vector2f buttonSize(800.0f, 200.0f);
@@ -343,7 +342,6 @@ void Game::onLeftMouseClick<State::SetupClient>()
 	if (capturedItemIndex == 0)
 	{
 		network.startClient(buttons[1]->getText());
-		setState(State::ConnectToServer);
 	}
 }
 
@@ -354,13 +352,26 @@ void Game::onEnd<State::SetupClient>()
 }
 
 template<>
-void Game::onBegin<State::ConnectToServer>()
+void Game::onBegin<State::AwaitingConnection>()
 {
+	sf::Vector2f buttonSize(800.0f, 200.0f);
+	sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 4.0f - buttonSize.y / 2.0f);
+	buttons.push_back(std::make_unique<Button>("Sällskapet samlas...", buttonSize, buttonPosition, 60));
 }
 
 template<>
-void Game::onTick<State::ConnectToServer>()
+void Game::onTick<State::AwaitingConnection>()
 {
+	if (network.isConnected())
+	{
+		setState(State::SetupGame);
+	}
+}
+
+template<>
+void Game::onEnd<State::AwaitingConnection>()
+{
+	buttons.clear();
 }
 
 template<>
