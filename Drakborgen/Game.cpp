@@ -76,14 +76,7 @@ void Game::run()
 		float timeDelta = timestamp - lastTimestamp;
 		lastTimestamp = timestamp;
 
-		if (state == State::AwaitingConnection)
-		{
-			if (network.isConnected())
-			{
-				setState(State::SetupGame);
-			}
-		}
-		else if (!network.isConnected())
+		if (!network.isConnected())
 		{
 			setState(State::AwaitingConnection);
 		}
@@ -238,13 +231,17 @@ sf::Vector2f Game::correctBoardPosition(sf::Vector2f boardPostion)
 template<>
 void Game::onBegin<State::SelectNetRole>()
 {
-	sf::Vector2f buttonSize(800.0f, 200.0f);
+	sf::Vector2f buttonSize(600.0f, 160.0f);
 	{
-		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y / 3.0f - buttonSize.y / 2.0f);
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 4.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Snåla", buttonSize, buttonPosition, 60));
+	}
+	{
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 4.0f - buttonSize.y / 2.0f);
 		buttons.push_back(std::make_unique<Button>("Håll gästabud", buttonSize, buttonPosition, 60));
 	}
 	{
-		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 3.0f - buttonSize.y / 2.0f);
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
 		buttons.push_back(std::make_unique<Button>("Snylta", buttonSize, buttonPosition, 60));
 	}
 }
@@ -254,9 +251,13 @@ void Game::onLeftMouseClick<State::SelectNetRole>()
 {
 	if (capturedItemIndex == 0)
 	{
+		setState(State::SetupGame);
+	}
+	else if (capturedItemIndex == 1)
+	{
 		setState(State::SetupServer);
 	}
-	else
+	else if (capturedItemIndex == 2)
 	{
 		setState(State::SetupClient);
 	}
@@ -273,21 +274,17 @@ void Game::onEnd<State::SelectNetRole>()
 template<>
 void Game::onBegin<State::SetupServer>()
 {
-	sf::Vector2f buttonSize(600.0f, 130.0f);
+	sf::Vector2f buttonSize(600.0f, 160.0f);
 	{
-		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y / 5.0f - buttonSize.y / 2.0f);
-		buttons.push_back(std::make_unique<Button>("Snåla", buttonSize, buttonPosition, 60));
-	}
-	{
-		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 4.0f - buttonSize.y / 2.0f);
 		buttons.push_back(std::make_unique<Button>("Bjud in en gäst", buttonSize, buttonPosition, 60));
 	}
 	{
-		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 5.0f - buttonSize.y / 2.0f);
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 4.0f - buttonSize.y / 2.0f);
 		buttons.push_back(std::make_unique<Button>("Bjud in två gäster", buttonSize, buttonPosition, 60));
 	}
 	{
-		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 4.0f / 5.0f - buttonSize.y / 2.0f);
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
 		buttons.push_back(std::make_unique<Button>("Bjud in tre gäster", buttonSize, buttonPosition, 60));
 	}
 }
@@ -303,14 +300,7 @@ void Game::onLeftMouseClick<State::SetupServer>()
 {
 	if (capturedItemIndex > -1)
 	{
-		if (capturedItemIndex == 0)
-		{
-			setState(State::SetupGame);
-		}
-		else
-		{
-			network.startServer(capturedItemIndex);
-		}
+		network.startServer(capturedItemIndex + 1);
 	}
 }
 
@@ -320,19 +310,21 @@ template<>
 void Game::onBegin<State::SetupClient>()
 {
 	{
-		sf::Vector2f buttonSize(800.0f, 200.0f);
+		// Needs to be at index 0
+		sf::Vector2f buttonSize(600.0f, 160.0f);
 		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 3.0f - buttonSize.y / 2.0f);
 		buttons.push_back(std::make_unique<Button>("Låt färden gå!", buttonSize, buttonPosition, 60));
 	}
 	{
-		sf::Vector2f buttonSize(800.0f, 80.0f);
-		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 3.0f - buttonSize.y / 2.0f);
-		//buttons.push_back(std::make_unique<Button>("Varthän?", buttonSize, buttonPosition, 60));
-	}
-	{
-		sf::Vector2f buttonSize(800.0f, 200.0f);
+		// Needs to be at index 1
+		sf::Vector2f buttonSize(500.0f, 120.0f);
 		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
 		buttons.push_back(std::make_unique<Button>("192.168.1.121", buttonSize, buttonPosition, 60));
+	}
+	{
+		sf::Vector2f buttonSize(400.0f, 80.0f);
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 8.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("Varthän?", buttonSize, buttonPosition, 60));
 	}
 }
 
@@ -354,7 +346,7 @@ void Game::onEnd<State::SetupClient>()
 template<>
 void Game::onBegin<State::AwaitingConnection>()
 {
-	sf::Vector2f buttonSize(800.0f, 200.0f);
+	sf::Vector2f buttonSize(600.0f, 160.0f);
 	sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 4.0f - buttonSize.y / 2.0f);
 	buttons.push_back(std::make_unique<Button>("Sällskapet samlas...", buttonSize, buttonPosition, 60));
 }
