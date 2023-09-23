@@ -257,12 +257,14 @@ void NetworkClient::operator()()
 
 void Network::startServer(int clientCount)
 {
+	connected = false;
 	networkThread = std::thread(NetworkServer(*this, clientCount));
 	networkThreadStarted = true;
 }
 
 void Network::startClient(const std::string& serverAddress)
 {
+	connected = false;
 	networkThread = std::thread(NetworkClient(*this, serverAddress));
 	networkThreadStarted = true;
 }

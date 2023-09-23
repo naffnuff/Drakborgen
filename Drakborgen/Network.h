@@ -35,7 +35,7 @@ private:
 
 	bool run = true;
 
-	bool connected = false;
+	bool connected = true;
 
 	std::thread networkThread;
 
