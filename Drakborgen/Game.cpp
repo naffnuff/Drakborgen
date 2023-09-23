@@ -237,12 +237,6 @@ void Game::onBegin<State::SelectNetRole>()
 }
 
 template<>
-void Game::onEnd<State::SelectNetRole>()
-{
-	buttons.clear();
-}
-
-template<>
 void Game::onLeftMouseClick<State::SelectNetRole>()
 {
 	if (capturedItemIndex == 0)
@@ -253,6 +247,12 @@ void Game::onLeftMouseClick<State::SelectNetRole>()
 	{
 		setState(State::SetupClient);
 	}
+}
+
+template<>
+void Game::onEnd<State::SelectNetRole>()
+{
+	buttons.clear();
 }
 
 // Server setup
@@ -296,7 +296,7 @@ void Game::onLeftMouseClick<State::SetupServer>()
 		}
 		else
 		{
-			network.setClientCount(capturedItemIndex);
+			network.startServer(capturedItemIndex);
 			setState(State::AwaitClients);
 		}
 	}
@@ -305,7 +305,6 @@ void Game::onLeftMouseClick<State::SetupServer>()
 template<>
 void Game::onBegin<State::AwaitClients>()
 {
-	network.start(NetRole::Server);
 }
 
 template<>
@@ -332,23 +331,19 @@ void Game::onBegin<State::SetupClient>()
 		}
 	}
 	{
-		sf::Vector2f buttonSize(150.0f, 130.0f);
-		{
-			sf::Vector2f buttonPosition(window.getSize().x * 3.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
-			buttons.push_back(std::make_unique<Button>(std::to_string(network.serverIpAddress[0]), buttonSize, buttonPosition, 60));
-		}
-		{
-			sf::Vector2f buttonPosition(window.getSize().x * 4.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
-			buttons.push_back(std::make_unique<Button>(std::to_string(network.serverIpAddress[1]), buttonSize, buttonPosition, 60));
-		}
-		{
-			sf::Vector2f buttonPosition(window.getSize().x * 5.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
-			buttons.push_back(std::make_unique<Button>(std::to_string(network.serverIpAddress[2]), buttonSize, buttonPosition, 60));
-		}
-		{
-			sf::Vector2f buttonPosition(window.getSize().x * 6.0f / 9.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
-			buttons.push_back(std::make_unique<Button>(std::to_string(network.serverIpAddress[3]), buttonSize, buttonPosition, 60));
-		}
+		sf::Vector2f buttonSize(800.0f, 200.0f);
+		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
+		buttons.push_back(std::make_unique<Button>("192.168.1.121", buttonSize, buttonPosition, 60));
+	}
+}
+
+template<>
+void Game::onLeftMouseClick<State::SetupClient>()
+{
+	if (capturedItemIndex == 0)
+	{
+		network.startClient(buttons[1]->getText());
+		setState(State::ConnectToServer);
 	}
 }
 
@@ -359,18 +354,8 @@ void Game::onEnd<State::SetupClient>()
 }
 
 template<>
-void Game::onLeftMouseClick<State::SetupClient>()
-{
-	if (capturedItemIndex == 0)
-	{
-		setState(State::ConnectToServer);
-	}
-}
-
-template<>
 void Game::onBegin<State::ConnectToServer>()
 {
-	network.start(NetRole::Client);
 }
 
 template<>

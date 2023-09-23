@@ -10,38 +10,157 @@
 #include <windows.h>
 #endif
 
-class NetworkRunner
+class NetworkServer
 {
 public:
-	NetworkRunner(Network& network, NetRole netRole)
+	NetworkServer(Network& network, int clientCount)
 		: network(network)
-		, netRole(netRole)
-	{ }
+	{
+		clients.resize(clientCount);
+		for (Client& client : clients)
+		{
+			client.socket = std::make_unique<sf::TcpSocket>();
+		}
+	}
 
 	void operator()();
 
 private:
-	void runServer();
-	void runClient();
+	Network& network;
+
+	struct Client
+	{
+		std::unique_ptr<sf::TcpSocket> socket;
+		bool connected = false;
+	};
+
+	std::vector<Client> clients;
+};
+
+class NetworkClient
+{
+public:
+	NetworkClient(Network& network, const std::string& serverAddress)
+		: network(network)
+		, serverAddress(serverAddress)
+	{
+		serverSocket = std::make_unique<sf::TcpSocket>();
+	}
+
+	void operator()();
 
 private:
 	Network& network;
-	NetRole netRole;
 
-	std::vector<std::unique_ptr<sf::TcpSocket>> sockets;
+	std::string serverAddress;
+
+	std::unique_ptr<sf::TcpSocket> serverSocket;
 };
 
-void NetworkRunner::operator()()
+void NetworkServer::operator()()
 {
 	try
 	{
-		if (netRole == NetRole::Server)
+		while (network.run)
 		{
-			runServer();
-		} 
-		else if (netRole == NetRole::Client)
-		{
-			runClient();
+			if (!network.connected)
+			{
+				sf::TcpListener listener;
+
+				// bind the listener to a port
+				if (listener.listen(53000) != sf::Socket::Status::Done)
+				{
+					THROW;
+				}
+
+				// accept a new connection
+				for (int i = 0; i < clients.size(); ++i)
+				{
+					Client& client = clients[i];
+
+					while (!client.connected)
+					{
+						std::cout << "Connecting client " << i << std::endl;
+
+						sf::Socket::Status status = listener.accept(*client.socket);
+
+						std::cout << "Client " << i << " connected with status ";
+
+						switch (status)
+						{
+						case sf::Socket::Done:
+							std::cout << "Done";
+							break;
+						case sf::Socket::NotReady:
+							std::cout << "NotReady";
+							break;
+						case sf::Socket::Partial:
+							std::cout << "Partial";
+							break;
+						case sf::Socket::Disconnected:
+							std::cout << "Disconnected";
+							break;
+						case sf::Socket::Error:
+							std::cout << "Error";
+							break;
+						default:
+							break;
+						}
+
+						std::cout << std::endl;
+
+						client.connected = status == sf::Socket::Done;
+					}
+				}
+
+				network.connected = true;
+			}
+
+			while (network.connected)
+			{
+				Sleep(5000);
+
+				for (int i = 0; i < clients.size() && network.connected; ++i)
+				{
+					Client& client = clients[i];
+
+					char data[10];
+					size_t received = 0;
+					sf::Socket::Status status = client.socket->receive(data, 10, received);
+
+					std::cout << "received " << received << " bytes from client " << i << " with status ";
+
+					switch (status)
+					{
+					case sf::Socket::Done:
+						std::cout << "Done, " << data[0] << " was the message";
+						break;
+					case sf::Socket::NotReady:
+						std::cout << "NotReady";
+						break;
+					case sf::Socket::Partial:
+						std::cout << "Partial";
+						break;
+					case sf::Socket::Disconnected:
+						std::cout << "Disconnected";
+						break;
+					case sf::Socket::Error:
+						std::cout << "Error";
+						break;
+					default:
+						break;
+					}
+
+					std::cout << std::endl;
+
+					client.connected = status == sf::Socket::Done;
+
+					if (!client.connected)
+					{
+						network.connected = false;
+					}
+				}
+			}
 		}
 	}
 	catch (std::exception& e)
@@ -52,32 +171,54 @@ void NetworkRunner::operator()()
 	}
 }
 
-void NetworkRunner::runServer()
+void NetworkClient::operator()()
 {
-	while (network.run)
+	try
 	{
-		while (!network.connected)
+		while (network.run)
 		{
-			sf::TcpListener listener;
-
-			// bind the listener to a port
-			if (listener.listen(53000) != sf::Socket::Status::Done)
+			while (!network.connected)
 			{
-				THROW;
+				std::cout << "Connecting to server" << std::endl;
+
+				sf::Socket::Status status = serverSocket->connect(sf::IpAddress(serverAddress), 53000);
+
+				std::cout << "Server accepted with status ";
+
+				switch (status)
+				{
+				case sf::Socket::Done:
+					std::cout << "Done";
+					break;
+				case sf::Socket::NotReady:
+					std::cout << "NotReady";
+					break;
+				case sf::Socket::Partial:
+					std::cout << "Partial";
+					break;
+				case sf::Socket::Disconnected:
+					std::cout << "Disconnected";
+					break;
+				case sf::Socket::Error:
+					std::cout << "Error";
+					break;
+				default:
+					break;
+				}
+
+				std::cout << std::endl;
+
+				network.connected = status == sf::Socket::Done;
 			}
 
-			// accept a new connection
-			for (int i = 0; i < network.clientCount; ++i)
+			while (network.connected)
 			{
-				// TODO: find out if this client is already connected
-				// Datastructure saying if each client is connected and its game initialized
+				Sleep(5000);
 
-				std::cout << "Connecting client " << i << std::endl;
-
-				sockets.push_back(std::make_unique<sf::TcpSocket>());
-				sf::Socket::Status status = listener.accept(*sockets[i]);
-
-				std::cout << "Client " << i << " connected with status ";
+				const char data[] = { 'g' };
+				size_t sent = 0;
+				sf::Socket::Status status = serverSocket->send(data, 1, sent);
+				std::cout << "sent " << sent << " bytes with status ";
 
 				switch (status)
 				{
@@ -105,126 +246,23 @@ void NetworkRunner::runServer()
 				network.connected = status == sf::Socket::Done;
 			}
 		}
-
-		while (network.connected)
-		{
-			Sleep(5000);
-
-			for (int i = 0; i < network.clientCount && network.connected; ++i)
-			{
-				char data[10];
-				size_t received = 0;
-				sf::Socket::Status status = sockets[i]->receive(data, 10, received);
-
-				std::cout << "received " << received << " bytes from client " << i << " with status ";
-
-				switch (status)
-				{
-				case sf::Socket::Done:
-					std::cout << "Done, " << data[0] << " was the message";
-					break;
-				case sf::Socket::NotReady:
-					std::cout << "NotReady";
-					break;
-				case sf::Socket::Partial:
-					std::cout << "Partial";
-					break;
-				case sf::Socket::Disconnected:
-					std::cout << "Disconnected";
-					break;
-				case sf::Socket::Error:
-					std::cout << "Error";
-					break;
-				default:
-					break;
-				}
-
-				std::cout << std::endl;
-
-				network.connected = status == sf::Socket::Done;
-			}
-		}
 	}
-}
-
-void NetworkRunner::runClient()
-{
-	while (network.run)
+	catch (std::exception& e)
 	{
-		while (!network.connected)
-		{
-			std::cout << "Connecting to server" << std::endl;
-
-			sockets.push_back(std::make_unique<sf::TcpSocket>());
-			sf::Socket::Status status = sockets[0]->connect(sf::IpAddress(sf::Uint8(network.serverIpAddress[0]), sf::Uint8(network.serverIpAddress[1]), sf::Uint8(network.serverIpAddress[2]), sf::Uint8(network.serverIpAddress[3])), 53000);
-
-			std::cout << "Server accepted with status ";
-
-			switch (status)
-			{
-			case sf::Socket::Done:
-				std::cout << "Done";
-				break;
-			case sf::Socket::NotReady:
-				std::cout << "NotReady";
-				break;
-			case sf::Socket::Partial:
-				std::cout << "Partial";
-				break;
-			case sf::Socket::Disconnected:
-				std::cout << "Disconnected";
-				break;
-			case sf::Socket::Error:
-				std::cout << "Error";
-				break;
-			default:
-				break;
-			}
-
-			std::cout << std::endl;
-
-			network.connected = status == sf::Socket::Done;
-		}
-
-		while (network.connected)
-		{
-			Sleep(5000);
-
-			const char data[] = { 'g' };
-			size_t sent = 0;
-			sf::Socket::Status status = sockets[0]->send(data, 1, sent);
-			std::cout << "sent " << sent << " bytes with status ";
-
-			switch (status)
-			{
-			case sf::Socket::Done:
-				std::cout << "Done";
-				break;
-			case sf::Socket::NotReady:
-				std::cout << "NotReady";
-				break;
-			case sf::Socket::Partial:
-				std::cout << "Partial";
-				break;
-			case sf::Socket::Disconnected:
-				std::cout << "Disconnected";
-				break;
-			case sf::Socket::Error:
-				std::cout << "Error";
-				break;
-			default:
-				break;
-			}
-
-			std::cout << std::endl;
-
-			network.connected = status == sf::Socket::Done;
-		}
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_INTENSITY));
+		std::cerr << std::endl << e.what() << std::endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY));
 	}
 }
 
-void Network::start(NetRole netRole)
+void Network::startServer(int clientCount)
 {
-	networkThread = std::thread(NetworkRunner(*this, netRole));
+	networkThread = std::thread(NetworkServer(*this, clientCount));
+	networkThreadStarted = true;
+}
+
+void Network::startClient(const std::string& serverAddress)
+{
+	networkThread = std::thread(NetworkClient(*this, serverAddress));
 	networkThreadStarted = true;
 }

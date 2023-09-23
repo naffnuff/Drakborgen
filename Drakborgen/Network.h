@@ -4,12 +4,6 @@
 #include <array>
 #include <iostream>
 
-enum class NetRole
-{
-	Server,
-	Client
-};
-
 class Network
 {
 public:
@@ -28,15 +22,8 @@ public:
 		std::cout << "Network destructor end" << std::endl;
 	}
 
-	void start(NetRole netRole);
-
-	void setClientCount(int count)
-	{
-		clientCount = count;
-	}
-
-public:
-	std::array<int, 4> serverIpAddress = { 192, 168, 1, 121 };
+	void startServer(int clientCount);
+	void startClient(const std::string& serverAddress);
 
 private:
 	bool networkThreadStarted = false;
@@ -45,9 +32,8 @@ private:
 
 	bool connected = false;
 
-	int clientCount = 0;
-
 	std::thread networkThread;
 
-	friend class NetworkRunner;
+	friend class NetworkServer;
+	friend class NetworkClient;
 };
