@@ -1,6 +1,7 @@
 #include "Network.h"
 
 #include "System.h"
+#include "Random.h"
 
 #include <SFML/Network.hpp>
 
@@ -13,14 +14,18 @@
 class NetworkServer
 {
 public:
-	NetworkServer(Network& network, int clientCount)
+	NetworkServer(Network& network, int clientCount, Random& random)
 		: network(network)
 	{
 		clients.resize(clientCount);
-		for (Client& client : clients)
+		playerOrder.resize(clientCount + 1);
+		playerOrder[0] = 0;
+		for (int i = 0; i < clientCount; ++i)
 		{
-			client.socket = std::make_unique<sf::TcpSocket>();
+			clients[i].socket = std::make_unique<sf::TcpSocket>();
+			playerOrder[i] = i + 1;
 		}
+		random.shuffle(playerOrder);
 	}
 
 	void operator()();
@@ -35,6 +40,8 @@ private:
 	};
 
 	std::vector<Client> clients;
+	std::vector<int> playerOrder;
+	int activePlayerIndex = 0;
 };
 
 class NetworkClient
@@ -213,7 +220,7 @@ void NetworkClient::operator()()
 
 			while (network.connected)
 			{
-				Sleep(5000);
+				Sleep(2000);
 
 				const char data[] = { 'g' };
 				size_t sent = 0;
