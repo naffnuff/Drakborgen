@@ -300,7 +300,7 @@ void Game::onLeftMouseClick<State::SetupServer>()
 {
 	if (capturedItemIndex > -1)
 	{
-		network.startServer(capturedItemIndex + 1);
+		network.startServer(capturedItemIndex + 1, random);
 		setState(State::NoState);
 	}
 }
@@ -323,7 +323,7 @@ void Game::onBegin<State::SetupClient>()
 		buttons.push_back(std::make_unique<Button>("Rasmus", buttonSize, buttonPosition, 60));
 	}
 	{
-		// Needs to be at index 1
+		// Needs to be at index 2
 		sf::Vector2f buttonSize(600.0f, 120.0f);
 		sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 4.0f / 5.0f - buttonSize.y / 2.0f);
 		buttons.push_back(std::make_unique<Button>("192.168.1.121", buttonSize, buttonPosition, 60));
@@ -345,7 +345,7 @@ void Game::onLeftMouseClick<State::SetupClient>()
 {
 	if (capturedItemIndex == 0)
 	{
-		network.startClient(buttons[1]->getText(), buttons[2]->getText());
+		network.startClient(/*buttons[1]->getText(), */buttons[2]->getText());
 		setState(State::NoState);
 	}
 }

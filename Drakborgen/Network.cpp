@@ -262,10 +262,10 @@ void NetworkClient::operator()()
 	}
 }
 
-void Network::startServer(int clientCount)
+void Network::startServer(int clientCount, Random& random)
 {
 	connected = false;
-	networkThread = std::thread(NetworkServer(*this, clientCount));
+	networkThread = std::thread(NetworkServer(*this, clientCount, random));
 	networkThreadStarted = true;
 }
 

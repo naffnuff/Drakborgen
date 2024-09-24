@@ -22,7 +22,7 @@ public:
 		std::cout << "Network destructor end" << std::endl;
 	}
 
-	void startServer(int clientCount);
+	void startServer(int clientCount, class Random& random);
 	void startClient(const std::string& serverAddress);
 
 	bool isConnected() const
