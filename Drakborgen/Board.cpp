@@ -10,8 +10,8 @@
 
 Board::Board(AnimationManager& animations)
 	: clickOverlay(sf::Vector2f(tileSize, tileSize))
-	, boardSprite("Media/spelplan.jpg")
-	, vaultSprite("Media/skattkammaren.png")
+	, boardSprite("../Media/spelplan.jpg")
+	, vaultSprite("../Media/skattkammaren.png")
 	, animations(animations)
 {
 	vaultSprite.get().setPosition(getSitePosition({ 4, 6 }));

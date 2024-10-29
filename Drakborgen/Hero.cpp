@@ -3,7 +3,7 @@
 Hero::Hero(const std::string& id, const std::string& name, int maxLife)
 	: id(id)
 	, name(name)
-	, statsCard(std::make_unique<Card>("Media/hjaltekort/" + id + ".png"))
+	, statsCard(std::make_unique<Card>("../Media/hjaltekort/" + id + ".png"))
 	, maxLife(maxLife)
 {
 }

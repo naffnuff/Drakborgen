@@ -4,7 +4,17 @@
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+	try
+            {
+                Game game = new Game();
+                Setup.SetUpGame(game);
+                game.Run();
+            }
+	catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+                throw;
+	}
         }
     }
 }

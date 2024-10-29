@@ -688,7 +688,7 @@ void Game::placeNewPlayer(Board::Site site, std::function<void()> callback)
 	}
 	std::unique_ptr<Card> card = cardDisplay.pullCard(0);
 	std::function<void()> cardAnimationCallback = [this, &player, site, callback]() {
-		board.addPlayer("Media/hjaltekort/" + player.hero.getId() + "gubbe.png", player.avatarIndex);
+		board.addPlayer("../Media/hjaltekort/" + player.hero.getId() + "gubbe.png", player.avatarIndex);
 		board.setPlayerSite(player.avatarIndex, { site, Direction::Invalid }, callback);
 		placeAtOrigin(player.hero.getStatsCard());
 	};
