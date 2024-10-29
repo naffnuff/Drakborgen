@@ -7,4 +7,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Third-Party\SFML.Net-2.6.0\src\SFML.Audio\SFML.Audio.csproj" />
+    <ProjectReference Include="..\Third-Party\SFML.Net-2.6.0\src\SFML.Graphics\SFML.Graphics.csproj" />
+    <ProjectReference Include="..\Third-Party\SFML.Net-2.6.0\src\SFML.Net\SFML.Net.csproj" />
+    <ProjectReference Include="..\Third-Party\SFML.Net-2.6.0\src\SFML.System\SFML.System.csproj" />
+    <ProjectReference Include="..\Third-Party\SFML.Net-2.6.0\src\SFML.Window\SFML.Window.csproj" />
+  </ItemGroup>
+
 </Project>
