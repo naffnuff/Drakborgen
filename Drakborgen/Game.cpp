@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "Tile.h"
+#include "Setup.h"
 
 Game::Game()
 #if BLESS_THIS_MESS
@@ -688,7 +689,7 @@ void Game::placeNewPlayer(Board::Site site, std::function<void()> callback)
 	}
 	std::unique_ptr<Card> card = cardDisplay.pullCard(0);
 	std::function<void()> cardAnimationCallback = [this, &player, site, callback]() {
-		board.addPlayer("../Media/hjaltekort/" + player.hero.getId() + "gubbe.png", player.avatarIndex);
+		board.addPlayer(Setup::getMediaPath() + "hjaltekort/" + player.hero.getId() + "gubbe.png", player.avatarIndex);
 		board.setPlayerSite(player.avatarIndex, { site, Direction::Invalid }, callback);
 		placeAtOrigin(player.hero.getStatsCard());
 	};

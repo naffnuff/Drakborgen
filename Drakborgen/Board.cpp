@@ -7,11 +7,12 @@
 #include "Tile.h"
 #include "Tower.h"
 #include "Vault.h"
+#include "Setup.h"
 
 Board::Board(AnimationManager& animations)
 	: clickOverlay(sf::Vector2f(tileSize, tileSize))
-	, boardSprite("../Media/spelplan.jpg")
-	, vaultSprite("../Media/skattkammaren.png")
+	, boardSprite(Setup::getMediaPath() + "spelplan.jpg")
+	, vaultSprite(Setup::getMediaPath() + "skattkammaren.png")
 	, animations(animations)
 {
 	vaultSprite.get().setPosition(getSitePosition({ 4, 6 }));

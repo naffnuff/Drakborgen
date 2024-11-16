@@ -1,4 +1,4 @@
-﻿namespace DrakborgenDotNet
+﻿namespace Drakborgen
 {
     internal class Program
     {
