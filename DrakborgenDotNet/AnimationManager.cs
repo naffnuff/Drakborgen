@@ -13,7 +13,7 @@ namespace Drakborgen
 
         private List<Animation> _animations = new List<Animation>();
 
-        private void Update(float elapsedTime, float)
+        internal void Update(float elapsedTime, float timeDelta)
         {
             List<Action> doneCallbacks = new List<Action>();
             for (int i = (int)(_animations.Count) - 1; i >= 0; --i)

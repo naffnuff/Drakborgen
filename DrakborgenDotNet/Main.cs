@@ -6,9 +6,12 @@
         {
 	try
             {
-                Game game = new Game();
-                Setup.SetUpGame(game);
-                game.Run();
+                using (Network network = new Network())
+                {
+                    Game game = new Game(network);
+                    Setup.SetUpGame(game);
+                    game.Run();
+                }
             }
 	catch (Exception e)
             {

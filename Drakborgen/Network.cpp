@@ -23,7 +23,7 @@ public:
 		for (int i = 0; i < clientCount; ++i)
 		{
 			clients[i].socket = std::make_unique<sf::TcpSocket>();
-			playerOrder[i] = i + 1;
+			playerOrder[i + 1] = i + 1; // Should index at i + 1, right?
 		}
 		random.shuffle(playerOrder);
 	}

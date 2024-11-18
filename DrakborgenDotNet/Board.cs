@@ -60,7 +60,7 @@ namespace Drakborgen
 
 
 
-        private void Update(float elapsedTime, float timeDelta)
+        internal void Update(float elapsedTime, float timeDelta)
         {
 	// one cycle per second
 	if (_moveSiteAnimationStartTime == 0.0f)

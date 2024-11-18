@@ -15,9 +15,11 @@ using static SFML.Window.Mouse;
 
 namespace Drakborgen
 {
+    using EventTable = List<Action>;
+
     internal class Game
     {
-        private readonly record struct Player(Hero hero, Board.MoveSite boardSite, int life = 0, int avatarIndex = 0);
+        private readonly record struct Player(Hero Hero, Board.MoveSite BoardSite, int Life = 0, int AvatarIndex = 0);
 
         internal Deck<Tile> Tiles { get; }
 
@@ -57,14 +59,14 @@ namespace Drakborgen
 
         private AnimationManager _animations;
 
-        internal Game()
+        internal Game(Network network)
         {
-            _network = new Network();
+            _network = network;
             _random = new Random();
             _window = new RenderWindow(new VideoMode(1024, 768), "Drakborgen");
             _animations = new AnimationManager();
             _board = new Board(_animations);
-            _cardDisplay = new CardDisplay();
+            _cardDisplay = new CardDisplay(_window);
             _idleHeroes = new List<Hero>();
             _players = new List<Player>();
             _buttons = new List<Button>();
@@ -128,79 +130,79 @@ namespace Drakborgen
                 float timeDelta = timestamp - lastTimestamp;
                 lastTimestamp = timestamp;
 
-                if (!_network.IsConnected())
+                if (!_network.IsConnected)
                 {
                     //setState(State::AwaitingConnection);
                 }
 
-                invokeEventHandler(onTickTable);
+                InvokeEventHandler(_onTickTable);
 
-                animations.update(timestamp, timeDelta);
+                _animations.Update(timestamp, timeDelta);
 
-                board.update(timestamp, timeDelta);
+                _board.Update(timestamp, timeDelta);
 
-                processSystemEvents();
+                ProcessSystemEvents();
 
-                window.clear();
+                _window.Clear();
 
-                window.draw(board);
-                window.draw(cardDisplay);
-                if (preGameSetup)
+                _window.Draw(_board);
+                _window.Draw(_cardDisplay);
+                if (_preGameSetup)
                 {
-                    for (Hero & hero : idleHeroes)
+                    foreach (Hero hero in _idleHeroes)
                     {
-                        if (hero.getStatsCard())
+                        if (hero.StatsCard != null)
                         {
-                            window.draw(*hero.getStatsCard());
+                            _window.Draw(hero.StatsCard);
                         }
                     }
                 }
-                if (activePlayerIndex >= 0 && players[activePlayerIndex].hero.getStatsCard())
+                if (_activePlayerIndex >= 0 && _players[_activePlayerIndex].Hero.StatsCard != null)
                 {
-                    window.draw(*players[activePlayerIndex].hero.getStatsCard());
+                    _window.Draw(_players[_activePlayerIndex].Hero.StatsCard);
                 }
-                for (const std::unique_ptr<Button>&button : buttons)
-		{
-                    window.draw(*button);
+                foreach (Button button in _buttons)
+                {
+                    _window.Draw(button);
                 }
 
-                window.display();
+                _window.Display();
             }
         }
 
-        void Game::processSystemEvents()
+        void ProcessSystemEvents()
         {
-            sf::Event event;
-	while (window.pollEvent(event))
+            Event sfEvent;
+	while (_window.PollEvent(sfEvent))
 
             {
-            if (event.type == sf::Event::EventType::Closed)
+            if (sfEvent.type == sf::Event::EventType::Closed)
 
                         {
             window.close();
         }
-		else if (event.type == sf::Event::EventType::MouseButtonPressed)
+		else if (sfEvent.type == sf::Event::EventType::MouseButtonPressed)
 
                         {
-            if (event.mouseButton.button == sf::Mouse::Button::Left)
+            if (sfEvent.mouseButton.button == sf::Mouse::Button::Left)
 
                                     {
             leftMouseButtonDown = true;
-            buttonPressedMousePosition.x = float(event.mouseButton.x);
-        buttonPressedMousePosition.y = float (event.mouseButton.y);
+            buttonPressedMousePosition.x = float(sfEvent.mouseButton.x);
+        buttonPressedMousePosition.y = float (sfEvent.mouseButton.y);
         buttonPressedBoardPosition = board.getPosition();
 				capturedItemIndex = getMouseOverItemIndex(buttonPressedMousePosition);
     }
 }
 
-                        else if (event.type == sf::Event::EventType::MouseButtonReleased)
+                        else if (sfEvent.type == sf::Event::EventType::MouseButtonReleased)
 
                         {
-    if (event.mouseButton.button == sf::Mouse::Button::Left && leftMouseButtonDown)
+    if (sfEvent.mouseButton.button == sf::Mouse::Button::Left && leftMouseButtonDown)
 			{
         leftMouseButtonDown = false;
-        buttonReleasedMousePosition.x = float(event.mouseButton.x);
-        buttonReleasedMousePosition.y = float(event.mouseButton.y);
+        buttonReleasedMousePosition.x = float(sfEvent.mouseButton.x);
+        buttonReleasedMousePosition.y = float(sfEvent.mouseButton.y);
         int mouseOverItemIndex = getMouseOverItemIndex(buttonReleasedMousePosition);
         if (mouseOverItemIndex == capturedItemIndex)
         {
@@ -208,7 +210,7 @@ namespace Drakborgen
         }
     }
 }
-		else if (event.type == sf::Event::EventType::MouseMoved)
+		else if (sfEvent.type == sf::Event::EventType::MouseMoved)
 
                         {
     if (leftMouseButtonDown && capturedItemIndex == -1)
@@ -216,18 +218,18 @@ namespace Drakborgen
         if (!xCenteredBoard || !yCenteredBoard)
         {
             animations.remove(board);
-            sf::Vector2f mouseMovementSincePressed(float(event.mouseMove.x -buttonPressedMousePosition.x), float(event.mouseMove.y - buttonPressedMousePosition.y));
+            sf::Vector2f mouseMovementSincePressed(float(sfEvent.mouseMove.x -buttonPressedMousePosition.x), float(sfEvent.mouseMove.y - buttonPressedMousePosition.y));
             sf::Vector2f newBoardPosition = buttonPressedBoardPosition + mouseMovementSincePressed;
             sf::Vector2f correctedBoardPosition = correctBoardPosition(newBoardPosition);
             board.setPosition(correctedBoardPosition);
             if (newBoardPosition.x != correctedBoardPosition.x)
             {
-                buttonPressedMousePosition.x = float(event.mouseMove.x);
+                buttonPressedMousePosition.x = float(sfEvent.mouseMove.x);
                 buttonPressedBoardPosition.x = correctedBoardPosition.x;
             }
             if (newBoardPosition.y != correctedBoardPosition.y)
             {
-                buttonPressedMousePosition.y = float(event.mouseMove.y);
+                buttonPressedMousePosition.y = float(sfEvent.mouseMove.y);
                 buttonPressedBoardPosition.y = correctedBoardPosition.y;
             }
         }
@@ -294,15 +296,15 @@ void Game::onBegin<State::SelectNetRole>()
     sf::Vector2f buttonSize(600.0f, 160.0f);
     {
         sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("Snåla", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("Snåla", buttonSize, buttonPosition, 60));
     }
     {
         sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("Håll gästabud", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("Håll gästabud", buttonSize, buttonPosition, 60));
     }
     {
         sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("Snylta", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("Snylta", buttonSize, buttonPosition, 60));
     }
 }
 
@@ -337,15 +339,15 @@ void Game::onBegin<State::SetupServer>()
     sf::Vector2f buttonSize(600.0f, 160.0f);
     {
         sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("Bjud in en gäst", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("Bjud in en gäst", buttonSize, buttonPosition, 60));
     }
     {
         sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("Bjud in två gäster", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("Bjud in två gäster", buttonSize, buttonPosition, 60));
     }
     {
         sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("Bjud in tre gäster", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("Bjud in tre gäster", buttonSize, buttonPosition, 60));
     }
 }
 
@@ -374,29 +376,29 @@ void Game::onBegin<State::SetupClient>()
         // Needs to be at index 0
         sf::Vector2f buttonSize(600.0f, 120.0f);
         sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 5.0f / 6.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("Låt färden gå!", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("Låt färden gå!", buttonSize, buttonPosition, 60));
     }
     {
         // Needs to be at index 1
         sf::Vector2f buttonSize(600.0f, 120.0f);
         sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("Rasmus", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("Rasmus", buttonSize, buttonPosition, 60));
     }
     {
         // Needs to be at index 2
         sf::Vector2f buttonSize(600.0f, 120.0f);
         sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 4.0f / 5.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("192.168.1.121", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("192.168.1.121", buttonSize, buttonPosition, 60));
     }
     {
         sf::Vector2f buttonSize(600.0f, 120.0f);
         sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 8.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("Om vem skall legenden vittna?", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("Om vem skall legenden vittna?", buttonSize, buttonPosition, 60));
     }
     {
         sf::Vector2f buttonSize(600.0f, 120.0f);
         sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 8.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("Varthän går färden?", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("Varthän går färden?", buttonSize, buttonPosition, 60));
     }
 }
 
@@ -421,7 +423,7 @@ void Game::onBegin<State::AwaitingConnection>()
 {
     sf::Vector2f buttonSize(600.0f, 160.0f);
     sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 4.0f - buttonSize.y / 2.0f);
-    buttons.push_back(std::make_unique<Button>("Sällskapet samlas...", buttonSize, buttonPosition, 60));
+    buttons.push_back(std::make_unique<Mouse.Button>("Sällskapet samlas...", buttonSize, buttonPosition, 60));
 }
 
 template<>
@@ -637,7 +639,7 @@ return index;
 std::vector<std::unique_ptr<Card>> Game::getHeroCards()
 {
     std::vector<std::unique_ptr<Card>> heroCards;
-    for (Hero & hero : idleHeroes)
+    foreach (Hero & hero : idleHeroes)
     {
         heroCards.push_back(hero.pullStatsCard());
     }
@@ -792,7 +794,7 @@ void Game::onNewPlayerPlaced()
     {
         sf::Vector2f buttonSize(500.0f, 200.0f);
         sf::Vector2f buttonPosition(window.getSize().x* 3.0f / 4.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Button>("Låt äventyret börja!", buttonSize, buttonPosition, 60));
+        buttons.push_back(std::make_unique<Mouse.Button>("Låt äventyret börja!", buttonSize, buttonPosition, 60));
         std::function < void() > cardsDisplayedCallback =
                     [this]()
 
@@ -823,7 +825,7 @@ void Game::startPlayerRound()
     std::stringstream ss;
     ss << player.hero.getName() << std::endl;
     ss << "Kroppspoäng: " << player.life << " / " << player.hero.getMaxLife();
-    buttons.emplace_back(std::make_unique<Button>(ss.str(), size, position, 30));
+    buttons.emplace_back(std::make_unique<Mouse.Button>(ss.str(), size, position, 30));
     board.setPlayerMoveSites(player.boardSite);
     board.showMoveSites(true);
     sf::Vector2u windowSize = window.getSize();
