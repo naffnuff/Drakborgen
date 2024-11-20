@@ -15,11 +15,11 @@ using static SFML.Window.Mouse;
 
 namespace Drakborgen
 {
-    using EventTable = List<Action>;
-
     internal class Game
     {
-        private readonly record struct Player(Hero Hero, Board.MoveSite BoardSite, int Life = 0, int AvatarIndex = 0);
+        private delegate void EventCallback(Game game);
+
+        private record struct Player(Hero Hero, Board.MoveSite BoardSite, int Life = 0, int AvatarIndex = 0);
 
         internal Deck<Tile> Tiles { get; }
 
@@ -52,10 +52,10 @@ namespace Drakborgen
 
         private int _activePlayerIndex = -1;
 
-        private EventTable _onBeginTable;
-        private EventTable _onTickTable;
-        private EventTable _onLeftMouseClickTable;
-        private EventTable _onEndTable;
+        private List<EventCallback> _onBeginTable;
+        private List<EventCallback> _onTickTable;
+        private List<EventCallback> _onLeftMouseClickTable;
+        private List<EventCallback> _onEndTable;
 
         private AnimationManager _animations;
 
@@ -67,7 +67,7 @@ namespace Drakborgen
             _animations = new AnimationManager();
             _board = new Board(_animations);
             _cardDisplay = new CardDisplay(_window);
-            _idleHeroes = new List<Hero>();
+            _idleHeroes = new List<Hero>(4);
             _players = new List<Player>();
             _buttons = new List<Button>();
 
@@ -75,7 +75,7 @@ namespace Drakborgen
 
             _window.SetVerticalSyncEnabled(true);
 
-            Vector2f boardSize = _board.GetSize();
+            Vector2f boardSize = _board.Size;
             Vector2u windowSize = _window.Size;
             _xCenteredBoard = boardSize.X < windowSize.X;
             _yCenteredBoard = boardSize.Y < windowSize.X;
@@ -89,6 +89,68 @@ namespace Drakborgen
                 boardPosition.Y = (float)windowSize.Y / 2 - boardSize.Y / 2.0f;
             }
             _board.Position = boardPosition;
+
+            _window.Closed += OnWindowClosed;
+            _window.MouseButtonPressed += MouseButtonPressed;
+            _window.MouseButtonReleased += OnMouseButtonReleased;
+            _window.MouseMoved += OnMouseMoved;
+        }
+
+        private void OnWindowClosed(object? sender, EventArgs e)
+        {
+            _window.Close();
+        }
+
+        private void MouseButtonPressed(object? sender, MouseButtonEventArgs e)
+        {
+            if (e.Button == Mouse.Button.Left)
+            {
+                _leftMouseButtonDown = true;
+                _buttonPressedMousePosition.X = (float)e.X;
+                _buttonPressedMousePosition.Y = (float)e.Y;
+                _buttonPressedBoardPosition = _board.Position;
+                _capturedItemIndex = GetMouseOverItemIndex(_buttonPressedMousePosition);
+            }
+        }
+
+        private void OnMouseButtonReleased(object? sender, MouseButtonEventArgs e)
+        {
+            if (e.Button == Mouse.Button.Left && _leftMouseButtonDown)
+            {
+                _leftMouseButtonDown = false;
+                _buttonReleasedMousePosition.X = (float)e.X;
+                _buttonReleasedMousePosition.Y = (float)e.Y;
+                int mouseOverItemIndex = GetMouseOverItemIndex(_buttonReleasedMousePosition);
+                if (mouseOverItemIndex == _capturedItemIndex)
+                {
+                    InvokeEventHandler(_onLeftMouseClickTable);
+                }
+            }
+        }
+
+        private void OnMouseMoved(object? sender, MouseMoveEventArgs e)
+        {
+            if (_leftMouseButtonDown && _capturedItemIndex == -1)
+            {
+                if (!_xCenteredBoard || !_yCenteredBoard)
+                {
+                    _animations.Remove(_board);
+                    Vector2f mouseMovementSincePressed = new Vector2f((float)(e.X - _buttonPressedMousePosition.X), (float)(e.Y - _buttonPressedMousePosition.Y));
+                    Vector2f newBoardPosition = _buttonPressedBoardPosition + mouseMovementSincePressed;
+                    Vector2f correctedBoardPosition = CorrectBoardPosition(newBoardPosition);
+                    _board.Position = correctedBoardPosition;
+                    if (newBoardPosition.X != correctedBoardPosition.X)
+                    {
+                        _buttonPressedMousePosition.X = (float)e.X;
+                        _buttonPressedBoardPosition.X = correctedBoardPosition.X;
+                    }
+                    if (newBoardPosition.Y != correctedBoardPosition.Y)
+                    {
+                        _buttonPressedMousePosition.Y = (float)e.Y;
+                        _buttonPressedBoardPosition.Y = correctedBoardPosition.Y;
+                    }
+                }
+            }
         }
 
         internal void Run()
@@ -97,13 +159,13 @@ namespace Drakborgen
             float lastTimestamp = 0.0f;
             //tiles.shuffle();
             //bool toogle = false;
-            /*for (int row = 0; row < board.rowCount; ++row)
+            /*for (int row = 0; row < _board.rowCount; ++row)
 	{
-		for (int column = 0; column < board.columnCount; ++column)
+		for (int column = 0; column < _board.columnCount; ++column)
 		{
-			if (toogle && !tiles.isEmpty() && !board.hasTile({ row, column }))
+			if (toogle && !tiles.isEmpty() && !_board.hasTile({ row, column }))
 			{
-				board.placeTile(tiles.pullNextItem(), { row, column });
+				_board.placeTile(tiles.pullNextItem(), { row, column });
 			}
 			toogle = !toogle;
 		}
@@ -119,7 +181,7 @@ namespace Drakborgen
                 // update the fps text every second
                 if (fpsTimer.ElapsedTime.AsSeconds() >= 1)
                 {
-                    //std::cout << fpsCount << " fps" << std::endl;
+                    //std.cout << fpsCount << " fps" << std.endl;
                     fpsTimer.Restart();
                     fpsCount = 0;
                 }
@@ -132,7 +194,7 @@ namespace Drakborgen
 
                 if (!_network.IsConnected)
                 {
-                    //setState(State::AwaitingConnection);
+                    //SetState(State.AwaitingConnection);
                 }
 
                 InvokeEventHandler(_onTickTable);
@@ -170,701 +232,602 @@ namespace Drakborgen
             }
         }
 
-        void ProcessSystemEvents()
+        private void InvokeEventHandler(List<EventCallback> eventTable)
         {
-            Event sfEvent;
-	while (_window.PollEvent(sfEvent))
-
-            {
-            if (sfEvent.type == sf::Event::EventType::Closed)
-
-                        {
-            window.close();
+            EventCallback callback = eventTable[(int)_state];
+            callback(this);
         }
-		else if (sfEvent.type == sf::Event::EventType::MouseButtonPressed)
 
-                        {
-            if (sfEvent.mouseButton.button == sf::Mouse::Button::Left)
-
-                                    {
-            leftMouseButtonDown = true;
-            buttonPressedMousePosition.x = float(sfEvent.mouseButton.x);
-        buttonPressedMousePosition.y = float (sfEvent.mouseButton.y);
-        buttonPressedBoardPosition = board.getPosition();
-				capturedItemIndex = getMouseOverItemIndex(buttonPressedMousePosition);
-    }
-}
-
-                        else if (sfEvent.type == sf::Event::EventType::MouseButtonReleased)
-
-                        {
-    if (sfEvent.mouseButton.button == sf::Mouse::Button::Left && leftMouseButtonDown)
-			{
-        leftMouseButtonDown = false;
-        buttonReleasedMousePosition.x = float(sfEvent.mouseButton.x);
-        buttonReleasedMousePosition.y = float(sfEvent.mouseButton.y);
-        int mouseOverItemIndex = getMouseOverItemIndex(buttonReleasedMousePosition);
-        if (mouseOverItemIndex == capturedItemIndex)
+        private void SetState(State newState)
         {
-            invokeEventHandler(onLeftMouseClickTable);
-        }
-    }
-}
-		else if (sfEvent.type == sf::Event::EventType::MouseMoved)
-
-                        {
-    if (leftMouseButtonDown && capturedItemIndex == -1)
-    {
-        if (!xCenteredBoard || !yCenteredBoard)
-        {
-            animations.remove(board);
-            sf::Vector2f mouseMovementSincePressed(float(sfEvent.mouseMove.x -buttonPressedMousePosition.x), float(sfEvent.mouseMove.y - buttonPressedMousePosition.y));
-            sf::Vector2f newBoardPosition = buttonPressedBoardPosition + mouseMovementSincePressed;
-            sf::Vector2f correctedBoardPosition = correctBoardPosition(newBoardPosition);
-            board.setPosition(correctedBoardPosition);
-            if (newBoardPosition.x != correctedBoardPosition.x)
+            if (newState != _state)
             {
-                buttonPressedMousePosition.x = float(sfEvent.mouseMove.x);
-                buttonPressedBoardPosition.x = correctedBoardPosition.x;
-            }
-            if (newBoardPosition.y != correctedBoardPosition.y)
-            {
-                buttonPressedMousePosition.y = float(sfEvent.mouseMove.y);
-                buttonPressedBoardPosition.y = correctedBoardPosition.y;
+                InvokeEventHandler(_onEndTable);
+                _state = newState;
+                InvokeEventHandler(_onBeginTable);
             }
         }
-    }
-}
-}
-}
 
-void Game::invokeEventHandler(const EventTable& eventTable)
-{
-	if (std::function<void(Game&)> function = eventTable[int(state)])
-	{
-    function(*this);
-}
+        private Vector2f CorrectBoardPosition(Vector2f boardPostion)
+        {
+            if (_xCenteredBoard)
+            {
+                boardPostion.X = (float)(_window.Size.X / 2) - _board.Size.X / 2.0f;
+            }
+            else if (boardPostion.X > 0.0f)
+            {
+                boardPostion.X = 0.0f;
+            }
+            else if (boardPostion.X + _board.Size.X < _window.Size.X)
+            {
+                boardPostion.X = _window.Size.X - _board.Size.X;
+            }
+            if (_xCenteredBoard)
+            {
+                boardPostion.Y = (float)(_window.Size.Y / 2) - _board.Size.Y / 2.0f;
+            }
+            else if (boardPostion.Y > 0.0f)
+            {
+                boardPostion.Y = 0.0f;
+            }
+            else if (boardPostion.Y + _board.Size.Y < _window.Size.Y)
+            {
+                boardPostion.Y = _window.Size.Y - _board.Size.Y;
+            }
+            return boardPostion;
+        }
 
+        private void OnBegin_SelectNetRole()
+        {
+            Vector2f buttonSize = new Vector2f(600.0f, 160.0f);
+            {
+                Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 1.0f / 4.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("Snåla", buttonSize, buttonPosition, 60));
+            }
+            {
+                Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 2.0f / 4.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("Håll gästabud", buttonSize, buttonPosition, 60));
+            }
+            {
+                Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 3.0f / 4.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("Snylta", buttonSize, buttonPosition, 60));
+            }
+        }
+
+        private void OnLeftMouseClick_SelectNetRole()
+        {
+            if (_capturedItemIndex == 0)
+            {
+                SetState(State.SetupGame);
+            }
+            else if (_capturedItemIndex == 1)
+            {
+                SetState(State.SetupServer);
+            }
+            else if (_capturedItemIndex == 2)
+            {
+                SetState(State.SetupClient);
+            }
+        }
+
+        private void OnEnd_SelectNetRole()
+        {
+            _buttons.Clear();
+        }
+
+        // Server setup
+
+        private void OnBegin_SetupServer()
+        {
+            Vector2f buttonSize = new Vector2f(600.0f, 160.0f);
+            {
+                Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 1.0f / 4.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("Bjud in en gäst", buttonSize, buttonPosition, 60));
+            }
+            {
+                Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 2.0f / 4.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("Bjud in två gäster", buttonSize, buttonPosition, 60));
+            }
+            {
+                Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 3.0f / 4.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("Bjud in tre gäster", buttonSize, buttonPosition, 60));
+            }
+        }
+
+        private void OnEnd_SetupServer()
+        {
+            _buttons.Clear();
+        }
+
+        private void OnLeftMouseClick_SetupServer()
+        {
+            if (_capturedItemIndex > -1)
+            {
+                _network.StartServer(_capturedItemIndex + 1, _random);
+                SetState(State.NoState);
+            }
+        }
+
+        // Client setup
+
+        private void OnBegin_SetupClient()
+        {
+            {
+                // Needs to be at index 0
+                Vector2f buttonSize = new Vector2f(600.0f, 120.0f);
+                Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 5.0f / 6.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("Låt färden gå!", buttonSize, buttonPosition, 60));
+            }
+            {
+                // Needs to be at index 1
+                Vector2f buttonSize = new Vector2f(600.0f, 120.0f);
+                Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 2.0f / 5.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("Rasmus", buttonSize, buttonPosition, 60));
+            }
+            {
+                // Needs to be at index 2
+                Vector2f buttonSize = new Vector2f(600.0f, 120.0f);
+                Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 4.0f / 5.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("192.168.1.121", buttonSize, buttonPosition, 60));
+            }
+            {
+                Vector2f buttonSize = new Vector2f(600.0f, 120.0f);
+                Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 1.0f / 8.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("Om vem skall legenden vittna?", buttonSize, buttonPosition, 60));
+            }
+            {
+                Vector2f buttonSize = new Vector2f(600.0f, 120.0f);
+                Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 2.0f / 8.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("Varthän går färden?", buttonSize, buttonPosition, 60));
+            }
+        }
+
+        private void OnLeftMouseClick_SetupClient()
+        {
+            if (_capturedItemIndex == 0)
+            {
+                _network.StartClient(/*_buttons[1]->getText(), */_buttons[2].ButtonText;
+                SetState(State.NoState);
+            }
+        }
+
+        private void OnEnd_SetupClient()
+        {
+            _buttons.Clear();
+        }
+
+        private void OnBegin_AwaitingConnection()
+        {
+            Vector2f buttonSize = new Vector2f(600.0f, 160.0f);
+            Vector2f buttonPosition = new Vector2f(_window.Size.X / 2.0f - buttonSize.X / 2.0f, _window.Size.Y * 2.0f / 4.0f - buttonSize.Y / 2.0f);
+            _buttons.Add(new Button("Sällskapet samlas...", buttonSize, buttonPosition, 60));
+        }
+
+        private void OnTick_AwaitingConnection()
+        {
+            if (_network.IsConnected)
+            {
+                SetState(State.NoState);
+            }
+        }
+
+        private void OnEnd_AwaitingConnection()
+        {
+            _buttons.clear();
+        }
+
+        private void OnBegin_SetupGame()
+        {
+            if (_idleHeroes.Count == 0)
+            {
+                _idleHeroes.Capacity = 4;
+                _idleHeroes.Add(new Hero("rohan", "Riddar Rohan", 17));
+                _idleHeroes.Add(new Hero("sigeir", "Sigeir Skarpyxe", 16));
+                _idleHeroes.Add(new Hero("aelfric", "Aelfric Brunkåpa", 15));
+                _idleHeroes.Add(new Hero("bardhor", "Bardhor Bågman", 11));
+            }
+
+            _board.SetGameStartMoveSites();
+
+            DisplayCards(GetHeroCards(), () => { });
+
+            SetState(State.PickHero);
+        }
+
+        private void OnLeftMouseClick_PickHero()
+        {
+            if (_capturedItemIndex >= 0)
+            {
+                _buttons.Clear();
+                if (_capturedItemIndex < _cardDisplay.CardCount) // hero card clicked
+                {
+                    SetState(State.PickStartTower);
+                }
+                else // begin-game button clicked
+                {
+                    for (int i = (int)_idleHeroes.Count - 1; i >= 0; --i)
+                    {
+                        Card card = _cardDisplay.PullCard(i);
+                        Action callback = () => { };
+                        if (i == _idleHeroes.Count - 1)
+                        {
+                            callback = () => { _preGameSetup = false; };
+                        }
+                        MoveOffScreen(card, (float)(i + 1) / (float)(_idleHeroes.Count), callback);
+                        _idleHeroes[i].PlaceStatsCard(card);
+                    }
+                    StartNewGame();
+                    SetState(State.PlayerMove);
+                }
+            }
+        }
+
+        private void OnBegin_PickStartTower()
+        {
+            PanToNextFreeTower();
+            CreatePlayer(_capturedItemIndex);
+            _board.ShowMoveSites(true);
+        }
+
+        private void OnLeftMouseClick_PickStartTower()
+        {
+            Vector2f mouseBoardPosition = GetMouseBoardPosition();
+            if (_board.TestMoveSites(mouseBoardPosition))
+            {
+                _board.ShowMoveSites(false);
+                Board.Site site = _board.GetSite(mouseBoardPosition);
+                _board.RemoveMoveSite(site);
+                PlaceNewPlayer(site, () => { OnNewPlayerPlaced(); });
+                if (_idleHeroes.Count == 0)
+                {
+                    SetState(State.PlayerMove);
+                }
+                else
+                {
+                    SetState(State.PickHero);
+                }
+            }
+        }
+
+        private void OnLeftMouseClick_PlayerMove()
+        {
+            if (_capturedItemIndex >= _cardDisplay.CardCount)
+            {
+                SetState(State.ViewStatsCard);
+            }
             else
-{
-    THROW;
-}
-}
-
-void Game::setState(State newState)
-{
-    if (newState != state)
-    {
-        invokeEventHandler(onEndTable);
-        state = newState;
-        invokeEventHandler(onBeginTable);
-    }
-}
-
-sf::Vector2f Game::correctBoardPosition(sf::Vector2f boardPostion)
-{
-    if (xCenteredBoard)
-    {
-        boardPostion.x = float(window.getSize().x / 2) - board.getSize().x / 2.0f;
-    }
-    else if (boardPostion.x > 0.0f)
-    {
-        boardPostion.x = 0.0f;
-    }
-    else if (boardPostion.x + board.getSize().x < window.getSize().x)
-    {
-        boardPostion.x = window.getSize().x - board.getSize().x;
-    }
-    if (xCenteredBoard)
-    {
-        boardPostion.y = float(window.getSize().y / 2) - board.getSize().y / 2.0f;
-    }
-    else if (boardPostion.y > 0.0f)
-    {
-        boardPostion.y = 0.0f;
-    }
-    else if (boardPostion.y + board.getSize().y < window.getSize().y)
-    {
-        boardPostion.y = window.getSize().y - board.getSize().y;
-    }
-    return boardPostion;
-}
-
-template<>
-void Game::onBegin<State::SelectNetRole>()
-{
-    sf::Vector2f buttonSize(600.0f, 160.0f);
-    {
-        sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("Snåla", buttonSize, buttonPosition, 60));
-    }
-    {
-        sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("Håll gästabud", buttonSize, buttonPosition, 60));
-    }
-    {
-        sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("Snylta", buttonSize, buttonPosition, 60));
-    }
-}
-
-template<>
-void Game::onLeftMouseClick<State::SelectNetRole>()
-{
-    if (capturedItemIndex == 0)
-    {
-        setState(State::SetupGame);
-    }
-    else if (capturedItemIndex == 1)
-    {
-        setState(State::SetupServer);
-    }
-    else if (capturedItemIndex == 2)
-    {
-        setState(State::SetupClient);
-    }
-}
-
-template<>
-void Game::onEnd<State::SelectNetRole>()
-{
-    buttons.clear();
-}
-
-// Server setup
-
-template<>
-void Game::onBegin<State::SetupServer>()
-{
-    sf::Vector2f buttonSize(600.0f, 160.0f);
-    {
-        sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("Bjud in en gäst", buttonSize, buttonPosition, 60));
-    }
-    {
-        sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("Bjud in två gäster", buttonSize, buttonPosition, 60));
-    }
-    {
-        sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("Bjud in tre gäster", buttonSize, buttonPosition, 60));
-    }
-}
-
-template<>
-void Game::onEnd<State::SetupServer>()
-{
-    buttons.clear();
-}
-
-template<>
-void Game::onLeftMouseClick<State::SetupServer>()
-{
-    if (capturedItemIndex > -1)
-    {
-        network.startServer(capturedItemIndex + 1, random);
-        setState(State::NoState);
-    }
-}
-
-// Client setup
-
-template<>
-void Game::onBegin<State::SetupClient>()
-{
-    {
-        // Needs to be at index 0
-        sf::Vector2f buttonSize(600.0f, 120.0f);
-        sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 5.0f / 6.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("Låt färden gå!", buttonSize, buttonPosition, 60));
-    }
-    {
-        // Needs to be at index 1
-        sf::Vector2f buttonSize(600.0f, 120.0f);
-        sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 5.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("Rasmus", buttonSize, buttonPosition, 60));
-    }
-    {
-        // Needs to be at index 2
-        sf::Vector2f buttonSize(600.0f, 120.0f);
-        sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 4.0f / 5.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("192.168.1.121", buttonSize, buttonPosition, 60));
-    }
-    {
-        sf::Vector2f buttonSize(600.0f, 120.0f);
-        sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 1.0f / 8.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("Om vem skall legenden vittna?", buttonSize, buttonPosition, 60));
-    }
-    {
-        sf::Vector2f buttonSize(600.0f, 120.0f);
-        sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 8.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("Varthän går färden?", buttonSize, buttonPosition, 60));
-    }
-}
-
-template<>
-void Game::onLeftMouseClick<State::SetupClient>()
-{
-    if (capturedItemIndex == 0)
-    {
-        network.startClient(/*buttons[1]->getText(), */buttons[2]->getText());
-        setState(State::NoState);
-    }
-}
-
-template<>
-void Game::onEnd<State::SetupClient>()
-{
-    buttons.clear();
-}
-
-template<>
-void Game::onBegin<State::AwaitingConnection>()
-{
-    sf::Vector2f buttonSize(600.0f, 160.0f);
-    sf::Vector2f buttonPosition(window.getSize().x / 2.0f - buttonSize.x / 2.0f, window.getSize().y * 2.0f / 4.0f - buttonSize.y / 2.0f);
-    buttons.push_back(std::make_unique<Mouse.Button>("Sällskapet samlas...", buttonSize, buttonPosition, 60));
-}
-
-template<>
-void Game::onTick<State::AwaitingConnection>()
-{
-    if (network.isConnected())
-    {
-        setState(State::NoState);
-    }
-}
-
-template<>
-void Game::onEnd<State::AwaitingConnection>()
-{
-    buttons.clear();
-}
-
-template<>
-void Game::onBegin<State::SetupGame>()
-{
-    if (idleHeroes.size() == 0)
-    {
-        idleHeroes.reserve(4);
-        idleHeroes.push_back(Hero("rohan", "Riddar Rohan", 17));
-        idleHeroes.push_back(Hero("sigeir", "Sigeir Skarpyxe", 16));
-        idleHeroes.push_back(Hero("aelfric", "Aelfric Brunkåpa", 15));
-        idleHeroes.push_back(Hero("bardhor", "Bardhor Bågman", 11));
-    }
-
-    board.setGameStartMoveSites();
-
-    displayCards(getHeroCards(), []() { });
-
-    setState(State::PickHero);
-}
-
-template<>
-void Game::onLeftMouseClick<State::PickHero>()
-{
-    if (capturedItemIndex >= 0)
-    {
-        buttons.clear();
-        if (capturedItemIndex < cardDisplay.cardCount()) // hero card clicked
-        {
-            setState(State::PickStartTower);
-        }
-        else // begin-game button clicked
-        {
-            for (int i = int(idleHeroes.size()) - 1; i >= 0; --i)
             {
-                std::unique_ptr<Card> card = cardDisplay.pullCard(i);
-                std::function < void() > callback = []() { };
-                if (i == idleHeroes.size() - 1)
+                Vector2f mouseBoardPosition = GetMouseBoardPosition();
+                if (_board.TestMoveSites(mouseBoardPosition))
                 {
-                    callback = [this]() { preGameSetup = false; };
-                }
-                moveOffScreen(card, float(i + 1) / float(idleHeroes.size()), callback);
-                idleHeroes[i].placeStatsCard(std::move(card));
-            }
-            startNewGame();
-            setState(State::PlayerMove);
-        }
-    }
-}
-
-template<>
-void Game::onBegin<State::PickStartTower>()
-{
-    panToNextFreeTower();
-    createPlayer(capturedItemIndex);
-    board.showMoveSites(true);
-}
-
-template<>
-void Game::onLeftMouseClick<State::PickStartTower>()
-{
-    sf::Vector2f mouseBoardPosition = getMouseBoardPosition();
-    if (board.testMoveSites(mouseBoardPosition))
-    {
-        board.showMoveSites(false);
-        Board::Site site = board.getSite(mouseBoardPosition);
-        board.removeMoveSite(site);
-        placeNewPlayer(site, [this]() { onNewPlayerPlaced(); });
-        if (idleHeroes.empty())
-        {
-            setState(State::PlayerMove);
-        }
-        else
-        {
-            setState(State::PickHero);
-        }
-    }
-}
-
-template<>
-void Game::onLeftMouseClick<State::PlayerMove>()
-{
-    if (capturedItemIndex >= cardDisplay.cardCount())
-    {
-        setState(State::ViewStatsCard);
-    }
-    else
-    {
-        sf::Vector2f mouseBoardPosition = getMouseBoardPosition();
-        if (board.testMoveSites(mouseBoardPosition))
-        {
-            Board::MoveSite moveSite = board.getMoveSite(mouseBoardPosition);
-            if (!board.hasTile(moveSite.site))
-            {
-                std::unique_ptr<Tile> tile = tiles.pullNextItem();
-                board.placeTile(std::move(tile), moveSite);
-            }
-            Tile & tile = *board.getTile(moveSite.site);
-            movePlayer(activePlayerIndex, moveSite, [this, &tile]() { onPlayerMoved(tile); });
-            board.clearMoveSites();
-            // setting new state async
-        }
-    }
-}
-
-template<>
-void Game::onBegin<State::ViewStatsCard>()
-{
-    //board.showMoveSites(false);
-    std::unique_ptr<Card> card = players[activePlayerIndex].hero.pullStatsCard();
-    if (!card)
-    {
-        THROW;
-    }
-    displayCard(std::move(card), []() { });
-}
-
-template<>
-void Game::onLeftMouseClick<State::ViewStatsCard>()
-{
-    if (capturedItemIndex > -1)
-    {
-        setState(State::PlayerMove);
-    }
-}
-
-template<>
-void Game::onEnd<State::ViewStatsCard>()
-{
-    std::unique_ptr<Card> card = cardDisplay.pullCard();
-    moveOffScreen(card, 0.5f, [this]() { placeAtOrigin(players[activePlayerIndex].hero.getStatsCard()); });
-    players[activePlayerIndex].hero.placeStatsCard(std::move(card));
-    //board.showMoveSites(true);
-}
-
-template<>
-void Game::onBegin<State::TurnContinue>()
-{
-    startPlayerRound();
-    setState(State::PlayerMove);
-}
-
-template<>
-void Game::onBegin<State::TurnEnd>()
-{
-    activePlayerIndex = (activePlayerIndex + 1) % int(players.size());
-    onBegin<State::TurnContinue>();
-}
-
-// Helpers
-
-void Game::placeAtOrigin(std::unique_ptr<Card> & card) const
-{
-	sf::Vector2u windowSize = window.getSize();
-sf::Vector2f cardSize = card->getGlobalBounds().getSize();
-card->setPosition({ -cardSize.x, float(windowSize.y) });
-}
-
-void Game::moveOffScreen(std::unique_ptr<Card> & card, float time, std::function < void() > callback)
-{
-    sf::Vector2u windowSize = window.getSize();
-    sf::Vector2f cardSize = card->getGlobalBounds().getSize();
-    animations.add(*card, { float(windowSize.x), -cardSize.y }, time, callback);
-}
-
-void Game::moveToCenter(std::unique_ptr<Card> & card, std::function < void() > callback)
-{
-    sf::Vector2f cardSize = card->getGlobalBounds().getSize();
-    sf::Vector2u windowSize = window.getSize();
-    sf::Vector2f animationTarget(windowSize.x / 2.0f - cardSize.x / 2.0f, windowSize.y / 2.0f - cardSize.y / 2.0f);
-    animations.add(*card, animationTarget, 0.5f, callback);
-}
-
-sf::Vector2f Game::getMouseBoardPosition() const
-{
-	sf::Vector2f boardPosition = board.getPosition();
-sf::Vector2f mouseBoardPosition = sf::Vector2f(buttonReleasedMousePosition.x - boardPosition.x, buttonReleasedMousePosition.y - boardPosition.y);
-return mouseBoardPosition;
-}
-
-int Game::getMouseOverItemIndex(sf::Vector2f mousePosition) const
-{
-	int index = cardDisplay.hitTest(mousePosition);
-if (index == -1)
-{
-    for (int i = 0; i < buttons.size(); ++i)
-    {
-        if (buttons[i]->hitTest(mousePosition))
-        {
-            index = cardDisplay.cardCount() + i;
-            break;
-        }
-    }
-}
-return index;
-}
-
-std::vector<std::unique_ptr<Card>> Game::getHeroCards()
-{
-    std::vector<std::unique_ptr<Card>> heroCards;
-    foreach (Hero & hero : idleHeroes)
-    {
-        heroCards.push_back(hero.pullStatsCard());
-    }
-    return heroCards;
-}
-
-void Game::displayCard(std::unique_ptr<Card> && card, std::function < void() > callback)
-{
-    //placeAtOrigin(card);
-    moveToCenter(card, callback);
-    cardDisplay.pushCard(std::move(card));
-}
-
-void Game::displayCards(std::vector<std::unique_ptr<Card>> && cards, std::function < void() > callback)
-{
-    std::vector<sf::Vector2f> layout = cardDisplay.getLayout(cards);
-    for (int i = 0; i < cards.size(); ++i)
-    {
-        placeAtOrigin(cards[i]);
-        animations.add(*cards[i], layout[i], float(i + 1) / float(cards.size()), i == cards.size() - 1 ? callback : []() { });
-    cardDisplay.pushCard(std::move(cards[i]));
-}
-}
-
-void Game::panToNextFreeTower()
-{
-    sf::Vector2f boardTarget(0.0f, 0.0f);
-    sf::Vector2u windowSize = window.getSize();
-    if (players.size() == 0)
-    {
-        if (random.nextBool())
-        {
-            boardTarget.y = -float(windowSize.y);
-        }
-        if (random.nextBool())
-        {
-            boardTarget.x = -float(windowSize.x);
-        }
-    }
-    else
-    {
-        Board::Site lastSite = players.back().boardSite.site;
-        int oppositeRow = lastSite.row == 0 ? Board::rowCount - 1 : 0;
-        int oppositeColumn = lastSite.column == 0 ? Board::columnCount - 1 : 0;
-        std::vector<Board::Site> candidates = {
-                                    { oppositeRow, oppositeColumn },
-                                    { lastSite.row, oppositeColumn },
-                                    { oppositeRow, lastSite.column }
-                        };
-        //random.shuffle(candidates);
-        for (Board::Site candidate : candidates)
-        {
-            bool goodCandidate = true;
-            for (int i = 0; i < int(players.size()) - 1; ++i)
-            {
-                if (players[i].boardSite.site == candidate)
-                {
-                    goodCandidate = false;
-                    break;
+                    Board.MoveSite moveSite = _board.GetMoveSite(mouseBoardPosition);
+                    if (!_board.HasTile(moveSite.Site))
+                    {
+                        Tile tile = Tiles.PullNextItem();
+                        _board.PlaceTile(tile, moveSite);
+                    }
+                    Tile tile = _board.GetTile(moveSite.Site);
+                    MovePlayer(_activePlayerIndex, moveSite, () => { OnPlayerMoved(tile); });
+                    _board.ClearMoveSites();
+                    // setting new _state async
                 }
             }
-            if (goodCandidate)
+        }
+
+        private void OnBegin_ViewStatsCard()
+        {
+            //_board.showMoveSites(false);
+            Card card = _players[_activePlayerIndex].Hero.PullStatsCard();
+            if (card == null)
             {
-                if (candidate.row > 0)
-                {
-                    boardTarget.y = -float(windowSize.y);
-                }
-                if (candidate.column > 0)
-                {
-                    boardTarget.x = -float(windowSize.x);
-                }
-                break;
+                throw new Exception();
+            }
+            DisplayCard(card, () => { });
+        }
+
+        private void OnLeftMouseClick_ViewStatsCard()
+        {
+            if (_capturedItemIndex > -1)
+            {
+                SetState(State.PlayerMove);
             }
         }
-    }
-    animations.add(board, correctBoardPosition(boardTarget), 0.75f, []() { });
-}
 
-void Game::createPlayer(int heroIndex)
-{
-    std::unique_ptr<Card> pickedCard = cardDisplay.pullCard(heroIndex);
-    moveToCenter(pickedCard, []() { });
-    players.push_back({ std::move(idleHeroes[heroIndex]), Board::invalidMoveSite, idleHeroes[heroIndex].getMaxLife() });
-    ++activePlayerIndex;
-    idleHeroes.erase(idleHeroes.begin() + heroIndex);
-    for (int i = int(idleHeroes.size()) - 1; i >= 0; --i)
-    {
-        std::unique_ptr<Card> card = cardDisplay.pullCard(i);
-        moveOffScreen(card, float(i + 1) / float(idleHeroes.size()), []() { });
-    idleHeroes[i].placeStatsCard(std::move(card));
-}
-cardDisplay.pushCard(std::move(pickedCard));
-}
+        private void OnEnd_ViewStatsCard()
+        {
+            Card card = _cardDisplay.PullCard();
+            MoveOffScreen(card, 0.5f, () => { PlaceAtOrigin(_players[_activePlayerIndex].Hero.StatsCard); });
+            _players[_activePlayerIndex].Hero.PlaceStatsCard(card);
+            //_board.showMoveSites(true);
+        }
 
-void Game::placeNewPlayer(Board::Site site, std::function < void() > callback)
-{
-    if (players.size() == 0)
-    {
-        THROW;
-    }
-    int index = int(players.size()) - 1;
-    Player & player = players[index];
-    player.boardSite = { site };
-    player.avatarIndex = index;
-    if (cardDisplay.cardCount() != 1)
-    {
-        THROW;
-    }
-    std::unique_ptr<Card> card = cardDisplay.pullCard(0);
-    std::function < void() > cardAnimationCallback = [this, &player, site, callback]() {
-        board.addPlayer(Setup::getMediaPath() + "hjaltekort/" + player.hero.getId() + "gubbe.png", player.avatarIndex);
-        board.setPlayerSite(player.avatarIndex, { site, Direction::Invalid }, callback);
-        placeAtOrigin(player.hero.getStatsCard());
-    };
-    sf::Vector2f target;
-    sf::Vector2f cardSize = card->getGlobalBounds().getSize();
-    sf::Vector2u windowSize = window.getSize();
-    if (site.column == 0)
-    {
-        target.x = -cardSize.x;
-    }
-    else if (site.column == board.columnCount - 1)
-    {
-        target.x = float(windowSize.x);
-    }
-    if (site.row == 0)
-    {
-        target.y = -cardSize.y;
-    }
-    else if (site.row == board.rowCount - 1)
-    {
-        target.y = float(windowSize.y);
-    }
-    animations.add(*card, target, 0.5f, cardAnimationCallback);
-    player.hero.placeStatsCard(std::move(card));
-}
+        private void OnBegin_TurnContinue()
+        {
+            StartPlayerRound();
+            SetState(State.PlayerMove);
+        }
 
-void Game::movePlayer(int index, Board::MoveSite moveSite, std::function < void() > callback)
-{
-    Player & player = players[index];
-    player.boardSite = moveSite;
-    board.setPlayerSite(player.avatarIndex, moveSite, callback);
-}
+        private void OnBegin_TurnEnd()
+        {
+            _activePlayerIndex = (_activePlayerIndex + 1) % (int)_players.Count;
+            OnBegin_TurnContinue();
+        }
 
-void Game::onNewPlayerPlaced()
-{
-    if (idleHeroes.empty())
-    {
-        startNewGame();
-    }
-    else
-    {
-        sf::Vector2f buttonSize(500.0f, 200.0f);
-        sf::Vector2f buttonPosition(window.getSize().x* 3.0f / 4.0f - buttonSize.x / 2.0f, window.getSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
-        buttons.push_back(std::make_unique<Mouse.Button>("Låt äventyret börja!", buttonSize, buttonPosition, 60));
-        std::function < void() > cardsDisplayedCallback =
-                    [this]()
+        // Helpers
 
+        private void PlaceAtOrigin(Card? card)
+        {
+            if (card == null)
+            {
+                throw new Exception();
+            }
+            Vector2u windowSize = _window.Size;
+            Vector2f cardSize = card.GetGlobalBounds().Size;
+            card.Position = new Vector2f(-cardSize.X, (float)windowSize.Y);
+        }
+
+        private void MoveOffScreen(Card card, float time, Action callback)
+        {
+            Vector2u windowSize = _window.Size;
+            Vector2f cardSize = card.GetGlobalBounds().Size;
+            _animations.Add(card, new Vector2f((float)windowSize.X, -cardSize.Y), time, callback);
+        }
+
+        private void MoveToCenter(Card card, Action callback)
+        {
+            Vector2f cardSize = card.GetGlobalBounds().Size;
+            Vector2u windowSize = _window.Size;
+            Vector2f animationTarget = new Vector2f(windowSize.X / 2.0f - cardSize.X / 2.0f, windowSize.Y / 2.0f - cardSize.Y / 2.0f);
+            _animations.Add(card, animationTarget, 0.5f, callback);
+        }
+
+        private Vector2f GetMouseBoardPosition()
+        {
+            Vector2f boardPosition = _board.Position;
+            Vector2f mouseBoardPosition = new Vector2f(_buttonReleasedMousePosition.X - boardPosition.X, _buttonReleasedMousePosition.Y - boardPosition.Y);
+            return mouseBoardPosition;
+        }
+
+        private int GetMouseOverItemIndex(Vector2f mousePosition)
+        {
+            int index = _cardDisplay.HitTest(mousePosition);
+            if (index == -1)
+            {
+                for (int i = 0; i < _buttons.Count; ++i)
+                {
+                    if (_buttons[i].HitTest(mousePosition))
+                    {
+                        index = _cardDisplay.CardCount + i;
+                        break;
+                    }
+                }
+            }
+            return index;
+        }
+
+        private List<Card> GetHeroCards()
+        {
+            List<Card> heroCards;
+            foreach (Hero hero in _idleHeroes)
+            {
+                heroCards.Add(hero.PullStatsCard());
+            }
+            return heroCards;
+        }
+
+        private void DisplayCard(Card card, Action callback)
+        {
+            //placeAtOrigin(card);
+            MoveToCenter(card, callback);
+            _cardDisplay.PushCard(card);
+        }
+
+        private void DisplayCards(List<Card> cards, Action callback)
+        {
+            List<Vector2f> layout = _cardDisplay.GetLayout(cards);
+            for (int i = 0; i < cards.Count; ++i)
+            {
+                PlaceAtOrigin(cards[i]);
+                _animations.Add(cards[i], layout[i], (float)(i + 1) / (float)(cards.Count), i == cards.Count - 1 ? callback : () => { });
+                _cardDisplay.PushCard(cards[i]);
+            }
+        }
+
+        private void PanToNextFreeTower()
+        {
+            Vector2f boardTarget = new Vector2f(0.0f, 0.0f);
+            Vector2u windowSize = _window.Size;
+            if (_players.Count == 0)
+            {
+                if (_random.NextBool())
+                {
+                    boardTarget.Y = -(float)windowSize.Y;
+                }
+                if (_random.NextBool())
+                {
+                    boardTarget.X = -(float)windowSize.X;
+                }
+            }
+            else
+            {
+                Board.Site lastSite = _players.Last().BoardSite.Site;
+                int oppositeRow = lastSite.Row == 0 ? Board.RowCount - 1 : 0;
+                int oppositeColumn = lastSite.Column == 0 ? Board.ColumnCount - 1 : 0;
+                List<Board.Site> candidates = new List<Board.Site> {
+                    new Board.Site(oppositeRow, oppositeColumn),
+                    new Board.Site(lastSite.Row, oppositeColumn),
+                    new Board.Site(oppositeRow, lastSite.Column)
+                };
+                //_random.shuffle(candidates);
+                foreach (Board.Site candidate in candidates)
+                {
+                    bool goodCandidate = true;
+                    for (int i = 0; i < (int)_players.Count - 1; ++i)
+                    {
+                        if (_players[i].BoardSite.Site == candidate)
                         {
-        };
-        displayCards(getHeroCards(), cardsDisplayedCallback);
-    }
-}
+                            goodCandidate = false;
+                            break;
+                        }
+                    }
+                    if (goodCandidate)
+                    {
+                        if (candidate.Row > 0)
+                        {
+                            boardTarget.Y = -(float)windowSize.Y;
+                        }
+                        if (candidate.Column > 0)
+                        {
+                            boardTarget.X = -(float)windowSize.X;
+                        }
+                        break;
+                    }
+                }
+            }
+            _animations.Add(_board, CorrectBoardPosition(boardTarget), 0.75f, () => { });
+        }
 
-void Game::onPlayerMoved(Tile & tile)
-{
-    setState(tile.enter());
-}
+        private void CreatePlayer(int heroIndex)
+        {
+            Card pickedCard = _cardDisplay.PullCard(heroIndex);
+            MoveToCenter(pickedCard, () => { });
+            _players.Add(new Player(_idleHeroes[heroIndex], Board.InvalidMoveSite, _idleHeroes[heroIndex].MaxLife));
+            ++_activePlayerIndex;
+            _idleHeroes.RemoveAt(heroIndex);
+            for (int i = (int)(_idleHeroes.Count) - 1; i >= 0; --i)
+            {
+                Card card = _cardDisplay.PullCard(i);
+                MoveOffScreen(card, (float)(i + 1) / (float)_idleHeroes.Count, () => { });
+                _idleHeroes[i].PlaceStatsCard(card);
+            }
+            _cardDisplay.PushCard(pickedCard);
+        }
 
-void Game::startNewGame()
-{
-    board.clearMoveSites();
-    //random.shuffle(players);
-    activePlayerIndex = 0;
-    startPlayerRound();
-}
+        private void PlaceNewPlayer(Board.Site site, Action animationCallback)
+        {
+            if (_players.Count == 0)
+            {
+                throw new Exception();
+            }
+            int index = (int)_players.Count - 1;
+            Player player = _players[index];
+            player.BoardSite = new Board.MoveSite(site);
+            player.AvatarIndex = index;
+            if (_cardDisplay.CardCount != 1)
+            {
+                throw new Exception();
+            }
+            Card card = _cardDisplay.PullCard(0);
+            Action cardAnimationCallback = () =>
+            {
+                _board.AddPlayer(Setup.MediaPath + "hjaltekort/" + player.Hero.Id + "gubbe.png", player.AvatarIndex);
+                _board.SetPlayerSite(player.AvatarIndex, new Board.MoveSite(site), animationCallback);
+                PlaceAtOrigin(player.Hero.StatsCard);
+            };
+            Vector2f target = new Vector2f();
+            Vector2f cardSize = card.GetGlobalBounds().Size;
+            Vector2u windowSize = _window.Size;
+            if (site.Column == 0)
+            {
+                target.X = -cardSize.X;
+            }
+            else if (site.Column == Board.ColumnCount - 1)
+            {
+                target.X = (float)windowSize.X;
+            }
+            if (site.Row == 0)
+            {
+                target.Y = -cardSize.Y;
+            }
+            else if (site.Row == Board.RowCount - 1)
+            {
+                target.Y = (float)windowSize.Y;
+            }
+            _animations.Add(card, target, 0.5f, cardAnimationCallback);
+            player.Hero.PlaceStatsCard(card);
+        }
 
-void Game::startPlayerRound()
-{
-    Player & player = players[activePlayerIndex];
-    sf::Vector2f size(270.0f, 100.0f);
-    sf::Vector2f position(0.0f, 370.0f);
-    std::stringstream ss;
-    ss << player.hero.getName() << std::endl;
-    ss << "Kroppspoäng: " << player.life << " / " << player.hero.getMaxLife();
-    buttons.emplace_back(std::make_unique<Mouse.Button>(ss.str(), size, position, 30));
-    board.setPlayerMoveSites(player.boardSite);
-    board.showMoveSites(true);
-    sf::Vector2u windowSize = window.getSize();
-    sf::Vector2f avatarCenter = board.getAvatarCenter(player.avatarIndex);
-    animations.add(board, correctBoardPosition({ windowSize.x / 2.0f - avatarCenter.x, windowSize.y / 2.0f - avatarCenter.y }), 0.75f, [] () { });
-}
+        private void MovePlayer(int index, Board.MoveSite moveSite, Action animationCallback)
+        {
+            Player player = _players[index];
+            player.BoardSite = moveSite;
+            _board.SetPlayerSite(player.AvatarIndex, moveSite, animationCallback);
+        }
+
+        private void OnNewPlayerPlaced()
+        {
+            if (_idleHeroes.Count == 0)
+            {
+                StartNewGame();
+            }
+            else
+            {
+                Vector2f buttonSize = new Vector2f(500.0f, 200.0f);
+                Vector2f buttonPosition = new Vector2f(_window.Size.X * 3.0f / 4.0f - buttonSize.X / 2.0f, _window.Size.Y * 3.0f / 4.0f - buttonSize.Y / 2.0f);
+                _buttons.Add(new Button("Låt äventyret börja!", buttonSize, buttonPosition, 60));
+                DisplayCards(GetHeroCards(), () => { });
+            }
+        }
+
+        private void OnPlayerMoved(Tile tile)
+        {
+            SetState(tile.Enter());
+        }
+
+        private void StartNewGame()
+        {
+            _board.ClearMoveSites();
+            //_random.shuffle(_players);
+            _activePlayerIndex = 0;
+            StartPlayerRound();
+        }
+
+        private void StartPlayerRound()
+        {
+            Player player = _players[_activePlayerIndex];
+            Vector2f size = new Vector2f(270.0f, 100.0f);
+            Vector2f position = new Vector2f(0.0f, 370.0f);
+            string heroInfo = player.Hero.Name + "\n" + "Kroppspoäng: " + player.Life + " / " + player.Hero.MaxLife;
+            _buttons.Add(new Button(heroInfo, size, position, 30));
+            _board.SetPlayerMoveSites(player.BoardSite);
+            _board.ShowMoveSites(true);
+            Vector2u windowSize = _window.Size;
+            Vector2f avatarCenter = _board.GetAvatarCenter(player.AvatarIndex);
+            _animations.Add(_board, CorrectBoardPosition(new Vector2f(windowSize.X / 2.0f - avatarCenter.X, windowSize.Y / 2.0f - avatarCenter.Y)), 0.75f, () => { });
+        }
 
 // Setup
 
-template<State state>
+template<State _state>
 struct StateHandlerInitializer
 {
     StateHandlerInitializer(Game& game)
                 : next(game)
     {
-        game.onBeginTable[int(state)] = &Game::onBegin<state>;
-        game.onTickTable[int(state)] = &Game::onTick<state>;
-        game.onLeftMouseClickTable[int(state)] = &Game::onLeftMouseClick<state>;
-        game.onEndTable[int(state)] = &Game::onEnd<state>;
+        game._onBeginTable[int(_state)] = &Game.onBegin<_state>;
+        game._onTickTable[int(_state)] = &Game.onTick<_state>;
+        game._onLeftMouseClickTable[int(_state)] = &Game.onLeftMouseClick<_state>;
+        game._onEndTable[int(_state)] = &Game.onEnd<_state>;
     }
 
-    StateHandlerInitializer<State(int(state) + 1)> next;
+    StateHandlerInitializer<State(int(_state) + 1)> next;
 };
 
 template<>
-struct StateHandlerInitializer<State::StateCount>
+struct StateHandlerInitializer<State.StateCount>
 {
     StateHandlerInitializer(Game& game)
     {
-        game.onBeginTable.resize(int(State::StateCount));
-        game.onTickTable.resize(int(State::StateCount));
-        game.onLeftMouseClickTable.resize(int(State::StateCount));
-        game.onEndTable.resize(int(State::StateCount));
+        game._onBeginTable.resize(int(State.StateCount));
+        game._onTickTable.resize(int(State.StateCount));
+        game._onLeftMouseClickTable.resize(int(State.StateCount));
+        game._onEndTable.resize(int(State.StateCount));
     }
 };
 
-void Game::createStateLogicMap()
+void Game.createStateLogicMap()
 {
-    StateHandlerInitializer<State::NoState>(*this);
+    StateHandlerInitializer<State.NoState>(*this);
 }
     }
 }

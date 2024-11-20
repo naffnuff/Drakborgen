@@ -72,7 +72,7 @@ namespace Drakborgen
             }
         }
 
-        private void Remove(Transformable transformable)
+        internal void Remove(Transformable transformable)
         {
             for (int i = 0; i < _animations.Count; ++i)
             {

@@ -9,6 +9,8 @@ namespace Drakborgen
 {
     internal class CardDisplay : Transformable, Drawable
     {
+        internal int CardCount { get { return _cards.Count; }}
+
         private Window _window;
         private List<Card> _cards;
 
@@ -30,12 +32,12 @@ namespace Drakborgen
 	return -1;
         }
 
-        void PushCard(Card card)
+        internal void PushCard(Card card)
         {
 	_cards.Add(card);
         }
 
-        Card PullCard(int index)
+        internal Card PullCard(int index)
         {
 	Card card = _cards[index];
 	_cards.RemoveAt(index);

@@ -700,7 +700,7 @@ void Game::placeNewPlayer(Board::Site site, std::function<void()> callback)
 	{
 		target.x = -cardSize.x;
 	}
-	else if (site.column == board.columnCount - 1)
+	else if (site.column == Board::columnCount - 1)
 	{
 		target.x = float(windowSize.x);
 	}
@@ -708,7 +708,7 @@ void Game::placeNewPlayer(Board::Site site, std::function<void()> callback)
 	{
 		target.y = -cardSize.y;
 	}
-	else if (site.row == board.rowCount - 1)
+	else if (site.row == Board::rowCount - 1)
 	{
 		target.y = float(windowSize.y);
 	}

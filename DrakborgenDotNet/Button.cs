@@ -11,7 +11,7 @@ namespace Drakborgen
 {
     internal class Button : Drawable
     {
-        private string ButtonText
+        internal string ButtonText
         {
 	get
 	{
@@ -27,34 +27,24 @@ namespace Drakborgen
         private Font _font;
         private RectangleShape _background;
 
-        Button(string message, Vector2f size, Vector2f position, uint textSize)
+        internal Button(string message, Vector2f size, Vector2f position, uint textSize)
         {
 	_font = new Font(Setup.MediaPath + "ITCBLKAD.TTF");
+            _text = new Text(message, _font, textSize);
+            _background = new RectangleShape();
 
-	_background.FillColor = Color.Black;
+            _background.FillColor = Color.Black;
 	_background.Position = position;
 	_background.Size = size;
 
-	// select the font
-	_text.Font = _font; // font is a sf::Font
-
-	// set the string to display
-	ButtonText = message;
-
-	// set the character size
-	_text.CharacterSize = textSize; // in pixels, not points!
-
-	// set the color
 	_text.FillColor = Color.Red;
-
-	// set the text style
 	_text.Style = Text.Styles.Bold;
 
 	Vector2f globalTextSize = _text.GetGlobalBounds().Size;
 	_text.Position = new Vector2f(position.X + size.X / 2.0f - globalTextSize.X / 2.0f, position.Y + size.Y / 2.0f - 45.0f);
         }
 
-        bool HitTest(Vector2f point)
+        internal bool HitTest(Vector2f point)
         {
 	FloatRect buttonRectangle = _background.GetGlobalBounds();
 	return buttonRectangle.Contains(point);

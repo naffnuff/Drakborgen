@@ -6,13 +6,21 @@ namespace Drakborgen
 {
     internal class Board : Transformable, Drawable
     {
+        internal Vector2f Size
+        {
+            get
+            {
+                return _boardSprite.GetLocalBounds().Size;
+            }
+        }
+
         private const float GridOriginX = 418.0f;
         private const float GridOriginY = 119.0f;
         private const float TileSize = 178.0f;
 
         internal readonly record struct Site(int Row, int Column);
 
-        internal readonly record struct MoveSite(Site Site, Direction Direction)
+        internal readonly record struct MoveSite(Site Site, Direction Direction = Direction.Invalid)
         {
 	internal MoveSite(int row, int column, Direction direction = Direction.Invalid)
 	    : this(new Site(row, column), direction)
@@ -22,14 +30,14 @@ namespace Drakborgen
 
         private record Player(Card Avatar)
         {
-	internal Site Site { get; set; } = _invalidSite;
+	internal Site Site { get; set; } = InvalidSite;
         }
 
-        private static readonly Site _invalidSite = new Site(-1, -1);
-        private static readonly MoveSite _invalidMoveSite = new MoveSite(_invalidSite, Direction.Invalid);
+        internal static readonly Site InvalidSite = new Site(-1, -1);
+        internal static readonly MoveSite InvalidMoveSite = new MoveSite(InvalidSite);
 
-        private const int RowCount = 10;
-        private const int ColumnCount = 13;
+        internal const int RowCount = 10;
+        internal const int ColumnCount = 13;
 
         private Sprite _boardSprite = new Sprite(new Texture(Setup.MediaPath + "spelplan.jpg"));
         private Sprite _vaultSprite = new Sprite(new Texture(Setup.MediaPath + "skattkammaren.png"));
@@ -45,17 +53,17 @@ namespace Drakborgen
 
         internal Board(AnimationManager animations)
         {
-            _animations = animations;
-            _vaultSprite.Position = GetSitePosition(new Site(4, 6));
-            _vaultSprite.Position += new Vector2f(0.0f, 10.0f);
-            //players.reserve(4);
+	_animations = animations;
+	_vaultSprite.Position = GetSitePosition(new Site(4, 6));
+	_vaultSprite.Position += new Vector2f(0.0f, 10.0f);
+	//players.reserve(4);
 
-            _tileGrid[0, 0] = new Tower(new List<Direction>() { Direction.East, Direction.South });
-            _tileGrid[0, ColumnCount - 1] = new Tower(new List<Direction>() { Direction.West, Direction.South });
-            _tileGrid[RowCount - 1, 0] = new Tower(new List<Direction>() { Direction.East, Direction.North });
-            _tileGrid[RowCount - 1, ColumnCount - 1] = new Tower(new List<Direction>() { Direction.West, Direction.North });
-            _tileGrid[4, 6] = Vault.MakeVault(Direction.North);
-            _tileGrid[5, 6] = Vault.MakeVault(Direction.South);
+	_tileGrid[0, 0] = new Tower(new List<Direction>() { Direction.East, Direction.South });
+	_tileGrid[0, ColumnCount - 1] = new Tower(new List<Direction>() { Direction.West, Direction.South });
+	_tileGrid[RowCount - 1, 0] = new Tower(new List<Direction>() { Direction.East, Direction.North });
+	_tileGrid[RowCount - 1, ColumnCount - 1] = new Tower(new List<Direction>() { Direction.West, Direction.North });
+	_tileGrid[4, 6] = Vault.MakeVault(Direction.North);
+	_tileGrid[5, 6] = Vault.MakeVault(Direction.South);
         }
 
 
@@ -97,15 +105,10 @@ namespace Drakborgen
 	return new Site((int)((position.Y - GridOriginY) / TileSize), (int)((position.X - GridOriginX) / TileSize));
         }
 
-        private Vector2f GetAvatarCenter(int index)
+        internal Vector2f GetAvatarCenter(int index)
         {
 	FloatRect bounds = _players[index].Avatar.GetGlobalBounds();
 	return new Vector2f(bounds.Left + bounds.Width / 2.0f, bounds.Top + bounds.Height / 2.0f);
-        }
-
-        internal Vector2f GetSize()
-        {
-	return _boardSprite.GetLocalBounds().Size;
         }
 
         private void SetGameStartMoveSites()
@@ -114,7 +117,7 @@ namespace Drakborgen
 	_moveSiteAnimationStartTime = 0.0f;
         }
 
-        private void SetPlayerMoveSites(MoveSite playerSite)
+        internal void SetPlayerMoveSites(MoveSite playerSite)
         {
 	foreach (List<Direction> exits in GetTile(playerSite.Site).GetExits(playerSite.Direction))
 	{
@@ -127,7 +130,7 @@ namespace Drakborgen
 	_moveSiteAnimationStartTime = 0.0f;
         }
 
-        private bool TestMoveSites(Vector2f position)
+        internal bool TestMoveSites(Vector2f position)
         {
 	if (!_moveSitesShown)
 	{
@@ -173,12 +176,12 @@ namespace Drakborgen
 	}
         }
 
-        private void ClearMoveSites()
+        internal void ClearMoveSites()
         {
 	_moveSites.Clear();
         }
 
-        private void ShowMoveSites(bool show)
+        internal void ShowMoveSites(bool show)
         {
 	_moveSitesShown = show;
 	if (show)
@@ -187,7 +190,7 @@ namespace Drakborgen
 	}
         }
 
-        private void AddPlayer(string imagePath, int index)
+        internal void AddPlayer(string imagePath, int index)
         {
 	if (_players.Count != index)
 	{
@@ -198,14 +201,14 @@ namespace Drakborgen
 	player.Avatar.Scale = new Vector2f(1.0f / 3.0f, 1.0f / 3.0f);
         }
 
-        private void SetPlayerSite(int index, MoveSite moveSite, Action callback)
+        internal void SetPlayerSite(int index, MoveSite moveSite, Action animationCallback)
         {
 	if (_players.Count <= index)
 	{
 	    throw new Exception();
 	}
 	_players[index].Site = moveSite.Site;
-	PlacePlayer(index, moveSite.Direction, callback);
+	PlacePlayer(index, moveSite.Direction, animationCallback);
         }
 
         void Drawable.Draw(RenderTarget target, RenderStates states)
@@ -242,7 +245,7 @@ namespace Drakborgen
 	return _tileGrid[site.Row, site.Column] != null;
         }
 
-        private Tile GetTile(Site site)
+        internal Tile GetTile(Site site)
         {
 	if (!HasTile(site))
 	{
@@ -256,7 +259,7 @@ namespace Drakborgen
 	return site.Row >= 0 && site.Row < RowCount && site.Column >= 0 && site.Column < ColumnCount;
         }
 
-        private void PlacePlayer(int index, Direction direction, Action callback)
+        private void PlacePlayer(int index, Direction direction, Action animationCallback)
 {
 	Player player = _players[index];
 	Vector2f sitePosition = GetSitePosition(player.Site);
@@ -264,11 +267,11 @@ namespace Drakborgen
 	Vector2f animationTarget = new Vector2f(sitePosition.X + TileSize / 2.0f - avatarSize.X / 2.0f, sitePosition.Y + TileSize / 2.0f - avatarSize.Y / 2.0f);
 	if (direction == Direction.Invalid)
 	{
-		float avatarStartX = animationTarget.X + (player.Site.Column == 0 ? -TileSize : TileSize) * 2.0f;
-		float avatarStartY = animationTarget.Y + (player.Site.Row == 0 ? -TileSize : TileSize);
-		player.Avatar.Position = new Vector2f(avatarStartX, avatarStartY);
+	    float avatarStartX = animationTarget.X + (player.Site.Column == 0 ? -TileSize : TileSize) * 2.0f;
+	    float avatarStartY = animationTarget.Y + (player.Site.Row == 0 ? -TileSize : TileSize);
+	    player.Avatar.Position = new Vector2f(avatarStartX, avatarStartY);
 	}
-	_animations.Add(player.Avatar, animationTarget, 0.5f, callback);
+	_animations.Add(player.Avatar, animationTarget, 0.5f, animationCallback);
 }
 
         private MoveSite CreateMoveSite(Site site, List<Direction> exits)

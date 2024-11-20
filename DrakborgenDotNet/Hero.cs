@@ -5,21 +5,20 @@ namespace Drakborgen
     internal class Hero
     {
         internal Card? StatsCard { get; private set; }
+        internal int MaxLife { get; init; }
+        internal string Id { get; init; }
+        internal string Name { get; init; }
 
-        private string _id;
-        private string _name;
-        private int _maxLife = 0;
-
-        Hero(string id, string name, int maxLife)
+        internal Hero(string id, string name, int maxLife)
         {
-            _id = id;
-	_name = name;
-	_maxLife = maxLife;
+            Id = id;
+	Name = name;
 
+            MaxLife = maxLife;
             StatsCard = new Card(Setup.MediaPath + "hjaltekort/" + id + ".png");
         }
 
-        Card PullStatsCard()
+        internal Card PullStatsCard()
         {
 	if (StatsCard == null)
 	{
@@ -30,7 +29,7 @@ namespace Drakborgen
 	return result;
         }
 
-        void PlaceStatsCard(Card card)
+        internal void PlaceStatsCard(Card card)
         {
             if (StatsCard != null)
             {
