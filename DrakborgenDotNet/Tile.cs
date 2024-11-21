@@ -36,7 +36,7 @@ namespace Drakborgen
 
         internal bool CanDraw()
         {
-            throw new NotImplementedException();
+            return _sprite != null;
         }
 
         internal void SetOrientation(Direction direction)

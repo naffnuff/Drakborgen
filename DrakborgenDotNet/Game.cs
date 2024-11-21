@@ -25,7 +25,7 @@ namespace Drakborgen
 
         private Network _network;
 
-        private Random _random;
+        private System.Random _random;
         private RenderWindow _window;
         private Board _board;
 
@@ -52,17 +52,17 @@ namespace Drakborgen
 
         private int _activePlayerIndex = -1;
 
-        private List<EventCallback> _onBeginTable;
-        private List<EventCallback> _onTickTable;
-        private List<EventCallback> _onLeftMouseClickTable;
-        private List<EventCallback> _onEndTable;
+        private EventCallback[] OnBeginTable {  get; set; }
+        private EventCallback[] OnTickTable { get; set; }
+        private EventCallback[] OnLeftMouseClickTable { get; set; }
+        private EventCallback[] OnEndTable { get; set; }
 
         private AnimationManager _animations;
 
         internal Game(Network network)
         {
             _network = network;
-            _random = new Random();
+            _random = new System.Random();
             _window = new RenderWindow(new VideoMode(1024, 768), "Drakborgen");
             _animations = new AnimationManager();
             _board = new Board(_animations);
@@ -123,7 +123,7 @@ namespace Drakborgen
                 int mouseOverItemIndex = GetMouseOverItemIndex(_buttonReleasedMousePosition);
                 if (mouseOverItemIndex == _capturedItemIndex)
                 {
-                    InvokeEventHandler(_onLeftMouseClickTable);
+                    InvokeEventHandler(OnLeftMouseClickTable);
                 }
             }
         }
@@ -197,13 +197,13 @@ namespace Drakborgen
                     //SetState(State.AwaitingConnection);
                 }
 
-                InvokeEventHandler(_onTickTable);
+                InvokeEventHandler(OnTickTable);
 
                 _animations.Update(timestamp, timeDelta);
 
                 _board.Update(timestamp, timeDelta);
 
-                ProcessSystemEvents();
+                //ProcessSystemEvents();
 
                 _window.Clear();
 
@@ -232,7 +232,7 @@ namespace Drakborgen
             }
         }
 
-        private void InvokeEventHandler(List<EventCallback> eventTable)
+        private void InvokeEventHandler(EventCallback[] eventTable)
         {
             EventCallback callback = eventTable[(int)_state];
             callback(this);
@@ -242,9 +242,9 @@ namespace Drakborgen
         {
             if (newState != _state)
             {
-                InvokeEventHandler(_onEndTable);
+                InvokeEventHandler(OnEndTable);
                 _state = newState;
-                InvokeEventHandler(_onBeginTable);
+                InvokeEventHandler(OnBeginTable);
             }
         }
 
@@ -386,7 +386,7 @@ namespace Drakborgen
         {
             if (_capturedItemIndex == 0)
             {
-                _network.StartClient(/*_buttons[1]->getText(), */_buttons[2].ButtonText;
+                _network.StartClient(/*_buttons[1]->getText(), */_buttons[2].ButtonText);
                 SetState(State.NoState);
             }
         }
@@ -413,7 +413,7 @@ namespace Drakborgen
 
         private void OnEnd_AwaitingConnection()
         {
-            _buttons.clear();
+            _buttons.Clear();
         }
 
         private void OnBegin_SetupGame()
@@ -796,38 +796,60 @@ namespace Drakborgen
             _animations.Add(_board, CorrectBoardPosition(new Vector2f(windowSize.X / 2.0f - avatarCenter.X, windowSize.Y / 2.0f - avatarCenter.Y)), 0.75f, () => { });
         }
 
-// Setup
+        // Setup
 
-template<State _state>
-struct StateHandlerInitializer
-{
-    StateHandlerInitializer(Game& game)
-                : next(game)
-    {
-        game._onBeginTable[int(_state)] = &Game.onBegin<_state>;
-        game._onTickTable[int(_state)] = &Game.onTick<_state>;
-        game._onLeftMouseClickTable[int(_state)] = &Game.onLeftMouseClick<_state>;
-        game._onEndTable[int(_state)] = &Game.onEnd<_state>;
-    }
+        private class StateHandlerInitializer
+        {
+            internal StateHandlerInitializer(Game game, State state)
+            {
+                if (state == State.StateCount)
+                {
+                    int size = (int)State.StateCount;
+                    game.OnBeginTable = new EventCallback[size];
+                    game.OnTickTable = new EventCallback[size];
+                    game.OnLeftMouseClickTable = new EventCallback[size];
+                    game.OnEndTable = new EventCallback[size];
+                }
+                else
+                {
+                    _next = new StateHandlerInitializer(game, state + 1);
 
-    StateHandlerInitializer<State(int(_state) + 1)> next;
-};
+                    game.CreateStateHandler("OnBegin", state);
+                    game.CreateStateHandler("OnTick", state);
+                    game.CreateStateHandler("OnLeftMouseClick", state);
+                    game.CreateStateHandler("OnEnd", state);
+                }
+            }
 
-template<>
-struct StateHandlerInitializer<State.StateCount>
-{
-    StateHandlerInitializer(Game& game)
-    {
-        game._onBeginTable.resize(int(State.StateCount));
-        game._onTickTable.resize(int(State.StateCount));
-        game._onLeftMouseClickTable.resize(int(State.StateCount));
-        game._onEndTable.resize(int(State.StateCount));
-    }
-};
+            private StateHandlerInitializer? _next;
+        }
 
-void Game.createStateLogicMap()
-{
-    StateHandlerInitializer<State.NoState>(*this);
-}
+        private void CreateStateHandler(string eventName, State state)
+        {
+            Type? type = GetType();
+            string fieldName = eventName + "Table";
+            FieldInfo? field = type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+            EventCallback[]? table = field?.GetValue(this) as EventCallback[];
+            if (table == null)
+            {
+                Console.WriteLine(fieldName);
+                throw new Exception(fieldName + " not found");
+            }
+            string methodName = eventName + "_" + state.ToString();
+            string methodOtherName = eventName + "_" + Enum.GetName(state);
+            MethodInfo? method = type.GetMethod(methodName);
+            if (method == null)
+            {
+                Console.WriteLine(methodName);
+                Console.WriteLine(methodOtherName);
+                throw new Exception();
+            }
+            table[(int)state] = (EventCallback)Delegate.CreateDelegate(typeof(EventCallback), this, method);
+        }
+
+        private void CreateStateLogicMap()
+        {
+            new StateHandlerInitializer(this, State.NoState);
+        }
     }
 }

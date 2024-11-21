@@ -100,7 +100,7 @@ namespace Drakborgen
 	return new Vector2f(GridOriginX + TileSize * site.Column, GridOriginY + TileSize * site.Row);
         }
 
-        private Site GetSite(Vector2f position)
+        internal Site GetSite(Vector2f position)
         {
 	return new Site((int)((position.Y - GridOriginY) / TileSize), (int)((position.X - GridOriginX) / TileSize));
         }
@@ -111,7 +111,7 @@ namespace Drakborgen
 	return new Vector2f(bounds.Left + bounds.Width / 2.0f, bounds.Top + bounds.Height / 2.0f);
         }
 
-        private void SetGameStartMoveSites()
+        internal void SetGameStartMoveSites()
         {
 	_moveSites = new List<MoveSite>() { new MoveSite(0, 0), new MoveSite(0, ColumnCount - 1), new MoveSite(RowCount - 1, 0), new MoveSite(RowCount - 1, ColumnCount - 1) };
 	_moveSiteAnimationStartTime = 0.0f;
@@ -147,7 +147,7 @@ namespace Drakborgen
 	return false;
         }
 
-        private MoveSite GetMoveSite(Vector2f position)
+        internal MoveSite GetMoveSite(Vector2f position)
         {
 	if (!_moveSitesShown)
 	{
@@ -164,7 +164,7 @@ namespace Drakborgen
 	throw new Exception();
         }
 
-        private void RemoveMoveSite(Site site)
+        internal void RemoveMoveSite(Site site)
         {
 	for (int i = 0; i < _moveSites.Count; i++)
 	{
@@ -240,7 +240,7 @@ namespace Drakborgen
 	}
         }
 
-        private bool HasTile(Site site)
+        internal bool HasTile(Site site)
         {
 	return _tileGrid[site.Row, site.Column] != null;
         }

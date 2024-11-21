@@ -125,7 +125,7 @@ namespace Drakborgen
             int[] _playerOrder;
             int _activePlayerIndex = 0;
 
-            internal NetworkServer(Network network, int clientCount, Random random)
+            internal NetworkServer(Network network, int clientCount, System.Random random)
             {
                 _network = network;
                 _clients = new Client[clientCount];
@@ -259,7 +259,7 @@ namespace Drakborgen
             }
         }
 
-        internal void StartServer(int clientCount, Random random)
+        internal void StartServer(int clientCount, System.Random random)
         {
             IsConnected = false;
             _networkHost = new NetworkServer(this, clientCount, random);
