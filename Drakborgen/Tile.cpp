@@ -44,9 +44,7 @@ void Tile::transposeExits(std::vector<std::vector<Direction>>& exits) const
 	{
 		for (Direction& direction : exit)
 		{
-			std::cout << "Exit before transpose: " << direction << std::endl;
 			direction = applyOrientation(direction, false);
-			std::cout << "Exit after transpose: " << direction << std::endl;
 		}
 	}
 	std::cout << imagePath << std::endl;

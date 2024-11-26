@@ -74,9 +74,7 @@ namespace Drakborgen
             {
                 for (int i = 0; i < exit.Count; ++i)
                 {
-                    Console.WriteLine("Exit before transpose: " + exit[i]);
                     exit[i] = ApplyOrientation(exit[i], false);
-                    Console.WriteLine("Exit after transpose: " + exit[i]);
                 }
             }
             Console.WriteLine(_imagePath);

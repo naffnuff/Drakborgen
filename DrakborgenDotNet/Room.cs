@@ -30,7 +30,6 @@ namespace Drakborgen
 
         internal override State Enter()
         {
-
             Console.WriteLine(" -> turn end");
             return State.TurnEnd;
         }
