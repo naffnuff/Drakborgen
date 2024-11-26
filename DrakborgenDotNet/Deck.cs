@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,7 +13,7 @@ namespace Drakborgen
         private List<T> _items;
         private Random _random;
 
-        internal Deck(int capacity, System.Random random)
+        internal Deck(int capacity, Random random)
         {
             _capacity = capacity;
             _random = random;
@@ -21,13 +22,12 @@ namespace Drakborgen
 
         void shuffle()
         {
-            _random.Shuffle(items);
+            _random.Shuffle(CollectionsMarshal.AsSpan(_items));
         }
 
         internal void CreateItem<ItemType>(string imagePath, List<Direction>? exits) where ItemType : class, T
         {
-            ItemType? item = Activator.CreateInstance(typeof(ItemType), imagePath, exits) as ItemType;
-            if (item == null)
+            if (Activator.CreateInstance(typeof(ItemType), [imagePath, exits]) is not ItemType item)
             {
                 throw new Exception();
             }
@@ -38,24 +38,24 @@ namespace Drakborgen
             }
         }
 
-        bool isEmpty() const
-	{
-		return items.size() == 0;
-	}
+        private bool IsEmpty()
+        {
+            return _items.Count == 0;
+        }
 
-    internal bool IsFull()
+        internal bool IsFull()
         {
             return _items.Count == _capacity;
         }
 
-        std::unique_ptr<T> pullNextItem()
+        internal T PullNextItem()
         {
-            if (items.size() == 0)
+            if (IsEmpty())
             {
-                THROW;
+                throw new Exception();
             }
-            std::unique_ptr<T> item = std::move(items.front());
-            items.erase(items.begin());
+            T item = _items.First();
+            _items.RemoveAt(0);
             //std::unique_ptr<T> item = std::move(items.back());
             //items.pop_back();
             return item;

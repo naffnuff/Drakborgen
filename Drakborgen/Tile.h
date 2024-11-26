@@ -45,3 +45,25 @@ private:
 
 	Direction orientation = Direction::North;
 };
+
+inline std::ostream& operator<<(std::ostream& o, Direction direction)
+{
+	std::string name;
+	switch (direction)
+	{
+	case Direction::Invalid:
+		return o << "Invalid";
+	case Direction::North:
+		return o << "North";
+	case Direction::East:
+		return o << "East";
+	case Direction::South:
+		return o << "South";
+	case Direction::West:
+		return o << "West";
+	case Direction::Count:
+		return o << "Count";
+	default:
+		return o;
+	}
+}

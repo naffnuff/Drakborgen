@@ -10,8 +10,19 @@
             _exits = new List<List<Direction>>(exits.Count);
             foreach (Direction exit in exits)
             {
-                _exits.Add(new List<Direction>() { exit });
+                _exits.Add([exit]);
             }
+        }
+
+        internal override List<List<Direction>> GetExits(Direction direction)
+        {
+            return _exits;
+        }
+
+        internal override State Enter()
+        {
+            Console.WriteLine(" -> turn continue");
+            return State.TurnContinue;
         }
     }
 }

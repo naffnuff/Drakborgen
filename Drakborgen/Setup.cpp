@@ -33,7 +33,7 @@ void Setup::createTiles(TileDeck& tiles)
 	createTile<Room>(tiles, "017", Direction::North, Direction::East, Direction::South, Direction::West);
 	createTile<Room>(tiles, "018", Direction::North, Direction::South);
 	createTile<Room>(tiles, "019", Direction::South);
-	createTile<Room>(tiles, "020", Direction::North, Direction::East, Direction::South, Direction::West);
+	createTile<Room>(tiles, "020", Direction::North, Direction::South, Direction::West);
 	createTile<Corridor>(tiles, "021", Direction::South, Direction::East);
 	createTile<Room>(tiles, "022", Direction::North, Direction::East, Direction::South, Direction::West);
 	createTile<Room>(tiles, "023", Direction::East, Direction::South, Direction::West);

@@ -58,10 +58,10 @@ namespace Drakborgen
 	_vaultSprite.Position += new Vector2f(0.0f, 10.0f);
 	//players.reserve(4);
 
-	_tileGrid[0, 0] = new Tower(new List<Direction>() { Direction.East, Direction.South });
-	_tileGrid[0, ColumnCount - 1] = new Tower(new List<Direction>() { Direction.West, Direction.South });
-	_tileGrid[RowCount - 1, 0] = new Tower(new List<Direction>() { Direction.East, Direction.North });
-	_tileGrid[RowCount - 1, ColumnCount - 1] = new Tower(new List<Direction>() { Direction.West, Direction.North });
+	_tileGrid[0, 0] = new Tower([Direction.East, Direction.South]);
+	_tileGrid[0, ColumnCount - 1] = new Tower([Direction.West, Direction.South]);
+	_tileGrid[RowCount - 1, 0] = new Tower([Direction.East, Direction.North ]);
+	_tileGrid[RowCount - 1, ColumnCount - 1] = new Tower([Direction.West, Direction.North]);
 	_tileGrid[4, 6] = Vault.MakeVault(Direction.North);
 	_tileGrid[5, 6] = Vault.MakeVault(Direction.South);
         }
@@ -84,7 +84,7 @@ namespace Drakborgen
 	_clickOverlay.FillColor = new Color((byte)(0x80 + 0x7f * fraction), (byte)(0x80 + 0x7f * fraction), (byte)(0x80 + 0x7f * fraction), (byte)(0xff * fraction));
         }
 
-        private void PlaceTile(Tile tile, MoveSite moveSite)
+        internal void PlaceTile(Tile tile, MoveSite moveSite)
         {
 	if (HasTile(moveSite.Site) || !WithinBounds(moveSite.Site))
 	{
@@ -113,7 +113,7 @@ namespace Drakborgen
 
         internal void SetGameStartMoveSites()
         {
-	_moveSites = new List<MoveSite>() { new MoveSite(0, 0), new MoveSite(0, ColumnCount - 1), new MoveSite(RowCount - 1, 0), new MoveSite(RowCount - 1, ColumnCount - 1) };
+	_moveSites = [new MoveSite(0, 0), new MoveSite(0, ColumnCount - 1), new MoveSite(RowCount - 1, 0), new MoveSite(RowCount - 1, ColumnCount - 1)];
 	_moveSiteAnimationStartTime = 0.0f;
         }
 
@@ -218,7 +218,7 @@ namespace Drakborgen
 	target.Draw(_vaultSprite, states);
 	foreach (Tile tile in _tileGrid)
 	{
-	    if (tile.CanDraw())
+	    if (tile != null && tile.CanDraw())
 	    {
 	        target.Draw(tile, states);
 	    }
@@ -242,7 +242,9 @@ namespace Drakborgen
 
         internal bool HasTile(Site site)
         {
-	return _tileGrid[site.Row, site.Column] != null;
+	Console.WriteLine(site.Row + ":" + site.Column);
+            Console.WriteLine(_tileGrid.Length);
+            return _tileGrid[site.Row, site.Column] != null;
         }
 
         internal Tile GetTile(Site site)

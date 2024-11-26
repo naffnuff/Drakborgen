@@ -114,9 +114,9 @@ namespace Drakborgen
 
         private class NetworkServer : INetworkHost
         {
-            private record Client(TcpSocket Socket, bool Connected = false)
+            private record Client(TcpSocket Socket, bool IsConnected = false)
             {
-                internal bool Connected { get; set; }
+                internal bool IsConnected { get; set; } = IsConnected;
             }
 
             Network _network;
@@ -125,7 +125,7 @@ namespace Drakborgen
             int[] _playerOrder;
             int _activePlayerIndex = 0;
 
-            internal NetworkServer(Network network, int clientCount, System.Random random)
+            internal NetworkServer(Network network, int clientCount, Random random)
             {
                 _network = network;
                 _clients = new Client[clientCount];
@@ -160,7 +160,7 @@ namespace Drakborgen
                             {
                                 Client client = _clients[i];
 
-                                while (!client.Connected)
+                                while (!client.IsConnected)
                                 {
                                     Console.WriteLine("Connecting client " + i);
 
@@ -168,7 +168,7 @@ namespace Drakborgen
 
                                     Console.WriteLine("Client " + i + " connected with status " + Enum.GetName(status));
 
-                                    client.Connected = status == TcpSocket.Status.Done;
+                                    client.IsConnected = status == TcpSocket.Status.Done;
                                 }
                             }
 
@@ -189,9 +189,9 @@ namespace Drakborgen
 
                                 Console.WriteLine("received " + received + " bytes from client " + i + " with status " + Enum.GetName(status) + ", " + data + " was the message");
 
-                                client.Connected = status == TcpSocket.Status.Done;
+                                client.IsConnected = status == TcpSocket.Status.Done;
 
-                                if (!client.Connected)
+                                if (!client.IsConnected)
                                 {
                                     _network.IsConnected = false;
                                 }
@@ -241,7 +241,7 @@ namespace Drakborgen
                         {
                             Thread.Sleep(2000);
 
-                            char[] data = { 'g' };
+                            char[] data = ['g'];
                             int sent = 0;
                             TcpSocket.Status status = _serverSocket.Send(data, 1, sent);
                             Console.WriteLine("sent " + sent + " bytes with status " + Enum.GetName(status));
@@ -259,7 +259,7 @@ namespace Drakborgen
             }
         }
 
-        internal void StartServer(int clientCount, System.Random random)
+        internal void StartServer(int clientCount, Random random)
         {
             IsConnected = false;
             _networkHost = new NetworkServer(this, clientCount, random);

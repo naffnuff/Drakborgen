@@ -17,15 +17,19 @@ namespace Drakborgen
 {
     internal class Game
     {
-        private delegate void EventCallback(Game game);
+        private delegate void EventCallback();
 
-        private record struct Player(Hero Hero, Board.MoveSite BoardSite, int Life = 0, int AvatarIndex = 0);
+        private record Player(Hero Hero, Board.MoveSite BoardSite, int Life = 0, int AvatarIndex = 0)
+        {
+            internal Board.MoveSite BoardSite { get; set; } = BoardSite;
+            internal int AvatarIndex { get; set; } = AvatarIndex;
+        }
 
         internal Deck<Tile> Tiles { get; }
 
         private Network _network;
 
-        private System.Random _random;
+        private Random _random;
         private RenderWindow _window;
         private Board _board;
 
@@ -62,8 +66,9 @@ namespace Drakborgen
         internal Game(Network network)
         {
             _network = network;
-            _random = new System.Random();
-            _window = new RenderWindow(new VideoMode(1024, 768), "Drakborgen");
+            _random = new Random();
+            //_window = new RenderWindow(new VideoMode(1024, 768), "Drakborgen");
+            _window = new RenderWindow(VideoMode.DesktopMode, "Drakborgen");
             _animations = new AnimationManager();
             _board = new Board(_animations);
             _cardDisplay = new CardDisplay(_window);
@@ -91,18 +96,22 @@ namespace Drakborgen
             _board.Position = boardPosition;
 
             _window.Closed += OnWindowClosed;
-            _window.MouseButtonPressed += MouseButtonPressed;
+            _window.MouseButtonPressed += OnMouseButtonPressed;
             _window.MouseButtonReleased += OnMouseButtonReleased;
             _window.MouseMoved += OnMouseMoved;
+
+            CreateStateLogicMap();
         }
 
         private void OnWindowClosed(object? sender, EventArgs e)
         {
+            Console.WriteLine("OnWindowClosed");
             _window.Close();
         }
 
-        private void MouseButtonPressed(object? sender, MouseButtonEventArgs e)
+        private void OnMouseButtonPressed(object? sender, MouseButtonEventArgs e)
         {
+            Console.WriteLine("OnMouseButtonPressed");
             if (e.Button == Mouse.Button.Left)
             {
                 _leftMouseButtonDown = true;
@@ -115,6 +124,7 @@ namespace Drakborgen
 
         private void OnMouseButtonReleased(object? sender, MouseButtonEventArgs e)
         {
+            Console.WriteLine("OnMouseButtonReleased");
             if (e.Button == Mouse.Button.Left && _leftMouseButtonDown)
             {
                 _leftMouseButtonDown = false;
@@ -204,6 +214,7 @@ namespace Drakborgen
                 _board.Update(timestamp, timeDelta);
 
                 //ProcessSystemEvents();
+                _window.DispatchEvents();
 
                 _window.Clear();
 
@@ -235,7 +246,7 @@ namespace Drakborgen
         private void InvokeEventHandler(EventCallback[] eventTable)
         {
             EventCallback callback = eventTable[(int)_state];
-            callback(this);
+            callback();
         }
 
         private void SetState(State newState)
@@ -506,8 +517,10 @@ namespace Drakborgen
                         Tile tile = Tiles.PullNextItem();
                         _board.PlaceTile(tile, moveSite);
                     }
-                    Tile tile = _board.GetTile(moveSite.Site);
-                    MovePlayer(_activePlayerIndex, moveSite, () => { OnPlayerMoved(tile); });
+                    {
+                        Tile tile = _board.GetTile(moveSite.Site);
+                        MovePlayer(_activePlayerIndex, moveSite, () => { OnPlayerMoved(tile); });
+                    }
                     _board.ClearMoveSites();
                     // setting new _state async
                 }
@@ -607,7 +620,7 @@ namespace Drakborgen
 
         private List<Card> GetHeroCards()
         {
-            List<Card> heroCards;
+            List<Card> heroCards = new List<Card>();
             foreach (Hero hero in _idleHeroes)
             {
                 heroCards.Add(hero.PullStatsCard());
@@ -624,7 +637,7 @@ namespace Drakborgen
 
         private void DisplayCards(List<Card> cards, Action callback)
         {
-            List<Vector2f> layout = _cardDisplay.GetLayout(cards);
+            Vector2f[] layout = _cardDisplay.GetLayout(cards);
             for (int i = 0; i < cards.Count; ++i)
             {
                 PlaceAtOrigin(cards[i]);
@@ -653,11 +666,11 @@ namespace Drakborgen
                 Board.Site lastSite = _players.Last().BoardSite.Site;
                 int oppositeRow = lastSite.Row == 0 ? Board.RowCount - 1 : 0;
                 int oppositeColumn = lastSite.Column == 0 ? Board.ColumnCount - 1 : 0;
-                List<Board.Site> candidates = new List<Board.Site> {
+                List<Board.Site> candidates = [
                     new Board.Site(oppositeRow, oppositeColumn),
                     new Board.Site(lastSite.Row, oppositeColumn),
                     new Board.Site(oppositeRow, lastSite.Column)
-                };
+                ];
                 //_random.shuffle(candidates);
                 foreach (Board.Site candidate in candidates)
                 {
@@ -828,23 +841,20 @@ namespace Drakborgen
         {
             Type? type = GetType();
             string fieldName = eventName + "Table";
-            FieldInfo? field = type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
-            EventCallback[]? table = field?.GetValue(this) as EventCallback[];
-            if (table == null)
+            PropertyInfo? property = type.GetProperty(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+            EventCallback[]? table = property?.GetValue(this) as EventCallback[] ?? throw new Exception(fieldName + " not found");
+
+            string methodName = eventName + "_" + Enum.GetName(state);
+            if (type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance) is MethodInfo method)
             {
-                Console.WriteLine(fieldName);
-                throw new Exception(fieldName + " not found");
+                Console.WriteLine("Found " + methodName);
+                table[(int)state] = (EventCallback)Delegate.CreateDelegate(typeof(EventCallback), this, method);
             }
-            string methodName = eventName + "_" + state.ToString();
-            string methodOtherName = eventName + "_" + Enum.GetName(state);
-            MethodInfo? method = type.GetMethod(methodName);
-            if (method == null)
+            else
             {
-                Console.WriteLine(methodName);
-                Console.WriteLine(methodOtherName);
-                throw new Exception();
+                Console.Error.WriteLine("Did not find " + methodName);
+                table[(int)state] = () => { };
             }
-            table[(int)state] = (EventCallback)Delegate.CreateDelegate(typeof(EventCallback), this, method);
         }
 
         private void CreateStateLogicMap()

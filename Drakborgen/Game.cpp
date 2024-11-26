@@ -9,8 +9,8 @@
 
 Game::Game()
 #if BLESS_THIS_MESS
-	//: window(sf::VideoMode::getDesktopMode(), "Drakborgen")
-	: window(sf::VideoMode(1024, 768), "Drakborgen")
+	: window(sf::VideoMode::getDesktopMode(), "Drakborgen")
+	//: window(sf::VideoMode(1024, 768), "Drakborgen")
 #else
 	: window(sf::VideoMode::getDesktopMode(), "Drakborgen", sf::Style::Fullscreen)
 #endif // BLESS_THIS_MESS

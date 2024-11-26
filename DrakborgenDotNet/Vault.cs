@@ -17,31 +17,40 @@ namespace Drakborgen
             {
                 case Direction.North:
                     return new Vault(
-                        new List<List<Direction>>()
-                        {
-                            new List<Direction>() { Direction.North },
-                            new List<Direction>() { Direction.East },
-                            new List<Direction>() { Direction.West },
-                            new List<Direction>() { Direction.South, Direction.East },
-                            new List<Direction>() { Direction.South, Direction.South },
-                            new List<Direction>() { Direction.South, Direction.West }
-                        }
+                        [
+                            [Direction.North],
+                            [Direction.East],
+                            [Direction.West],
+                            [Direction.South, Direction.East],
+                            [Direction.South, Direction.South],
+                            [Direction.South, Direction.West]
+                        ]
                     );
                 case Direction.South:
                     return new Vault(
-                        new List<List<Direction>>()
-                        {
-                            new List<Direction>() { Direction.South },
-                            new List<Direction>() { Direction.East },
-                            new List<Direction>() { Direction.West },
-                            new List<Direction>() { Direction.North, Direction.East },
-                            new List<Direction>() { Direction.North, Direction.North },
-                            new List<Direction>() { Direction.North, Direction.West }
-                        }
+                        [
+                            [Direction.South],
+                            [Direction.East],
+                            [Direction.West],
+                            [Direction.North, Direction.East],
+                            [Direction.North, Direction.North],
+                            [Direction.North, Direction.West]
+                        ]
                     );
                 default:
                     throw new Exception();
             }
+        }
+
+        internal override List<List<Direction>> GetExits(Direction direction)
+        {
+            return _exits;
+        }
+
+        internal override State Enter()
+        {
+            Console.WriteLine(" -> turn end");
+            return State.TurnEnd;
         }
     }
 }

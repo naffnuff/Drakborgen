@@ -209,6 +209,7 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
 bool Board::hasTile(Site site) const
 {
+	std::cout << site.row << ":" << site.column << std::endl;
 	return tileGrid[site.row][site.column] != nullptr;
 }
 

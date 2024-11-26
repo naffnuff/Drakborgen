@@ -63,18 +63,20 @@ namespace Drakborgen
             }
         }
 
-        private Direction ApplyOrientation(Direction direction, bool invert)
+        protected Direction ApplyOrientation(Direction direction, bool invert)
         {
             return (Direction)(((int)direction + (invert ? -(int)_orientation : (int)_orientation)) % (int)Direction.Count);
         }
 
-        private void TransposeExits(List<List<Direction>> exits)
+        protected void TransposeExits(List<List<Direction>> exits)
         {
             foreach (List<Direction> exit in exits)
             {
                 for (int i = 0; i < exit.Count; ++i)
                 {
+                    Console.WriteLine("Exit before transpose: " + exit[i]);
                     exit[i] = ApplyOrientation(exit[i], false);
+                    Console.WriteLine("Exit after transpose: " + exit[i]);
                 }
             }
             Console.WriteLine(_imagePath);
