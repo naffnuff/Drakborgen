@@ -5,7 +5,7 @@
             "name": "Debug",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/out/build/default/DrakborgenCpp.exe",
+            "program": "${workspaceFolder}/out/build/default/Drakborgen.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/out/build/default",
