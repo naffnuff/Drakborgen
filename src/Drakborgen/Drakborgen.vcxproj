@@ -130,50 +130,50 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Animation.cpp" />
-    <ClCompile Include="src\Board.cpp" />
-    <ClCompile Include="src\Button.cpp" />
-    <ClCompile Include="src\Card.cpp" />
-    <ClCompile Include="src\CardDisplay.cpp" />
-    <ClCompile Include="src\Corridor.cpp" />
-    <ClCompile Include="src\Game.cpp" />
-    <ClCompile Include="src\Hero.cpp" />
-    <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Network.cpp" />
-    <ClCompile Include="src\Random.cpp" />
-    <ClCompile Include="src\Room.cpp" />
-    <ClCompile Include="src\Setup.cpp" />
-    <ClCompile Include="src\SplitRoom.cpp" />
-    <ClCompile Include="src\System.cpp" />
-    <ClCompile Include="src\Tile.cpp" />
-    <ClCompile Include="src\Tower.cpp" />
-    <ClCompile Include="src\UniqueSprite.cpp" />
-    <ClCompile Include="src\Vault.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\Animation.h" />
-    <ClInclude Include="src\Board.h" />
-    <ClInclude Include="src\Button.h" />
-    <ClInclude Include="src\Card.h" />
-    <ClInclude Include="src\CardDisplay.h" />
-    <ClInclude Include="src\Corridor.h" />
-    <ClInclude Include="src\Deck.h" />
-    <ClInclude Include="src\Game.h" />
-    <ClInclude Include="src\Hero.h" />
-    <ClInclude Include="src\Network.h" />
-    <ClInclude Include="src\Random.h" />
-    <ClInclude Include="src\Room.h" />
-    <ClInclude Include="src\Setup.h" />
-    <ClInclude Include="src\SplitRoom.h" />
-    <ClInclude Include="src\State.h" />
-    <ClInclude Include="src\System.h" />
-    <ClInclude Include="src\Tile.h" />
-    <ClInclude Include="src\Tower.h" />
-    <ClInclude Include="src\UniqueSprite.h" />
-    <ClInclude Include="src\Vault.h" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="vcpkg.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="Board.h" />
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="Card.h" />
+    <ClInclude Include="CardDisplay.h" />
+    <ClInclude Include="Corridor.h" />
+    <ClInclude Include="Deck.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="Hero.h" />
+    <ClInclude Include="Network.h" />
+    <ClInclude Include="Random.h" />
+    <ClInclude Include="Room.h" />
+    <ClInclude Include="Setup.h" />
+    <ClInclude Include="SplitRoom.h" />
+    <ClInclude Include="State.h" />
+    <ClInclude Include="System.h" />
+    <ClInclude Include="Tile.h" />
+    <ClInclude Include="Tower.h" />
+    <ClInclude Include="UniqueSprite.h" />
+    <ClInclude Include="Vault.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Card.cpp" />
+    <ClCompile Include="CardDisplay.cpp" />
+    <ClCompile Include="Corridor.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Hero.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Network.cpp" />
+    <ClCompile Include="Random.cpp" />
+    <ClCompile Include="Room.cpp" />
+    <ClCompile Include="Setup.cpp" />
+    <ClCompile Include="SplitRoom.cpp" />
+    <ClCompile Include="System.cpp" />
+    <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="Tower.cpp" />
+    <ClCompile Include="UniqueSprite.cpp" />
+    <ClCompile Include="Vault.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
