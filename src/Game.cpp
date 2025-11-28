@@ -789,14 +789,10 @@ struct StateHandlerInitializer
 };
 
 template<>
-struct StateHandlerInitializer<State::StateCount>
+struct StateHandlerInitializer<State::Count>
 {
-	StateHandlerInitializer(Game& game)
+	StateHandlerInitializer(Game&)
 	{
-		game.onBeginTable.resize(int(State::StateCount));
-		game.onTickTable.resize(int(State::StateCount));
-		game.onLeftMouseClickTable.resize(int(State::StateCount));
-		game.onEndTable.resize(int(State::StateCount));
 	}
 };
 

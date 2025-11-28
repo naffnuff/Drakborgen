@@ -14,5 +14,5 @@ enum class State
 	ViewStatsCard,
 	TurnContinue,
 	TurnEnd,
-	StateCount
+	Count
 };

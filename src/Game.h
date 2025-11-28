@@ -43,7 +43,7 @@ public:
 private:
 	void processSystemEvents();
 
-	using EventTable = std::vector<std::function<void(Game&)>>;
+	using EventTable = std::array<std::function<void(Game&)>, (size_t)State::Count>;
 	void invokeEventHandler(const EventTable& eventTable);
 
 	void setState(State newState);
