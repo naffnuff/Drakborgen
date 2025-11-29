@@ -135,9 +135,12 @@
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Board.h" />
-    <ClInclude Include="Button.h" />
+    <ClInclude Include="MainMenu.h" />
+    <ClInclude Include="StateHandlerInitializer.h" />
+    <ClInclude Include="TextBox.h" />
     <ClInclude Include="Card.h" />
     <ClInclude Include="CardDisplay.h" />
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Corridor.h" />
     <ClInclude Include="Deck.h" />
     <ClInclude Include="Game.h" />
@@ -153,13 +156,17 @@
     <ClInclude Include="Tower.h" />
     <ClInclude Include="UniqueSprite.h" />
     <ClInclude Include="Vault.h" />
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="Visual.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Board.cpp" />
-    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="CardDisplay.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Corridor.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Hero.cpp" />
@@ -174,6 +181,7 @@
     <ClCompile Include="Tower.cpp" />
     <ClCompile Include="UniqueSprite.cpp" />
     <ClCompile Include="Vault.cpp" />
+    <ClCompile Include="Engine.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

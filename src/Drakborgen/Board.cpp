@@ -1,13 +1,15 @@
 #include "Board.h"
 
-#include <iostream>
-#include <vector>
-
 #include "System.h"
+#include "Engine.h"
 #include "Tile.h"
 #include "Tower.h"
 #include "Vault.h"
 #include "Setup.h"
+#include "Animation.h"
+
+#include <iostream>
+#include <vector>
 
 Board::Board(AnimationManager& animations)
 	: clickOverlay(sf::Vector2f(tileSize, tileSize))
@@ -66,7 +68,7 @@ Board::Site Board::getSite(sf::Vector2f position) const
 
 sf::Vector2f Board::getAvatarCenter(int index) const
 {
-	sf::FloatRect bounds = players[index].avatar->getGlobalBounds();
+	sf::FloatRect bounds = players[index].avatar->getBounds();
 	return { bounds.left + bounds.width / 2.0f, bounds.top + bounds.height / 2.0f };
 }
 
@@ -231,7 +233,7 @@ void Board::placePlayer(int index, Direction direction, std::function<void()> ca
 {
 	Player& player = players[index];
 	sf::Vector2f sitePosition = getSitePosition(player.site);
-	sf::Vector2f avatarSize = player.avatar->getGlobalBounds().getSize();
+	sf::Vector2f avatarSize = player.avatar->getBounds().getSize();
 	sf::Vector2f animationTarget(sitePosition.x + tileSize / 2.0f - avatarSize.x / 2.0f, sitePosition.y + tileSize / 2.0f - avatarSize.y / 2.0f);
 	if (direction == Direction::Invalid)
 	{

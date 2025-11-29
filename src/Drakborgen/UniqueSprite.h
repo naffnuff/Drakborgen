@@ -1,9 +1,12 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
-#include <SFML/Graphics/Sprite.hpp>
-#include "SFML/Graphics.hpp"
+namespace sf {
+class Texture;
+class Sprite;
+}
 
 class UniqueSprite
 {

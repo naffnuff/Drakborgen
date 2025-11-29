@@ -1,10 +1,10 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include "System.h"
 #include "Random.h"
+
+#include <memory>
+#include <vector>
 
 template<typename T, int Capacity>
 class Deck

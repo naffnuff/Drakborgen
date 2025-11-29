@@ -19,11 +19,11 @@ Card& Card::operator=(Card&& other) noexcept
 
 void Card::centerAround(sf::Vector2f position)
 {
-	sf::FloatRect bounds = getGlobalBounds();
+	sf::FloatRect bounds = getBounds();
 	setPosition({ position.x - float(bounds.width) / 2.0f, position.y - float(bounds.height) / 2.0f });
 }
 
-sf::FloatRect Card::getGlobalBounds()
+sf::FloatRect Card::getBounds() const
 {
 	return getTransform().transformRect(sprite.get().getLocalBounds());
 }

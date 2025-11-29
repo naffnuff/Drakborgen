@@ -2,6 +2,8 @@
 
 #include "System.h"
 
+#include <SFML/Graphics.hpp>
+
 UniqueSprite::UniqueSprite(const std::string& imagePath)
 	: texture(std::make_unique<sf::Texture>())
 	, sprite(std::make_unique<sf::Sprite>())

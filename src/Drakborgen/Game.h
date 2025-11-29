@@ -1,7 +1,5 @@
 #pragma once
 
-#include "UniqueSprite.h"
-
 #include "State.h"
 #include "Hero.h"
 #include "Card.h"
@@ -9,15 +7,12 @@
 #include "Board.h"
 #include "Deck.h"
 #include "Tile.h"
-#include "Animation.h"
-#include "Button.h"
-#include "Network.h"
-
-#define BLESS_THIS_MESS 1
-
-#include <map>
+#include "TextBox.h"
+#include "UniqueSprite.h"
 
 using TileDeck = Deck<Tile, 115>;
+
+class Engine;
 
 class Game
 {
@@ -31,24 +26,15 @@ private:
 	};
 
 public:
-	Game();
+	Game(Engine& engine, Random& random, Board& board);
 	
 	Game(const Game&) = delete;
 	Game& operator=(const Game&) = delete;
 
 	TileDeck& getTiles() { return tiles; }
 
-	void run();
-
 private:
-	void processSystemEvents();
-
-	using EventTable = std::array<std::function<void(Game&)>, (size_t)State::Count>;
-	void invokeEventHandler(const EventTable& eventTable);
-
 	void setState(State newState);
-
-	sf::Vector2f correctBoardPosition(sf::Vector2f boardPostion);
 
 	template<State>
 	void onBegin() {}
@@ -62,14 +48,16 @@ private:
 	template<State>
 	void onEnd() {}
 
-	void placeAtOrigin(std::unique_ptr<Card>& card) const;
-	void moveOffScreen(std::unique_ptr<Card>& card, float time, std::function<void()> callback);
-	void moveToCenter(std::unique_ptr<Card>& card, std::function<void()> callback);
-	sf::Vector2f getMouseBoardPosition() const;
-	int getMouseOverItemIndex(sf::Vector2f mousePosition) const;
+	void animate(sf::Transformable& transformable, sf::Vector2f target, float time, std::function<void()> doneCallback);
+
+	void pickHero(int heroIndex);
+	void requestGameStart();
+	void placeAtOrigin(Card* card) const;
+	void moveOffScreen(Card* card, float time, std::function<void()> callback);
+	void moveToCenter(Card* card, std::function<void()> callback);
 	std::vector<std::unique_ptr<Card>> getHeroCards();
 	void displayCard(std::unique_ptr<Card>&& card, std::function<void()> callback);
-	void displayCards(std::vector<std::unique_ptr<Card>>&& cards, std::function<void()> callback);
+	void displayCards(std::vector<std::unique_ptr<Card>>&& cards, std::function<void(int)> callback);
 	void panToNextFreeTower();
 	void createPlayer(int heroIndex);
 	void placeNewPlayer(Board::Site site, std::function<void()> callback);
@@ -82,44 +70,23 @@ private:
 	void createStateLogicMap();
 
 private:
-	template<State state>
-	friend struct StateHandlerInitializer;
+	Engine& engine;
 
-	Network network;
-
-	Random random;
-	sf::RenderWindow window;
-	Board board;
+	Random& random;
+	Board& board;
 	CardDisplay cardDisplay;
 	TileDeck tiles;
 
-	State state = State::NoState;
-
 	int playerCount = 4;
-
-	bool xCenteredBoard = false;
-	bool yCenteredBoard = false;
-
-	bool leftMouseButtonDown = false;
-	sf::Vector2f buttonPressedBoardPosition;
-	sf::Vector2f buttonPressedMousePosition;
-	sf::Vector2f buttonReleasedMousePosition;
-	int capturedItemIndex = 0;
 
 	bool preGameSetup = true;
 
 	std::vector<Hero> idleHeroes;
 	std::vector<Player> players;
 
-	std::vector<std::unique_ptr<Button>> buttons;
-
 	int activePlayerIndex = -1;
 
-	EventTable onBeginTable;
-	EventTable onTickTable;
-	EventTable onLeftMouseClickTable;
-	EventTable onEndTable;
-
-	AnimationManager animations;
+	template<State state, State endState, typename Handler>
+	friend struct StateHandlerInitializer;
 };
 

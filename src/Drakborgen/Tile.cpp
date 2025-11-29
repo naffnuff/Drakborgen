@@ -1,5 +1,7 @@
 #include "Tile.h"
 
+#include <SFML/Graphics.hpp>
+
 #include <iostream>
 
 Tile::Tile()

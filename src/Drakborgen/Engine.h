@@ -1,0 +1,83 @@
+#pragma once
+
+#include "State.h"
+#include "Network.h"
+
+#include "SFML/Graphics.hpp"
+
+#include <functional>
+#include <array>
+#include <set>
+
+#define BLESS_THIS_MESS 1
+
+class AnimationManager;
+class Board;
+class TextBox;
+class Button;
+
+class Engine
+{
+public:
+	Engine(AnimationManager& animations, Board& board);
+
+	void run();
+
+	sf::Vector2u getWindowSize();
+
+	void setState(State newState);
+
+	void animate(sf::Transformable& transformable, sf::Vector2f target, float time, std::function<void()> doneCallback);
+
+	void addButton(Button* button);
+	void removeButton(Button* button);
+
+	sf::Vector2f getMouseBoardPosition() const;
+	sf::Vector2f correctBoardPosition(sf::Vector2f boardPosition);
+
+	Network& getNetwork();
+
+	void createButton(const std::string& message, sf::Vector2f size, sf::Vector2f position, int textSize, std::function<void()> callback);
+	void clearButtons();
+
+private:
+	void processSystemEvents();
+
+	using EventTable = std::array<std::function<void()>, (size_t)State::Count>;
+	void invokeEventHandler(const EventTable& eventTable);
+
+	Button* getHitButton(sf::Vector2f position) const;
+
+private:
+	sf::RenderWindow window;
+
+	Network network;
+
+	State state = State::NoState;
+
+	EventTable onBeginTable;
+	EventTable onTickTable;
+	EventTable onLeftMouseClickTable;
+	EventTable onEndTable;
+
+	AnimationManager& animations;
+
+	Board& board;
+
+	bool xCenteredBoard = false;
+	bool yCenteredBoard = false;
+
+	bool leftMouseButtonDown = false;
+	sf::Vector2f buttonPressedBoardPosition;
+	sf::Vector2f buttonPressedMousePosition;
+	sf::Vector2f buttonReleasedMousePosition;
+	Button* capturedButton = nullptr;
+
+	std::set<Button*> buttons;
+
+	std::vector<std::unique_ptr<TextBox>> textBoxes;
+	std::vector<std::unique_ptr<Button>> internalButtons;
+
+	template<State state, State endState, typename Handler>
+	friend struct StateHandlerInitializer;
+};

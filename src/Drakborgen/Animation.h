@@ -1,8 +1,8 @@
 #pragma once
 
-#include <functional>
-
 #include "SFML/Graphics.hpp"
+
+#include <functional>
 
 class AnimationManager
 {

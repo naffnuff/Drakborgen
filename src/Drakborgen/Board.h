@@ -1,13 +1,14 @@
 #pragma once
 
-#include <memory>
-#include <array>
-
-#include "UniqueSprite.h"
-
 #include "Tile.h"
 #include "Card.h"
-#include "Animation.h"
+#include "UniqueSprite.h"
+
+#include <memory>
+#include <array>
+#include <functional>
+
+class AnimationManager;
 
 class Board : public sf::Drawable, public sf::Transformable
 {

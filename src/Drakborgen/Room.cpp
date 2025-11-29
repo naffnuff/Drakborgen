@@ -1,8 +1,8 @@
 #include "Room.h"
 
-#include <iostream>
-
 #include "System.h"
+
+#include <iostream>
 
 std::vector<std::vector<Direction>> Room::getExits(Direction entrance) const
 {

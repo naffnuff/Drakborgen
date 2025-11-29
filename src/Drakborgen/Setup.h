@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Game.h"
+
 #include <optional>
 #include <filesystem>
-
-#include "Game.h"
 
 class Setup
 {

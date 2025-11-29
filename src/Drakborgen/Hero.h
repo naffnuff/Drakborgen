@@ -20,7 +20,7 @@ public:
 	std::unique_ptr<Card> pullStatsCard();
 	void placeStatsCard(std::unique_ptr<Card> card);
 
-	std::unique_ptr<Card>& getStatsCard() { return statsCard; }
+	Card* getStatsCard() { return statsCard.get(); }
 
 private:
 	std::string id;

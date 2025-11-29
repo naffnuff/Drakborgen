@@ -1,31 +1,25 @@
 #include "CardDisplay.h"
 
+#include "Card.h"
+#include "Engine.h"
 #include "System.h"
 
-CardDisplay::CardDisplay(sf::Window& window)
-	: window(window)
+CardDisplay::CardDisplay(Engine& engine)
+	: engine(engine)
 {
 }
 
-int CardDisplay::hitTest(sf::Vector2f mousePosition) const
-{
-	for (int i = 0; i < cards.size(); ++i)
-	{
-		if (cards[i]->getGlobalBounds().contains(mousePosition))
-		{
-			return i;
-		}
-	}
-	return -1;
-}
-
-void CardDisplay::pushCard(std::unique_ptr<Card> card)
+void CardDisplay::pushCard(std::unique_ptr<Card> card, std::function<void()> buttonCallback)
 {
 	cards.push_back(std::move(card));
+	cardButtons.emplace_back(std::make_unique<Button>(cards.back().get(), buttonCallback));
+	engine.addButton(cardButtons.back().get());
 }
 
 std::unique_ptr<Card> CardDisplay::pullCard(int index)
 {
+	engine.removeButton(cardButtons[index].get());
+	cardButtons.erase(cardButtons.begin() + index);
 	std::unique_ptr<Card> card = std::move(cards[index]);
 	cards.erase(cards.begin() + index);
 	return card;
@@ -43,7 +37,7 @@ void CardDisplay::draw(sf::RenderTarget& target, sf::RenderStates states) const
 std::vector<sf::Vector2f> CardDisplay::getLayout(const std::vector<std::unique_ptr<Card>>& laidOutCards)
 {
 	std::vector<sf::Vector2f> layout(laidOutCards.size());
-	sf::Vector2u windowSize = window.getSize();
+	sf::Vector2u windowSize = engine.getWindowSize();
 	std::vector<std::pair<float, float>> quarters;
 	if (layout.size() == 1)
 	{
@@ -68,8 +62,8 @@ std::vector<sf::Vector2f> CardDisplay::getLayout(const std::vector<std::unique_p
 	for (int i = 0; i < quarters.size(); ++i)
 	{
 		layout[i] = { windowSize.x * quarters[i].first / 4.0f, windowSize.y * quarters[i].second / 4.0f };
-		layout[i].x -= laidOutCards[i]->getGlobalBounds().width / 2.0f;
-		layout[i].y -= laidOutCards[i]->getGlobalBounds().height / 2.0f;
+		layout[i].x -= laidOutCards[i]->getBounds().width / 2.0f;
+		layout[i].y -= laidOutCards[i]->getBounds().height / 2.0f;
 	}
 	return layout;
 }

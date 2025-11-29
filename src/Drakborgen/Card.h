@@ -1,8 +1,11 @@
 #pragma once
 
+#include "Visual.h"
 #include "UniqueSprite.h"
 
-class Card : public sf::Drawable, public sf::Transformable
+#include <SFML/Graphics.hpp>
+
+class Card : public Visual, public sf::Transformable
 {
 public:
 	Card(const std::string& imagePath);
@@ -14,7 +17,8 @@ public:
 	//Card& operator=(Card&& other) noexcept;
 
 	void centerAround(sf::Vector2f position);
-	sf::FloatRect getGlobalBounds();
+
+	sf::FloatRect getBounds() const override;
 
 	std::string imagePath;
 

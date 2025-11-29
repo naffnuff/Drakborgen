@@ -5,6 +5,10 @@
 #include "State.h"
 #include "UniqueSprite.h"
 
+#include <SFML/Graphics.hpp>
+
+#include <vector>
+
 enum class Direction
 {
 	Invalid = -1,

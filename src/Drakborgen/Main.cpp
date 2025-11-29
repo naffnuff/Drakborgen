@@ -1,7 +1,10 @@
 #include <iostream>
 
+#include "Animation.h"
 #include "Setup.h"
 #include "Game.h"
+#include "Engine.h"
+#include "MainMenu.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -11,9 +14,14 @@ int main()
 {
 	try
 	{
-		Game game;
+		AnimationManager animations;
+		Board board(animations);
+		Engine engine(animations, board);
+		Random random;
+		MainMenu mainMenu(engine, random);
+		Game game(engine, random, board);
 		Setup::setUpGame(game);
-		game.run();
+		engine.run();
 	}
 	catch (std::exception& e)
 	{

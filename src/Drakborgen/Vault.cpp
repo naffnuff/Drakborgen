@@ -1,8 +1,8 @@
 #include "Vault.h"
 
-#include <iostream>
-
 #include "System.h"
+
+#include <iostream>
 
 std::unique_ptr<Vault> Vault::makeVault(Direction section)
 {
