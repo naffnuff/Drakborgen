@@ -15,6 +15,7 @@ class AnimationManager;
 class Board;
 class TextBox;
 class Button;
+class Visual;
 
 class Engine
 {
@@ -29,16 +30,19 @@ public:
 
 	void animate(sf::Transformable& transformable, sf::Vector2f target, float time, std::function<void()> doneCallback);
 
-	void addButton(Button* button);
-	void removeButton(Button* button);
+	void addExternalButton(Button* button);
+	void removeExternalButton(Button* button);
+
+	void addExternalVisual(Visual* visual);
+	void removeExternalVisual(Visual* visual);
 
 	sf::Vector2f getMouseBoardPosition() const;
 	sf::Vector2f correctBoardPosition(sf::Vector2f boardPosition);
 
 	Network& getNetwork();
 
-	void createButton(const std::string& message, sf::Vector2f size, sf::Vector2f position, int textSize, std::function<void()> callback);
-	void clearButtons();
+	void createInternalButton(const std::string& message, sf::Vector2f size, sf::Vector2f position, int textSize, std::function<void()> callback);
+	void clearInternalButtons();
 
 private:
 	void processSystemEvents();
@@ -74,6 +78,7 @@ private:
 	Button* capturedButton = nullptr;
 
 	std::set<Button*> buttons;
+	std::set<Visual*> visuals;
 
 	std::vector<std::unique_ptr<TextBox>> textBoxes;
 	std::vector<std::unique_ptr<Button>> internalButtons;

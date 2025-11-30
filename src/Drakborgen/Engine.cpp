@@ -75,6 +75,10 @@ void Engine::run()
 
 		window.draw(board);
 
+		for (const Visual* visual : visuals)
+		{
+			window.draw(*visual);
+		}
 		for (const Button* button : buttons)
 		{
 			window.draw(*button);
@@ -109,16 +113,19 @@ Network& Engine::getNetwork()
 	return network;
 }
 
-void Engine::createButton(const std::string& message, sf::Vector2f size, sf::Vector2f position, int textSize, std::function<void()> callback)
+void Engine::createInternalButton(const std::string& message, sf::Vector2f size, sf::Vector2f position, int textSize, std::function<void()> callback)
 {
 	textBoxes.emplace_back(std::make_unique<TextBox>(message, size, position, textSize));
 	internalButtons.emplace_back(std::make_unique<Button>(textBoxes.back().get(), callback));
 	buttons.insert(internalButtons.back().get());
 }
 
-void Engine::clearButtons()
+void Engine::clearInternalButtons()
 {
-	buttons.clear();
+	for (std::unique_ptr<Button>& button : internalButtons)
+	{
+		buttons.erase(button.get());
+	}
 	internalButtons.clear();
 	textBoxes.clear();
 }
@@ -138,14 +145,24 @@ void Engine::animate(sf::Transformable& transformable, sf::Vector2f target, floa
 	animations.add(transformable, target, time, doneCallback);
 }
 
-void Engine::addButton(Button* button)
+void Engine::addExternalButton(Button* button)
 {
 	buttons.insert(button);
 }
 
-void Engine::removeButton(Button* button)
+void Engine::removeExternalButton(Button* button)
 {
 	buttons.erase(button);
+}
+
+void Engine::addExternalVisual(Visual* visual)
+{
+	visuals.insert(visual);
+}
+
+void Engine::removeExternalVisual(Visual* visual)
+{
+	visuals.erase(visual);
 }
 
 sf::Vector2f Engine::getMouseBoardPosition() const
@@ -212,13 +229,16 @@ void Engine::processSystemEvents()
 				buttonReleasedMousePosition.x = float(event.mouseButton.x);
 				buttonReleasedMousePosition.y = float(event.mouseButton.y);
 				Button* mouseOverButton = getHitButton(buttonReleasedMousePosition);
-				if (mouseOverButton)
+				if (mouseOverButton == capturedButton)
 				{
-					mouseOverButton->click();
-				}
-				else if (capturedButton == nullptr)
-				{
-					invokeEventHandler(onLeftMouseClickTable);
+					if (mouseOverButton)
+					{
+						mouseOverButton->click();
+					}
+					else
+					{
+						invokeEventHandler(onLeftMouseClickTable);
+					}
 				}
 			}
 		}

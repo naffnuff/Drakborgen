@@ -13,12 +13,12 @@ void CardDisplay::pushCard(std::unique_ptr<Card> card, std::function<void()> but
 {
 	cards.push_back(std::move(card));
 	cardButtons.emplace_back(std::make_unique<Button>(cards.back().get(), buttonCallback));
-	engine.addButton(cardButtons.back().get());
+	engine.addExternalButton(cardButtons.back().get());
 }
 
 std::unique_ptr<Card> CardDisplay::pullCard(int index)
 {
-	engine.removeButton(cardButtons[index].get());
+	engine.removeExternalButton(cardButtons[index].get());
 	cardButtons.erase(cardButtons.begin() + index);
 	std::unique_ptr<Card> card = std::move(cards[index]);
 	cards.erase(cards.begin() + index);

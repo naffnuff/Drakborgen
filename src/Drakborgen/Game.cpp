@@ -48,7 +48,6 @@ void Game::onBegin<State::SetupGame>()
 template<>
 void Game::onBegin<State::PickStartTower>()
 {
-	panToNextFreeTower();
 	board.showMoveSites(true);
 }
 
@@ -131,23 +130,19 @@ void Game::onBegin<State::TurnEnd>()
 
 void Game::pickHero(int heroIndex)
 {
-	engine.clearButtons();
+	engine.clearInternalButtons();
+	panToNextFreeTower();
 	createPlayer(heroIndex);
 	setState(State::PickStartTower);
 }
 
 void Game::requestGameStart()
 {
-	engine.clearButtons();
+	engine.clearInternalButtons();
 	for (int i = int(idleHeroes.size()) - 1; i >= 0; --i)
 	{
 		std::unique_ptr<Card> card = cardDisplay.pullCard(i);
-		std::function<void()> callback = []() {};
-		if (i == idleHeroes.size() - 1)
-		{
-			callback = [this]() { preGameSetup = false; };
-		}
-		moveOffScreen(card.get(), float(i + 1) / float(idleHeroes.size()), callback);
+		moveOffScreen(card.get(), float(i + 1) / float(idleHeroes.size()), []() {});
 		idleHeroes[i].placeStatsCard(std::move(card));
 	}
 	startNewGame();
@@ -165,7 +160,8 @@ void Game::moveOffScreen(Card* card, float time, std::function<void()> callback)
 {
 	sf::Vector2u windowSize = engine.getWindowSize();
 	sf::Vector2f cardSize = card->getBounds().getSize();
-	engine.animate(*card, { float(windowSize.x), -cardSize.y }, time, callback);
+	engine.addExternalVisual(card);
+	engine.animate(*card, { float(windowSize.x), -cardSize.y }, time, [this, card, callback]() { engine.removeExternalVisual(card); callback(); });
 }
 
 void Game::moveToCenter(Card* card, std::function<void()> callback)
@@ -289,7 +285,10 @@ void Game::placeNewPlayer(Board::Site site, std::function<void()> callback)
 		THROW;
 	}
 	std::unique_ptr<Card> card = cardDisplay.pullCard(0);
-	std::function<void()> cardAnimationCallback = [this, &player, site, callback]() {
+	Card* cardPtr = card.get();
+	engine.addExternalVisual(cardPtr);
+	std::function<void()> cardAnimationCallback = [this, &player, site, cardPtr, callback]() {
+		engine.removeExternalVisual(cardPtr);
 		board.addPlayer(Setup::getMediaPath() + "hjaltekort/" + player.hero.getId() + "gubbe.png", player.avatarIndex);
 		board.setPlayerSite(player.avatarIndex, { site, Direction::Invalid }, callback);
 		placeAtOrigin(player.hero.getStatsCard());
@@ -334,7 +333,7 @@ void Game::onNewPlayerPlaced()
 	{
 		sf::Vector2f buttonSize(500.0f, 200.0f);
 		sf::Vector2f buttonPosition(engine.getWindowSize().x * 3.0f / 4.0f - buttonSize.x / 2.0f, engine.getWindowSize().y * 3.0f / 4.0f - buttonSize.y / 2.0f);
-		engine.createButton("Låt äventyret börja!", buttonSize, buttonPosition, 60, [this]() { requestGameStart(); });
+		engine.createInternalButton("Låt äventyret börja!", buttonSize, buttonPosition, 60, [this]() { requestGameStart(); });
 		displayCards(getHeroCards(), [this](int heroIndex) { pickHero(heroIndex); });
 	}
 }
@@ -360,7 +359,7 @@ void Game::startPlayerRound()
 	std::stringstream ss;
 	ss << player.hero.getName() << std::endl;
 	ss << "Kroppspoäng: " << player.life << " / " << player.hero.getMaxLife();
-	engine.createButton(ss.str(), size, position, 30, [this]() { setState(State::ViewStatsCard); });
+	engine.createInternalButton(ss.str(), size, position, 30, [this]() { setState(State::ViewStatsCard); });
 	board.setPlayerMoveSites(player.boardSite);
 	board.showMoveSites(true);
 	sf::Vector2u windowSize = engine.getWindowSize();
