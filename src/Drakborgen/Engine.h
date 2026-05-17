@@ -9,7 +9,7 @@
 #include <array>
 #include <set>
 
-#define BLESS_THIS_MESS 1
+#define BLESS_THIS_MESS 0
 
 class AnimationManager;
 class Board;

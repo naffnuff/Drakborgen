@@ -1,12 +1,13 @@
 #pragma once
 
 #include <random>
+#include <algorithm>
 
 class Random
 {
 public:
 	Random();
-	
+
 	Random(const Random&) = delete;
 	Random& operator=(const Random&) = delete;
 
@@ -25,4 +26,3 @@ void Random::shuffle(Container& container)
 {
 	std::shuffle(container.begin(), container.end(), generator);
 }
-

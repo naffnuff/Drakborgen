@@ -1,5 +1,7 @@
 #include "Animation.h"
 
+#include <cmath>
+
 #include "System.h"
 
 void AnimationManager::update(float elapsedTime, float)

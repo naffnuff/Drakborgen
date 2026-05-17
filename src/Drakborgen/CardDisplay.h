@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <functional>
+#include <memory>
 
 class Card;
 class Engine;
@@ -14,10 +15,10 @@ class CardDisplay : public sf::Drawable, public sf::Transformable
 {
 public:
 	CardDisplay(Engine& engine);
-	
+
 	CardDisplay(const CardDisplay&) = delete;
 	CardDisplay& operator=(const CardDisplay&) = delete;
-	
+
 	int cardCount() const { return int(cards.size()); }
 
 	void pushCard(std::unique_ptr<Card> card, std::function<void()> buttonCallback);
@@ -33,4 +34,3 @@ private:
 	std::vector<std::unique_ptr<Card>> cards;
 	std::vector<std::unique_ptr<Button>> cardButtons;
 };
-

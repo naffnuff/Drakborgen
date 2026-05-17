@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SFML/Graphics.hpp"
+#include "SFML/Graphics/Drawable.hpp"
 
 #include <functional>
 
@@ -22,4 +22,3 @@ private:
 	Visual* visual = nullptr;
 	std::function<void()> callback;
 };
-

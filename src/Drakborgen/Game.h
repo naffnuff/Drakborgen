@@ -7,8 +7,6 @@
 #include "Board.h"
 #include "Deck.h"
 #include "Tile.h"
-#include "TextBox.h"
-#include "UniqueSprite.h"
 
 using TileDeck = Deck<Tile, 115>;
 
@@ -27,7 +25,7 @@ private:
 
 public:
 	Game(Engine& engine, Random& random, Board& board);
-	
+
 	Game(const Game&) = delete;
 	Game& operator=(const Game&) = delete;
 
@@ -89,4 +87,3 @@ private:
 	template<State state, State endState, typename Handler>
 	friend struct StateHandlerInitializer;
 };
-

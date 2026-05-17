@@ -5,7 +5,9 @@
 
 #include <SFML/Network.hpp>
 
+#include <chrono>
 #include <iostream>
+#include <thread>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -125,7 +127,7 @@ void NetworkServer::operator()()
 
 			while (network.connected)
 			{
-				Sleep(5000);
+				std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
 				for (int i = 0; i < clients.size() && network.connected; ++i)
 				{
@@ -172,9 +174,9 @@ void NetworkServer::operator()()
 	}
 	catch (std::exception& e)
 	{
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_INTENSITY));
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_INTENSITY));
 		std::cerr << std::endl << e.what() << std::endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY));
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY));
 	}
 }
 
@@ -220,7 +222,7 @@ void NetworkClient::operator()()
 
 			while (network.connected)
 			{
-				Sleep(2000);
+			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
 				const char data[] = { 'g' };
 				size_t sent = 0;
@@ -256,9 +258,9 @@ void NetworkClient::operator()()
 	}
 	catch (std::exception& e)
 	{
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_INTENSITY));
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_INTENSITY));
 		std::cerr << std::endl << e.what() << std::endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY));
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY));
 	}
 }
 

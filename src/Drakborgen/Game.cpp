@@ -5,8 +5,6 @@
 #include "Engine.h"
 #include "StateHandlerInitializer.h"
 
-#include "SFML/Graphics.hpp"
-
 #include <iostream>
 #include <sstream>
 #include <memory>

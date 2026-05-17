@@ -419,3 +419,5 @@ FodyWeavers.xsd
 
 # vcpkg dependencies
 vcpkg_installed
+
+compile_commands.json
